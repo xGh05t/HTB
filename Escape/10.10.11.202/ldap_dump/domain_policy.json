@@ -1,0 +1,176 @@
+[{
+    "attributes": {
+        "auditingPolicy": [
+            "\u0000\u0001"
+        ],
+        "creationTime": [
+            "2023-03-11 06:21:16.769262+00:00"
+        ],
+        "dSASignature": [
+            {
+                "encoded": "AQAAACgAAAAAAAAAAAAAAAAAAAAAAAAAcL1Y5y+ph0+W9FIvYUwv7g==",
+                "encoding": "base64"
+            }
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "dc": [
+            "sequel"
+        ],
+        "distinguishedName": [
+            "DC=sequel,DC=htb"
+        ],
+        "fSMORoleOwner": [
+            "CN=NTDS Settings,CN=DC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=sequel,DC=htb"
+        ],
+        "forceLogoff": [
+            -9223372036854775808
+        ],
+        "gPLink": [
+            "[LDAP://CN={31B2F340-016D-11D2-945F-00C04FB984F9},CN=Policies,CN=System,DC=sequel,DC=htb;0]"
+        ],
+        "instanceType": [
+            5
+        ],
+        "isCriticalSystemObject": [
+            true
+        ],
+        "lockOutObservationWindow": [
+            "0:30:00"
+        ],
+        "lockoutDuration": [
+            "0:30:00"
+        ],
+        "lockoutThreshold": [
+            0
+        ],
+        "masteredBy": [
+            "CN=NTDS Settings,CN=DC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=sequel,DC=htb"
+        ],
+        "maxPwdAge": [
+            "42 days, 0:00:00"
+        ],
+        "minPwdAge": [
+            "1 day, 0:00:00"
+        ],
+        "minPwdLength": [
+            7
+        ],
+        "modifiedCount": [
+            1
+        ],
+        "modifiedCountAtLastProm": [
+            0
+        ],
+        "ms-DS-MachineAccountQuota": [
+            0
+        ],
+        "msDS-AllUsersTrustQuota": [
+            1000
+        ],
+        "msDS-Behavior-Version": [
+            7
+        ],
+        "msDS-ExpirePasswordsOnSmartCardOnlyAccounts": [
+            true
+        ],
+        "msDS-IsDomainFor": [
+            "CN=NTDS Settings,CN=DC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=sequel,DC=htb"
+        ],
+        "msDS-NcType": [
+            0
+        ],
+        "msDS-PerUserTrustQuota": [
+            1
+        ],
+        "msDS-PerUserTrustTombstonesQuota": [
+            10
+        ],
+        "msDs-masteredBy": [
+            "CN=NTDS Settings,CN=DC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=sequel,DC=htb"
+        ],
+        "nTMixedDomain": [
+            0
+        ],
+        "name": [
+            "sequel"
+        ],
+        "nextRid": [
+            1000
+        ],
+        "objectCategory": [
+            "CN=Domain-DNS,CN=Schema,CN=Configuration,DC=sequel,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "domain",
+            "domainDNS"
+        ],
+        "objectGUID": [
+            "{7c4ace6b-9788-44a5-a1a6-8424bcb61f5b}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209"
+        ],
+        "otherWellKnownObjects": [
+            "B:32:683A24E2E8164BD3AF86AC3C2CF3F981:CN=Keys,DC=sequel,DC=htb",
+            "B:32:1EB93889E40C45DF9F0C64D23BBB6237:CN=Managed Service Accounts,DC=sequel,DC=htb"
+        ],
+        "pwdHistoryLength": [
+            24
+        ],
+        "pwdProperties": [
+            1
+        ],
+        "rIDManagerReference": [
+            "CN=RID Manager$,CN=System,DC=sequel,DC=htb"
+        ],
+        "replUpToDateVector": [
+            {
+                "encoded": "AgAAAAAAAAARAAAAAAAAAOGqyw8b2ARJjcPvk94aDBgSQAEAAAAAAL/t6xkDAAAA/XJXFM+Mn0OPb7CRTm3JshzgAQAAAAAA1r/xGQMAAAAG/6EXDIBzRoGP5F5XHpsEB5AAAAAAAABLHeoZAwAAAMmSvhnhqVBEuH2pJQYV+XUUYAEAAAAAAGKb7BkDAAAANrPfPCA+b0W99rlrxXH5/SVwAgAAAAAA264cGgMAAAA1goVApBI0RbZSzVJLHIOBICACAAAAAAA3BfMZAwAAAPksu0LzqrhKhFTjrKT7T4IhMAIAAAAAAMII8xkDAAAADKBtRQNjaUaSm3NDHJW2kx3wAQAAAAAAduzxGQMAAAAzMV1hGdNTTrPtsou0kiw4GKABAAAAAAD52uwZAwAAAL4S/nA0asZFu53O/jJRM/IjUAIAAAAAAIJm8xkDAAAAuEPXfswwS02nuMgSeWiA4QigAAAAAAAAs13rGQMAAADPOo2Tpf/1TLy8aJ1Oh63QG9ABAAAAAABzqvEZAwAAAD58xa+FcUZPlwLh2rOv5s4OAAEAAAAAAKK66xkDAAAAlSKW31TJR0eGrPwzXDw0dArAAAAAAAAAibDrGQMAAACRuMng1sh+S44k8w06rkl5IkACAAAAAABgFPMZAwAAAHC9WOcvqYdPlvRSL2FML+4GgAAAAAAAADPF5BkDAAAAzwK07bTzeUWZ0cym53sfcSRgAgAAAAAAk5kEGgMAAAA=",
+                "encoding": "base64"
+            }
+        ],
+        "serverState": [
+            1
+        ],
+        "subRefs": [
+            "DC=ForestDnsZones,DC=sequel,DC=htb",
+            "DC=DomainDnsZones,DC=sequel,DC=htb",
+            "CN=Configuration,DC=sequel,DC=htb"
+        ],
+        "systemFlags": [
+            -1946157056
+        ],
+        "uASCompat": [
+            1
+        ],
+        "uSNChanged": [
+            159791
+        ],
+        "uSNCreated": [
+            4099
+        ],
+        "wellKnownObjects": [
+            "B:32:6227F0AF1FC2410D8E3BB10615BB5B0F:CN=NTDS Quotas,DC=sequel,DC=htb",
+            "B:32:F4BE92A4C777485E878E9421D53087DB:CN=Microsoft,CN=Program Data,DC=sequel,DC=htb",
+            "B:32:09460C08AE1E4A4EA0F64AEE7DAA1E5A:CN=Program Data,DC=sequel,DC=htb",
+            "B:32:22B70C67D56E4EFB91E9300FCA3DC1AA:CN=ForeignSecurityPrincipals,DC=sequel,DC=htb",
+            "B:32:18E2EA80684F11D2B9AA00C04F79F805:CN=Deleted Objects,DC=sequel,DC=htb",
+            "B:32:2FBAC1870ADE11D297C400C04FD8D5CD:CN=Infrastructure,DC=sequel,DC=htb",
+            "B:32:AB8153B7768811D1ADED00C04FD8D5CD:CN=LostAndFound,DC=sequel,DC=htb",
+            "B:32:AB1D30F3768811D1ADED00C04FD8D5CD:CN=System,DC=sequel,DC=htb",
+            "B:32:A361B2FFFFD211D1AA4B00C04FD7D83A:OU=Domain Controllers,DC=sequel,DC=htb",
+            "B:32:AA312825768811D1ADED00C04FD8D5CD:CN=Computers,DC=sequel,DC=htb",
+            "B:32:A9D1CA15768811D1ADED00C04FD8D5CD:CN=Users,DC=sequel,DC=htb"
+        ],
+        "whenChanged": [
+            "2023-03-11 06:21:16+00:00"
+        ],
+        "whenCreated": [
+            "2022-11-18 17:11:46+00:00"
+        ]
+    },
+    "dn": "DC=sequel,DC=htb"
+}]

