@@ -1,0 +1,1480 @@
+[{
+    "attributes": {
+        "accountExpires": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "adminCount": [
+            1
+        ],
+        "badPasswordTime": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "badPwdCount": [
+            0
+        ],
+        "cn": [
+            "abc123"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "2023-03-17 21:31:05+00:00",
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "distinguishedName": [
+            "CN=abc123,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "2023-03-17 21:23:11.617619+00:00"
+        ],
+        "lastLogonTimestamp": [
+            "2023-03-17 21:23:06.966692+00:00"
+        ],
+        "logonCount": [
+            1
+        ],
+        "memberOf": [
+            "CN=Domain Admins,CN=Users,DC=flight,DC=htb"
+        ],
+        "name": [
+            "abc123"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{1fc65eb2-4dcf-4c2d-804a-32b2722fbd27}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-10602"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2023-03-17 21:21:32.239178+00:00"
+        ],
+        "sAMAccountName": [
+            "abc123"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            123036
+        ],
+        "uSNCreated": [
+            123010
+        ],
+        "userAccountControl": [
+            512
+        ],
+        "whenChanged": [
+            "2023-03-17 21:31:05+00:00"
+        ],
+        "whenCreated": [
+            "2023-03-17 21:21:32+00:00"
+        ]
+    },
+    "dn": "CN=abc123,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:26.129919+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "O.Possum"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Helpdesk"
+        ],
+        "distinguishedName": [
+            "CN=O.Possum,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "O.Possum"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{4eac161e-0877-4c4e-a716-b0628bc17f98}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1613"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:23.046320+00:00"
+        ],
+        "sAMAccountName": [
+            "O.Possum"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20563
+        ],
+        "uSNCreated": [
+            20559
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:23+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:23+00:00"
+        ]
+    },
+    "dn": "CN=O.Possum,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "badPwdCount": [
+            0
+        ],
+        "cn": [
+            "svc_apache"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Service Apache web"
+        ],
+        "distinguishedName": [
+            "CN=svc_apache,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "2023-03-17 12:16:36.018419+00:00"
+        ],
+        "lastLogonTimestamp": [
+            "2023-03-17 12:16:36.018419+00:00"
+        ],
+        "logonCount": [
+            26
+        ],
+        "name": [
+            "svc_apache"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{421d3197-8086-4f3e-b0f9-430feff3bd1e}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1612"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:23.014931+00:00"
+        ],
+        "sAMAccountName": [
+            "svc_apache"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            122923
+        ],
+        "uSNCreated": [
+            20553
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2023-03-17 12:16:36+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=svc_apache,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:41.272228+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "V.Stevens"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Secretary"
+        ],
+        "distinguishedName": [
+            "CN=V.Stevens,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "V.Stevens"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{71608ed7-8162-4ae3-87d7-e96665348c9e}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1611"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.983734+00:00"
+        ],
+        "sAMAccountName": [
+            "V.Stevens"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20551
+        ],
+        "uSNCreated": [
+            20547
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=V.Stevens,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:11.910902+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "D.Truff"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Project Manager"
+        ],
+        "distinguishedName": [
+            "CN=D.Truff,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "D.Truff"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{2455db07-91ae-4cdf-84d5-1fd5155b3694}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1610"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.952398+00:00"
+        ],
+        "sAMAccountName": [
+            "D.Truff"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20545
+        ],
+        "uSNCreated": [
+            20541
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=D.Truff,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:17.997881+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "I.Francis"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Nobody knows why he's here"
+        ],
+        "distinguishedName": [
+            "CN=I.Francis,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "I.Francis"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{8a98132f-d884-46a0-bd30-bdd00ef11d5a}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1609"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.921986+00:00"
+        ],
+        "sAMAccountName": [
+            "I.Francis"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20539
+        ],
+        "uSNCreated": [
+            20535
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=I.Francis,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "badPwdCount": [
+            0
+        ],
+        "cn": [
+            "W.Walker"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Payroll officer"
+        ],
+        "distinguishedName": [
+            "CN=W.Walker,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "W.Walker"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{9e6dce3c-004a-4f07-9fc0-8587ec4695bb}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1608"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.889946+00:00"
+        ],
+        "sAMAccountName": [
+            "W.Walker"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20533
+        ],
+        "uSNCreated": [
+            20529
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=W.Walker,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:09.881956+00:00"
+        ],
+        "badPwdCount": [
+            0
+        ],
+        "cn": [
+            "C.Bum"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Senior Web Developer"
+        ],
+        "distinguishedName": [
+            "CN=C.Bum,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "2023-03-17 21:13:18.038235+00:00"
+        ],
+        "lastLogonTimestamp": [
+            "2023-03-17 21:05:16.243711+00:00"
+        ],
+        "logonCount": [
+            9
+        ],
+        "memberOf": [
+            "CN=WebDevs,CN=Users,DC=flight,DC=htb"
+        ],
+        "name": [
+            "C.Bum"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{dba9fdd1-ba1f-49fd-aedc-0af770bf1583}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1607"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.858671+00:00"
+        ],
+        "sAMAccountName": [
+            "C.Bum"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            123004
+        ],
+        "uSNCreated": [
+            20523
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2023-03-17 21:05:16+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=C.Bum,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:24.097075+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "M.Gold"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Sysadmin"
+        ],
+        "distinguishedName": [
+            "CN=M.Gold,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "M.Gold"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{e3f8b43d-778b-4007-b9e2-780beff4468a}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1606"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.827652+00:00"
+        ],
+        "sAMAccountName": [
+            "M.Gold"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20521
+        ],
+        "uSNCreated": [
+            20517
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=M.Gold,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:22.065182+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "L.Kein"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Penetration tester"
+        ],
+        "distinguishedName": [
+            "CN=L.Kein,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "L.Kein"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{dbd2e4d8-e822-4066-bca2-e8eda6cc355a}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1605"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.796385+00:00"
+        ],
+        "sAMAccountName": [
+            "L.Kein"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20515
+        ],
+        "uSNCreated": [
+            20511
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=L.Kein,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:13.934143+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "G.Lors"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Sales manager"
+        ],
+        "distinguishedName": [
+            "CN=G.Lors,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "G.Lors"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{e7c5f762-2075-44bb-9a63-e6e9d01973d7}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1604"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.765944+00:00"
+        ],
+        "sAMAccountName": [
+            "G.Lors"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20509
+        ],
+        "uSNCreated": [
+            20505
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=G.Lors,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:28.171432+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "R.Cold"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "HR Assistant"
+        ],
+        "distinguishedName": [
+            "CN=R.Cold,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "R.Cold"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{cb38f5d6-e74b-4909-b028-8b5c3a4826fd}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1603"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.733765+00:00"
+        ],
+        "sAMAccountName": [
+            "R.Cold"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            20503
+        ],
+        "uSNCreated": [
+            20499
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2022-09-22 20:08:22+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=R.Cold,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "badPwdCount": [
+            0
+        ],
+        "cn": [
+            "S.Moon"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "description": [
+            "Junion Web Developer"
+        ],
+        "distinguishedName": [
+            "CN=S.Moon,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogonTimestamp": [
+            "2023-03-17 20:57:30.198420+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "name": [
+            "S.Moon"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{bf105bc0-3885-455f-9e30-01361bc9dbe5}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-1602"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:08:22.671164+00:00"
+        ],
+        "sAMAccountName": [
+            "S.Moon"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            123001
+        ],
+        "uSNCreated": [
+            20493
+        ],
+        "userAccountControl": [
+            66048
+        ],
+        "whenChanged": [
+            "2023-03-17 20:57:30+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 20:08:22+00:00"
+        ]
+    },
+    "dn": "CN=S.Moon,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "adminCount": [
+            1
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:20.028316+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "krbtgt"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "2022-09-22 20:32:29+00:00",
+            "2022-09-22 19:48:01+00:00",
+            "1601-01-01 00:04:16+00:00"
+        ],
+        "description": [
+            "Key Distribution Center Service Account"
+        ],
+        "distinguishedName": [
+            "CN=krbtgt,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "isCriticalSystemObject": [
+            true
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "memberOf": [
+            "CN=Denied RODC Password Replication Group,CN=Users,DC=flight,DC=htb"
+        ],
+        "msDS-SupportedEncryptionTypes": [
+            0
+        ],
+        "name": [
+            "krbtgt"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{5a5a297c-f181-49bb-9a08-7af4255b85d0}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-502"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 19:48:01.636721+00:00"
+        ],
+        "sAMAccountName": [
+            "krbtgt"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "servicePrincipalName": [
+            "kadmin/changepw"
+        ],
+        "showInAdvancedViewOnly": [
+            true
+        ],
+        "uSNChanged": [
+            24613
+        ],
+        "uSNCreated": [
+            12324
+        ],
+        "userAccountControl": [
+            514
+        ],
+        "whenChanged": [
+            "2022-09-22 20:32:29+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 19:48:01+00:00"
+        ]
+    },
+    "dn": "CN=krbtgt,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "9999-12-31 23:59:59.999999+00:00"
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:15.967121+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "Guest"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "2022-09-22 19:48:01+00:00",
+            "1601-01-01 00:00:01+00:00"
+        ],
+        "description": [
+            "Built-in account for guest access to the computer/domain"
+        ],
+        "distinguishedName": [
+            "CN=Guest,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "isCriticalSystemObject": [
+            true
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "logonCount": [
+            0
+        ],
+        "memberOf": [
+            "CN=Guests,CN=Builtin,DC=flight,DC=htb"
+        ],
+        "name": [
+            "Guest"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{2d0aaec7-af61-4f5b-8459-ca91a5c952d1}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-501"
+        ],
+        "primaryGroupID": [
+            514
+        ],
+        "pwdLastSet": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "sAMAccountName": [
+            "Guest"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            8197
+        ],
+        "uSNCreated": [
+            8197
+        ],
+        "userAccountControl": [
+            66082
+        ],
+        "whenChanged": [
+            "2022-09-22 19:47:40+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 19:47:40+00:00"
+        ]
+    },
+    "dn": "CN=Guest,CN=Users,DC=flight,DC=htb"
+},{
+    "attributes": {
+        "accountExpires": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "adminCount": [
+            1
+        ],
+        "badPasswordTime": [
+            "2023-03-17 20:57:07.837229+00:00"
+        ],
+        "badPwdCount": [
+            1
+        ],
+        "cn": [
+            "Administrator"
+        ],
+        "codePage": [
+            0
+        ],
+        "countryCode": [
+            0
+        ],
+        "dSCorePropagationData": [
+            "2022-09-22 20:32:29+00:00",
+            "2022-09-22 20:32:29+00:00",
+            "2022-09-22 19:48:01+00:00",
+            "1601-01-01 18:12:16+00:00"
+        ],
+        "description": [
+            "Built-in account for administering the computer/domain"
+        ],
+        "distinguishedName": [
+            "CN=Administrator,CN=Users,DC=flight,DC=htb"
+        ],
+        "instanceType": [
+            4
+        ],
+        "isCriticalSystemObject": [
+            true
+        ],
+        "lastLogoff": [
+            "1601-01-01 00:00:00+00:00"
+        ],
+        "lastLogon": [
+            "2023-03-17 12:16:59.237223+00:00"
+        ],
+        "lastLogonTimestamp": [
+            "2023-03-17 12:16:39.583384+00:00"
+        ],
+        "logonCount": [
+            54
+        ],
+        "logonHours": [
+            {
+                "encoded": "////////////////////////////",
+                "encoding": "base64"
+            }
+        ],
+        "memberOf": [
+            "CN=Group Policy Creator Owners,CN=Users,DC=flight,DC=htb",
+            "CN=Domain Admins,CN=Users,DC=flight,DC=htb",
+            "CN=Enterprise Admins,CN=Users,DC=flight,DC=htb",
+            "CN=Schema Admins,CN=Users,DC=flight,DC=htb",
+            "CN=Administrators,CN=Builtin,DC=flight,DC=htb"
+        ],
+        "name": [
+            "Administrator"
+        ],
+        "objectCategory": [
+            "CN=Person,CN=Schema,CN=Configuration,DC=flight,DC=htb"
+        ],
+        "objectClass": [
+            "top",
+            "person",
+            "organizationalPerson",
+            "user"
+        ],
+        "objectGUID": [
+            "{f2aac682-4e4e-4bfe-866b-f70085430df7}"
+        ],
+        "objectSid": [
+            "S-1-5-21-4078382237-1492182817-2568127209-500"
+        ],
+        "primaryGroupID": [
+            513
+        ],
+        "pwdLastSet": [
+            "2022-09-22 20:17:02.343126+00:00"
+        ],
+        "sAMAccountName": [
+            "Administrator"
+        ],
+        "sAMAccountType": [
+            805306368
+        ],
+        "uSNChanged": [
+            122926
+        ],
+        "uSNCreated": [
+            8196
+        ],
+        "userAccountControl": [
+            1114624
+        ],
+        "whenChanged": [
+            "2023-03-17 12:16:39+00:00"
+        ],
+        "whenCreated": [
+            "2022-09-22 19:47:40+00:00"
+        ]
+    },
+    "dn": "CN=Administrator,CN=Users,DC=flight,DC=htb"
+}]
