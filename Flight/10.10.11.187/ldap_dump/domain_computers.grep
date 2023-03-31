@@ -1,2 +1,0 @@
-cn	sAMAccountName	dNSHostName	operatingSystem	operatingSystemServicePack	operatingSystemVersion	lastLogon	userAccountControl	whenCreated	objectSid	description
-G0	G0$	g0.flight.htb	Windows Server 2019 Standard		10.0 (17763)	03/18/23 04:16:08	SERVER_TRUST_ACCOUNT, TRUSTED_FOR_DELEGATION	09/22/22 19:48:01	S-1-5-21-4078382237-1492182817-2568127209-1001	
