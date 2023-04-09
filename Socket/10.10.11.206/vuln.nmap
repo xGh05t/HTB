@@ -1,0 +1,80 @@
+# Nmap 7.93 scan initiated Sun Apr  9 05:37:17 2023 as: nmap -e tun0 -Pn -A --script=default,vuln -p22,80,5789 -oN vuln.nmap 10.10.11.206
+Nmap scan report for 10.10.11.206
+Host is up (0.075s latency).
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 4fe3a667a227f9118dc30ed773a02c28 (ECDSA)
+|_  256 816e78766b8aea7d1babd436b7f8ecc4 (ED25519)
+80/tcp   open  http    Apache httpd 2.4.52
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
+|_http-dombased-xss: Couldn't find any DOM based XSS.
+|_http-csrf: Couldn't find any CSRF vulnerabilities.
+|_http-passwd: ERROR: Script execution failed (use -d to debug)
+|_http-vuln-cve2013-7091: ERROR: Script execution failed (use -d to debug)
+|_http-title: Did not follow redirect to http://qreader.htb/
+5789/tcp open  unknown
+| fingerprint-strings: 
+|   GenericLines, GetRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Sun, 09 Apr 2023 05:37:51 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|     Failed to open a WebSocket connection: did not receive a valid HTTP request.
+|   HTTPOptions, RTSPRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Sun, 09 Apr 2023 05:37:52 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|     Failed to open a WebSocket connection: did not receive a valid HTTP request.
+|   Help, SSLSessionReq: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Sun, 09 Apr 2023 05:38:08 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|_    Failed to open a WebSocket connection: did not receive a valid HTTP request.
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port5789-TCP:V=7.93%I=7%D=4/9%Time=64324F2C%P=x86_64-pc-linux-gnu%r(Gen
+SF:ericLines,F4,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nDate:\x20Sun,\x2009
+SF:\x20Apr\x202023\x2005:37:51\x20GMT\r\nServer:\x20Python/3\.10\x20websoc
+SF:kets/10\.4\r\nContent-Length:\x2077\r\nContent-Type:\x20text/plain\r\nC
+SF:onnection:\x20close\r\n\r\nFailed\x20to\x20open\x20a\x20WebSocket\x20co
+SF:nnection:\x20did\x20not\x20receive\x20a\x20valid\x20HTTP\x20request\.\n
+SF:")%r(GetRequest,F4,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nDate:\x20Sun,
+SF:\x2009\x20Apr\x202023\x2005:37:51\x20GMT\r\nServer:\x20Python/3\.10\x20
+SF:websockets/10\.4\r\nContent-Length:\x2077\r\nContent-Type:\x20text/plai
+SF:n\r\nConnection:\x20close\r\n\r\nFailed\x20to\x20open\x20a\x20WebSocket
+SF:\x20connection:\x20did\x20not\x20receive\x20a\x20valid\x20HTTP\x20reque
+SF:st\.\n")%r(HTTPOptions,F4,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nDate:\
+SF:x20Sun,\x2009\x20Apr\x202023\x2005:37:52\x20GMT\r\nServer:\x20Python/3\
+SF:.10\x20websockets/10\.4\r\nContent-Length:\x2077\r\nContent-Type:\x20te
+SF:xt/plain\r\nConnection:\x20close\r\n\r\nFailed\x20to\x20open\x20a\x20We
+SF:bSocket\x20connection:\x20did\x20not\x20receive\x20a\x20valid\x20HTTP\x
+SF:20request\.\n")%r(RTSPRequest,F4,"HTTP/1\.1\x20400\x20Bad\x20Request\r\
+SF:nDate:\x20Sun,\x2009\x20Apr\x202023\x2005:37:52\x20GMT\r\nServer:\x20Py
+SF:thon/3\.10\x20websockets/10\.4\r\nContent-Length:\x2077\r\nContent-Type
+SF::\x20text/plain\r\nConnection:\x20close\r\n\r\nFailed\x20to\x20open\x20
+SF:a\x20WebSocket\x20connection:\x20did\x20not\x20receive\x20a\x20valid\x2
+SF:0HTTP\x20request\.\n")%r(Help,F4,"HTTP/1\.1\x20400\x20Bad\x20Request\r\
+SF:nDate:\x20Sun,\x2009\x20Apr\x202023\x2005:38:08\x20GMT\r\nServer:\x20Py
+SF:thon/3\.10\x20websockets/10\.4\r\nContent-Length:\x2077\r\nContent-Type
+SF::\x20text/plain\r\nConnection:\x20close\r\n\r\nFailed\x20to\x20open\x20
+SF:a\x20WebSocket\x20connection:\x20did\x20not\x20receive\x20a\x20valid\x2
+SF:0HTTP\x20request\.\n")%r(SSLSessionReq,F4,"HTTP/1\.1\x20400\x20Bad\x20R
+SF:equest\r\nDate:\x20Sun,\x2009\x20Apr\x202023\x2005:38:08\x20GMT\r\nServ
+SF:er:\x20Python/3\.10\x20websockets/10\.4\r\nContent-Length:\x2077\r\nCon
+SF:tent-Type:\x20text/plain\r\nConnection:\x20close\r\n\r\nFailed\x20to\x2
+SF:0open\x20a\x20WebSocket\x20connection:\x20did\x20not\x20receive\x20a\x2
+SF:0valid\x20HTTP\x20request\.\n");
+Service Info: Host: qreader.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sun Apr  9 05:39:42 2023 -- 1 IP address (1 host up) scanned in 144.72 seconds

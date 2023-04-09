@@ -1,0 +1,118 @@
+2023-04-09 05:28:16 GMT -- START TIME
+
+### Socket ###
+----------------------------------------
+|================================================================
+- Name: 
+- IP Address: 10.10.11.206 
+- OS: 
+- Notes: 
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// SCAN
+2023-04-09 05:35:20 GMT -- 
+ip=10.10.11.206
+
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80,5789
+
+2023-04-09 05:37:05 GMT -- 
+nmap -e tun0 -Pn -A --script=default,vuln -p$ports $ip -oN vuln.nmap
+
+
+# UDP scan
+2023-04-09 05:38:13 GMT -- 
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.10.11.206\t qreader.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// 80/tcp   open  http    Apache httpd 2.4.52
+//QReader
+//Simple tool, to extract and embed text in QR codes
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Browse
+firefox http://qreader.htb
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// scan website
+2023-04-09 05:44:17 GMT -- 
+nikto -h http://10.10.11.206 -o nikto_scan.txt
+//+ Apache/2.4.52 appears to be outdated (current is at least Apache/2.4.54). Apache 2.2.34 is the EOL for the 2.x branch.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// directory brute force
+2023-04-09 05:53:41 GMT -- 
+gobuster dir -u http://qreader.htb -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
+
+/report               (Status: 200) [Size: 4161]
+
+// vhost brute force
+2023-04-09 05:57:38 GMT -- 
+gobuster vhost -u qreader.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain -o vhosts-80.txt
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//Download the offline App from the site
+2023-04-09 06:05:08 GMT -- 
+wget http://qreader.htb/download/windows
+wget http://qreader.htb/download/linux
+
+mkdir qreader_bins/{linux,windows}
+unzip linux -d qreader_bins/linux
+unzip windows -d qreader_bins/windows
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RE on linux binary
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+file qreader
+//qreader: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=3f71fafa6e2e915b9bed491dd97e1bab785158de, for GNU/Linux 2.6.32, stripped
+
+chmod +x qreader
+
+2023-04-09 06:39:12 GMT -- 
+./qreader
+//Launches qreader
+
+gdb qreader
+(gdb) info functions
+
+//Interesting string compares
+0x00000000004020c0  strncmp@plt
+0x0000000000402290  strcmp@plt
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
