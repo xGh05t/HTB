@@ -1,4 +1,0 @@
-/embed               [33m (Status: 405)[0m [Size: 153]
-/reader              [33m (Status: 405)[0m [Size: 153]
-/report              [32m (Status: 200)[0m [Size: 4161]
-/server-status       [33m (Status: 403)[0m [Size: 276]
