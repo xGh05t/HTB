@@ -1,0 +1,4 @@
+root:x:0:0:root:/root:/bin/bash
+svc:x:1000:1000:svc:/home/svc:/bin/bash
+
+

