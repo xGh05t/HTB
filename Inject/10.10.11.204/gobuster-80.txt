@@ -1,5 +1,0 @@
-/blogs               [32m (Status: 200)[0m [Size: 5371]
-/environment         [31m (Status: 500)[0m [Size: 712]
-/error               [31m (Status: 500)[0m [Size: 106]
-/register            [32m (Status: 200)[0m [Size: 5654]
-/upload              [32m (Status: 200)[0m [Size: 1857]

