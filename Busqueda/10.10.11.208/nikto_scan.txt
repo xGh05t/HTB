@@ -1,7 +1,0 @@
-- Nikto v2.5.0/
-+ Target Host: searcher.htb
-+ Target Port: 80
-+ GET /: The anti-clickjacking X-Frame-Options header is not present. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options: 
-+ GET /: The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type. See: https://www.netsparker.com/web-vulnerability-scanner/vulnerabilities/missing-content-type-header/: 
-+ GET : Server banner changed from 'Werkzeug/2.1.2 Python/3.10.6' to 'Apache/2.4.52 (Ubuntu)'.
-+ OPTIONS OPTIONS: Allowed HTTP Methods: OPTIONS, GET, HEAD .

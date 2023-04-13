@@ -1,6 +1,0 @@
-405      GET        5l       20w      153c http://searcher.htb/search
-200      GET      430l      751w    13519c http://searcher.htb/
-403      GET        9l       28w      277c http://searcher.htb/server-status
-405      GET        5l       20w      153c http://searcher.htb/search
-200      GET      430l      751w    13519c http://searcher.htb/
-403      GET        9l       28w      277c http://searcher.htb/server-status
