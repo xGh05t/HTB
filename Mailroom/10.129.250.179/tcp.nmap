@@ -1,0 +1,28 @@
+# Nmap 7.93 scan initiated Sat Apr 15 21:16:11 2023 as: nmap -e tun0 -Pn -A -p22,80,626,4272,6416,13421,20702,29535,31203,44766,50930,53347,54828 -oN tcp.nmap 10.129.250.179
+Nmap scan report for 10.129.250.179
+Host is up (0.13s latency).
+
+PORT      STATE  SERVICE          VERSION
+22/tcp    open   ssh              OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 94bb2ffcaeb9b182afd789811aa76ce5 (RSA)
+|   256 821beb758b9630cf946e7957d9ddeca7 (ECDSA)
+|_  256 19fb45feb9e4275de5bbf35497dd68cf (ED25519)
+80/tcp    open   http             Apache httpd 2.4.54 ((Debian))
+|_http-server-header: Apache/2.4.54 (Debian)
+|_http-title: The Mail Room
+626/tcp   closed apple-imap-admin
+4272/tcp  closed vrml-multi-use
+6416/tcp  closed unknown
+13421/tcp closed unknown
+20702/tcp closed unknown
+29535/tcp closed unknown
+31203/tcp closed unknown
+44766/tcp closed unknown
+50930/tcp closed unknown
+53347/tcp closed unknown
+54828/tcp closed unknown
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Apr 15 21:16:35 2023 -- 1 IP address (1 host up) scanned in 23.92 seconds

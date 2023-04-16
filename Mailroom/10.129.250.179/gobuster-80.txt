@@ -1,0 +1,30 @@
+/.htm                [33m (Status: 403)[0m [Size: 279]
+/.html               [33m (Status: 403)[0m [Size: 279]
+/.hta                [33m (Status: 403)[0m [Size: 279]
+/.hta.html           [33m (Status: 403)[0m [Size: 279]
+/.htaccess           [33m (Status: 403)[0m [Size: 279]
+/.hta.txt            [33m (Status: 403)[0m [Size: 279]
+/.hta.php            [33m (Status: 403)[0m [Size: 279]
+/.htaccess.txt       [33m (Status: 403)[0m [Size: 279]
+/.htaccess.html      [33m (Status: 403)[0m [Size: 279]
+/.htaccess.php       [33m (Status: 403)[0m [Size: 279]
+/.hta.htm            [33m (Status: 403)[0m [Size: 279]
+/.htaccess.htm       [33m (Status: 403)[0m [Size: 279]
+/.htpasswd.txt       [33m (Status: 403)[0m [Size: 279]
+/.htpasswd.html      [33m (Status: 403)[0m [Size: 279]
+/.htpasswd           [33m (Status: 403)[0m [Size: 279]
+/.htpasswd.php       [33m (Status: 403)[0m [Size: 279]
+/.htpasswd.htm       [33m (Status: 403)[0m [Size: 279]
+/about.php           [32m (Status: 200)[0m [Size: 6891]
+/assets              [36m (Status: 301)[0m [Size: 317][34m [--> http://10.129.250.179/assets/][0m
+/contact.php         [32m (Status: 200)[0m [Size: 4317]
+/css                 [36m (Status: 301)[0m [Size: 314][34m [--> http://10.129.250.179/css/][0m
+/font                [36m (Status: 301)[0m [Size: 315][34m [--> http://10.129.250.179/font/][0m
+/index.php           [32m (Status: 200)[0m [Size: 7748]
+/index.php           [32m (Status: 200)[0m [Size: 7748]
+/inquiries           [36m (Status: 301)[0m [Size: 320][34m [--> http://10.129.250.179/inquiries/][0m
+/javascript          [36m (Status: 301)[0m [Size: 321][34m [--> http://10.129.250.179/javascript/][0m
+/js                  [36m (Status: 301)[0m [Size: 313][34m [--> http://10.129.250.179/js/][0m
+/server-status       [33m (Status: 403)[0m [Size: 279]
+/services.php        [32m (Status: 200)[0m [Size: 4336]
+/template            [33m (Status: 403)[0m [Size: 279]

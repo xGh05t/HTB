@@ -1,0 +1,33 @@
+# Nmap 7.93 scan initiated Sat Apr 15 21:20:59 2023 as: nmap -e tun0 -Pn -sV --script=vuln -p22,80,626,4272,6416,13421,20702,29535,31203,44766,50930,53347,54828 -oN vuln.nmap 10.129.250.179
+Nmap scan report for 10.129.250.179
+Host is up (0.13s latency).
+
+PORT      STATE  SERVICE          VERSION
+22/tcp    open   ssh              OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+80/tcp    open   http             Apache httpd 2.4.54 ((Debian))
+|_http-dombased-xss: Couldn't find any DOM based XSS.
+| http-csrf: 
+| Spidering limited to: maxdepth=3; maxpagecount=20; withinhost=10.129.250.179
+|   Found the following possible CSRF vulnerabilities: 
+|     
+|     Path: http://10.129.250.179:80/contact.php
+|     Form id: email
+|_    Form action: contact.php
+|_http-server-header: Apache/2.4.54 (Debian)
+|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
+|_http-vuln-cve2017-1001000: ERROR: Script execution failed (use -d to debug)
+626/tcp   closed apple-imap-admin
+4272/tcp  closed vrml-multi-use
+6416/tcp  closed unknown
+13421/tcp closed unknown
+20702/tcp closed unknown
+29535/tcp closed unknown
+31203/tcp closed unknown
+44766/tcp closed unknown
+50930/tcp closed unknown
+53347/tcp closed unknown
+54828/tcp closed unknown
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat Apr 15 21:21:54 2023 -- 1 IP address (1 host up) scanned in 54.94 seconds
