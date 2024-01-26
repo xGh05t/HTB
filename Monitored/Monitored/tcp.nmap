@@ -1,0 +1,37 @@
+# Nmap 7.94SVN scan initiated Fri Jan 26 00:27:17 2024 as: nmap -Pn -A -p22,80,389,443,5667 -oN tcp.nmap 10.129.30.53
+Nmap scan report for 10.129.30.53
+Host is up (0.11s latency).
+
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 61:e2:e7:b4:1b:5d:46:dc:3b:2f:91:38:e6:6d:c5:ff (RSA)
+|   256 29:73:c5:a5:8d:aa:3f:60:a9:4a:a3:e5:9f:67:5c:93 (ECDSA)
+|_  256 6d:7a:f9:eb:8e:45:c2:02:6a:d5:8d:4d:b3:a3:37:6f (ED25519)
+80/tcp   open  http       Apache httpd 2.4.56
+|_http-title: Did not follow redirect to https://nagios.monitored.htb/
+|_http-server-header: Apache/2.4.56 (Debian)
+389/tcp  open  ldap       OpenLDAP 2.2.X - 2.3.X
+443/tcp  open  ssl/http   Apache httpd 2.4.56 ((Debian))
+|_http-server-header: Apache/2.4.56 (Debian)
+|_http-title: Nagios XI
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+| ssl-cert: Subject: commonName=nagios.monitored.htb/organizationName=Monitored/stateOrProvinceName=Dorset/countryName=UK
+| Not valid before: 2023-11-11T21:46:55
+|_Not valid after:  2297-08-25T21:46:55
+5667/tcp open  tcpwrapped
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Aggressive OS guesses: Linux 4.15 - 5.8 (96%), Linux 5.3 - 5.4 (95%), Linux 2.6.32 (95%), Linux 5.0 - 5.5 (95%), Linux 3.1 (95%), Linux 3.2 (95%), AXIS 210A or 211 Network Camera (Linux 2.6.17) (95%), ASUS RT-N56U WAP (Linux 3.4) (93%), Linux 3.16 (93%), Linux 5.0 - 5.4 (93%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+Service Info: Host: nagios.monitored.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+TRACEROUTE (using port 22/tcp)
+HOP RTT       ADDRESS
+1   68.55 ms  10.10.16.1
+2   141.35 ms 10.129.30.53
+
+OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Fri Jan 26 00:27:42 2024 -- 1 IP address (1 host up) scanned in 24.86 seconds

@@ -1,0 +1,110 @@
+2024-01-26 00:19:23 CST -- START TIME
+### Monitored ###
+--------------------------------------
+
+
+|================================================================
+- Name: 
+- IP Address: 10.129.30.53
+- OS: 
+- Notes: 
+
+//CREDS:
+
+//Flags:
+#User:
+#System:
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+ping -c3 10.129.30.53
+64 bytes from 10.129.30.53: icmp_seq=1 ttl=63 time=65.6 ms
+64 bytes from 10.129.30.53: icmp_seq=2 ttl=63 time=65.4 ms
+64 bytes from 10.129.30.53: icmp_seq=3 ttl=63 time=67.2 ms
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.30.53
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//22,80,389,443,5667
+
+2024-01-26 00:27:03 CST -- 
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT     STATE SERVICE    VERSION
+22/tcp   open  ssh        OpenSSH 8.4p1 Debian 5+deb11u3 (protocol 2.0)
+| ssh-hostkey: 
+|   3072 61:e2:e7:b4:1b:5d:46:dc:3b:2f:91:38:e6:6d:c5:ff (RSA)
+|   256 29:73:c5:a5:8d:aa:3f:60:a9:4a:a3:e5:9f:67:5c:93 (ECDSA)
+|_  256 6d:7a:f9:eb:8e:45:c2:02:6a:d5:8d:4d:b3:a3:37:6f (ED25519)
+80/tcp   open  http       Apache httpd 2.4.56
+|_http-title: Did not follow redirect to https://nagios.monitored.htb/
+|_http-server-header: Apache/2.4.56 (Debian)
+389/tcp  open  ldap       OpenLDAP 2.2.X - 2.3.X
+443/tcp  open  ssl/http   Apache httpd 2.4.56 ((Debian))
+|_http-server-header: Apache/2.4.56 (Debian)
+|_http-title: Nagios XI
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+| ssl-cert: Subject: commonName=nagios.monitored.htb/organizationName=Monitored/stateOrProvinceName=Dorset/countryName=UK
+| Not valid before: 2023-11-11T21:46:55
+|_Not valid after:  2297-08-25T21:46:55
+5667/tcp open  tcpwrapped
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Aggressive OS guesses: Linux 4.15 - 5.8 (96%), Linux 5.3 - 5.4 (95%), Linux 2.6.32 (95%), Linux 5.0 - 5.5 (95%), Linux 3.1 (95%), Linux 3.2 (95%), AXIS 210A or 211 Network Camera (Linux 2.6.17) (95%), ASUS RT-N56U WAP (Linux 3.4) (93%), Linux 3.16 (93%), Linux 5.0 - 5.4 (93%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+Service Info: Host: nagios.monitored.htb; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT    STATE         SERVICE
+68/udp  open|filtered dhcpc
+123/udp open          ntp
+161/udp open          snmp
+162/udp open|filtered snmptrap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.30.53\tmonitored.htb nagios.monitored.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# gobuster use
+gobuster dir -u <URL> -w <WordList> -t <Threads> -x <FileExtensions>
+
+// directory brute force
+gobuster dir -u http://www.example.site -w /usr/share/dirb/wordlists/common.txt -t 3 -x php,txt,html,htm -o gobuster-80.txt
+
+// vhost brute force
+gobuster vhost -u http://monitored.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+ffuf -u "https://nagios.monitored.htb/nagiosxi/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-small.txt -r
+
+
+ffuf -u "https://nagios.monitored.htb/nagiosxi/api/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-small.txt -r -recursion
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
