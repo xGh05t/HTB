@@ -1,0 +1,149 @@
+2024-06-07 11:48:10 CDT -- START TIME
+### Ignition ###
+--------------------------------------
+
+|================================================================
+- Name: Ignition
+- IP Address: 10.129.1.27
+- OS: 
+- Notes: 
+
+//CREDS: Magento admin/qwerty123
+
+//Flag: 797d6c988d9dc5865e010b9410f247e0
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// TASKS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+#1 Which service version is found to be running on port 80?
+    nginx 1.14.2
+
+#2 What is the 3-digit HTTP status code returned when you visit http://{machine IP}/?
+    302
+
+#3 What is the virtual host name the webpage expects to be accessed by?
+    ignition.htb
+
+#4 What is the full path to the file on a Linux computer that holds a local list of domain name to IP address pairs?
+	/etc/hosts
+
+#5 Use a tool to brute force directories on the webserver. What is the full URL to the Magento login page?
+	http://ignition.htb/admin
+
+#6 Look up the password requirements for Magento and also try searching for the most common passwords of 2023. Which password provides access to the admin account?
+	qwerty123
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-06-07 11:58:37 CDT -- 
+// SCAN
+ip=10.129.1.27
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//80
+
+2024-06-07 12:00:36 CDT -- 
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+80/tcp open  http    nginx 1.14.2
+|_http-title: Did not follow redirect to http://ignition.htb/
+
+# UDP scan
+2024-06-07 12:02:21 CDT -- 
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT    STATE         SERVICE
+68/udp  open|filtered dhcpc
+998/udp open|filtered puparp
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+sudo sh -c "echo '10.129.1.27 ignition.htb' >> /etc/hosts"
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+# Web Pentesting
+
+// Web Version
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Stealthy
+whatweb -a 1 http://ignition.htb
+
+http://ignition.htb [200 OK] Country[RESERVED][ZZ], HTML5, HTTPServer[nginx/1.14.2], IP[10.129.1.27], Magento, Script[text&#x2F;javascript,text/javascript,text/x-magento-init], Title[Home page], UncommonHeaders[content-security-policy-report-only,x-content-type-options], X-Frame-Options[SAMEORIGIN], X-XSS-Protection[1; mode=block], nginx[1.14.2
+
+//Heavy
+whatweb -a 4 http://ignition.htb
+
+http://ignition.htb [200 OK] Cookies[PHPSESSID], Country[RESERVED][ZZ], HTML5, HTTPServer[nginx/1.14.2], HttpOnly[PHPSESSID], IP[10.129.1.27], Magento, Matomo, Script[text&#x2F;javascript,text/javascript,text/x-magento-init], Title[Home page], UncommonHeaders[content-security-policy-report-only,x-content-type-options], X-Frame-Options[SAMEORIGIN], X-XSS-Protection[1; mode=block], nginx[1.14.2]
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// gobuster --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-06-07 13:40:45 CDT -- 
+// directory brute force
+gobuster dir -u http://ignition.htb -w /usr/share/dirb/wordlists/common.txt -o gobuster-80.txt
+
+/0                    (Status: 200) [Size: 25803]
+/admin                (Status: 200) [Size: 7095]
+/catalog              (Status: 302) [Size: 0] [--> http://ignition.htb/]
+/checkout             (Status: 302) [Size: 0] [--> http://ignition.htb/checkout/cart/]
+/cms                  (Status: 200) [Size: 25817]
+/contact              (Status: 200) [Size: 28673]
+/enable-cookies       (Status: 200) [Size: 27176]
+/errors               (Status: 301) [Size: 185] [--> http://ignition.htb/errors/]
+/Home                 (Status: 301) [Size: 0] [--> http://ignition.htb/home]
+/home                 (Status: 200) [Size: 25802]
+/index.php            (Status: 200) [Size: 25815]
+/media                (Status: 301) [Size: 185] [--> http://ignition.htb/media/]
+/opt                  (Status: 301) [Size: 185] [--> http://ignition.htb/opt/]
+/robots               (Status: 200) [Size: 1]
+/robots.txt           (Status: 200) [Size: 1]
+/setup                (Status: 301) [Size: 185] [--> http://ignition.htb/setup/]
+/soap                 (Status: 200) [Size: 391]
+/static               (Status: 301) [Size: 185] [--> http://ignition.htb/static/]
+/wishlist             (Status: 302) [Size: 0] [--> http://ignition.htb/customer/account/login/referer/aHR0cDovL2lnbml0aW9uLmh0Yi93aXNobGlzdA%2C%2C/]
+
+
+2024-06-07 13:56:34 CDT -- 
+// vhost brute force
+gobuster vhost -u ignition.htb -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain
+//NOTHING
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+Congratulations, your flag is: 797d6c988d9dc5865e010b9410f247e0
+//797d6c988d9dc5865e010b9410f247e0
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2024-06-07 14:03:25 CDT -- COMPLETE
+
+
